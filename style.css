@@ -218,6 +218,9 @@ body {
     flex-direction: column;
     position: relative;
     flex-shrink: 0;
+    /* 모바일에서 동적 뷰포트 높이 사용 */
+    height: 100vh;
+    height: 100dvh;
 }
 
 .panel-header { padding: 35px 30px 25px; position: relative; }
@@ -232,9 +235,12 @@ body {
 }
 
 .tab-content {
-    display: none; padding: 0 30px 50px; overflow-y: auto; 
+    display: none; 
+    padding: 0 30px 50px; 
+    overflow-y: auto; 
     flex: 1;
-    
+    /* 모바일에서 안전한 스크롤 영역 확보 */
+    max-height: calc(100dvh - 120px); /* 헤더 공간 제외 */
 }
 .tab-content.active { display: block; }
 
@@ -1271,6 +1277,11 @@ details summary::marker {
     .tab-content {
         padding: 0 20px 80px; /* 기본 여백 */
         height: auto;
+        /* dvh 기반으로 최대 높이 설정하여 스크롤 영역 제한 */
+        max-height: calc(100dvh - 200px);
+        max-height: calc(-webkit-fill-available - 200px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     /* 크레딧 탭은 더 많은 여백 필요 */
@@ -1540,6 +1551,9 @@ details summary::marker {
 
     .tab-content {
         padding: 0 16px 25px;
+        /* 작은 화면에서도 dvh 적용 */
+        max-height: calc(100dvh - 180px);
+        max-height: calc(-webkit-fill-available - 180px);
     }
 
     .section-title h2 {
@@ -1569,7 +1583,8 @@ details summary::marker {
     .modal-content {
         width: 100%;
         margin: 10px;
-        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+        max-height: calc(-webkit-fill-available - 20px);
     }
 
     .color-grid {
@@ -1776,14 +1791,13 @@ details summary::marker {
     .modal {
         /* 실제 보이는 화면 영역만 사용 (브라우저 UI 제외) */
         height: 100dvh; /* dvh = dynamic viewport height */
-        height: 100vh;
         padding: 0; /* 패딩 제거 */
         align-items: stretch; /* 전체 높이 사용 */
         overflow-y: hidden; /* 모달 자체는 스크롤 안 함 */
     }
     
     .modal-content {
-        max-height: 100%; /* 전체 높이 활용 */
+        max-height: 100dvh; /* dvh로 전체 높이 활용 */
         max-width: 100%; /* 전체 너비 활용 */
         width: 100%;
         margin: 0; /* 마진 제거 */
@@ -1810,18 +1824,21 @@ details summary::marker {
         overflow-y: auto; /* 스크롤 활성화 */
         -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
         padding: 20px;
+        /* dvh 기반으로 최대 높이 계산 */
+        max-height: calc(100dvh - 140px); /* 헤더 + 푸터 공간 제외 */
     }
     
     /* 텍스트 영역 크기 조정 */
     .editor-textarea {
         min-height: 200px;
+        max-height: calc(100dvh - 400px); /* 모달 내 다른 요소들 고려 */
         font-size: 15px;
     }
     
     /* 모달 푸터 - 하단 고정 */
     .modal-footer {
         padding: 15px 20px;
-        padding-bottom: max(env(safe-area-inset-bottom, 0px), 30px); /* 안전 영역 확보 - 여백 증가 */
+        padding-bottom: max(env(safe-area-inset-bottom, 15px), 30px); /* 안전 영역 확보 - 여백 증가 */
         background: var(--modal-bg);
         flex-shrink: 0; /* 크기 고정 */
         border-top: 1px solid var(--modal-border);
@@ -1854,12 +1871,23 @@ details summary::marker {
 @supports (-webkit-touch-callout: none) {
     @media (max-width: 768px) {
         .modal {
+            height: 100dvh;
             height: -webkit-fill-available;
         }
         
         .modal-content {
-            max-height: calc(90vh - env(safe-area-inset-bottom, 0px) - 20px);
+            max-height: 100dvh;
+            max-height: -webkit-fill-available;
+        }
+        
+        .modal-body {
+            max-height: calc(100dvh - 140px);
+            max-height: calc(-webkit-fill-available - 140px);
+        }
+        
+        .editor-textarea {
+            max-height: calc(100dvh - 400px);
+            max-height: calc(-webkit-fill-available - 400px);
         }
     }
 }
-
