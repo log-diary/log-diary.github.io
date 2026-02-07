@@ -37,59 +37,6 @@ function normalizeImageUrl(url) {
     return url;
 }
 
-// ===== localStorage 안전 체크 함수 =====
-function isLocalStorageAvailable() {
-    try {
-        const test = '__localStorage_test__';
-        localStorage.setItem(test, test);
-        localStorage.removeItem(test);
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
-
-// 안전한 localStorage 래퍼 함수들
-const safeStorage = {
-    getItem: function(key) {
-        if (!isLocalStorageAvailable()) {
-            console.warn('localStorage is not available. Using default settings.');
-            return null;
-        }
-        try {
-            return localStorage.getItem(key);
-        } catch (e) {
-            console.error('Error reading from localStorage:', e);
-            return null;
-        }
-    },
-    setItem: function(key, value) {
-        if (!isLocalStorageAvailable()) {
-            console.warn('localStorage is not available. Settings will not be saved.');
-            return false;
-        }
-        try {
-            localStorage.setItem(key, value);
-            return true;
-        } catch (e) {
-            console.error('Error writing to localStorage:', e);
-            return false;
-        }
-    },
-    removeItem: function(key) {
-        if (!isLocalStorageAvailable()) {
-            return false;
-        }
-        try {
-            localStorage.removeItem(key);
-            return true;
-        } catch (e) {
-            console.error('Error removing from localStorage:', e);
-            return false;
-        }
-    }
-};
-
 // LocalStorage 키
 const STORAGE_KEY = 'rpLogEditorData';
 
@@ -251,15 +198,19 @@ const DEFAULT_TAGS = [
 ];
 
 // 페이지 로드 시 초기화
-window.addEventListener('load', function () {
+document.addEventListener('DOMContentLoaded', function () {
     initializeApp();
 });
 
 function initializeApp() {
-    loadFromStorage();
-    setupEventListeners();
-    setupTabs(); // 탭 설정 추가
-    updatePreview();
+    try {
+        loadFromStorage();
+        setupEventListeners();
+        setupTabs(); // 탭 설정 추가
+        updatePreview();
+    } catch (error) {
+        console.error('초기화 중 오류 발생:', error);
+    }
 }
 
 // 탭 네비게이션 설정 함수
@@ -308,41 +259,69 @@ function setupTabs() {
 // LocalStorage 로드
 function loadFromStorage() {
     try {
-        const saved = safeStorage.getItem(STORAGE_KEY);
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const data = JSON.parse(saved);
 
-            document.getElementById('useRoundedQuotes').checked = data.useRoundedQuotes || false;
-            document.getElementById('useTextIndent').checked = data.useTextIndent || false;
-            document.getElementById('enableTopSection').checked = data.enableTopSection || false;
+            // null 체크를 추가한 안전한 요소 설정
+            const useRoundedQuotes = document.getElementById('useRoundedQuotes');
+            const useTextIndent = document.getElementById('useTextIndent');
+            const enableTopSection = document.getElementById('enableTopSection');
+            const enableCover = document.getElementById('enableCover');
+            const coverImage = document.getElementById('coverImage');
+            const coverFocusX = document.getElementById('coverFocusX');
+            const coverFocusY = document.getElementById('coverFocusY');
+            const coverArchiveNo = document.getElementById('coverArchiveNo');
+            const coverTitle = document.getElementById('coverTitle');
+            const coverSubtitle = document.getElementById('coverSubtitle');
+            const coverContent = document.getElementById('coverContent');
+
+            if (useRoundedQuotes) useRoundedQuotes.checked = data.useRoundedQuotes || false;
+            if (useTextIndent) useTextIndent.checked = data.useTextIndent || false;
+            if (enableTopSection) enableTopSection.checked = data.enableTopSection || false;
 
             // 표지 관련 설정 로드
-            document.getElementById('enableCover').checked = data.enableCover || false;
-            document.getElementById('coverImage').value = data.coverImage || '';
-            document.getElementById('coverFocusX').value = data.coverFocusX || 50;
-            document.getElementById('coverFocusY').value = data.coverFocusY || 28;
-            document.getElementById('coverArchiveNo').value = data.coverArchiveNo || 'ARCHIVE NO.001';
-            document.getElementById('coverTitle').value = data.coverTitle || '';
-            document.getElementById('coverSubtitle').value = data.coverSubtitle || '';
-            document.getElementById('coverContent').style.display = data.enableCover ? 'block' : 'none';
+            if (enableCover) enableCover.checked = data.enableCover || false;
+            if (coverImage) coverImage.value = data.coverImage || '';
+            if (coverFocusX) coverFocusX.value = data.coverFocusX || 50;
+            if (coverFocusY) coverFocusY.value = data.coverFocusY || 28;
+            if (coverArchiveNo) coverArchiveNo.value = data.coverArchiveNo || 'ARCHIVE NO.001';
+            if (coverTitle) coverTitle.value = data.coverTitle || '';
+            if (coverSubtitle) coverSubtitle.value = data.coverSubtitle || '';
+            if (coverContent) coverContent.style.display = data.enableCover ? 'block' : 'none';
 
             // Focus 값 표시 업데이트
-            document.getElementById('coverFocusXValue').textContent = (data.coverFocusX || 50) + '%';
-            document.getElementById('coverFocusYValue').textContent = (data.coverFocusY || 28) + '%';
+            const coverFocusXValue = document.getElementById('coverFocusXValue');
+            const coverFocusYValue = document.getElementById('coverFocusYValue');
+            const topSectionContent = document.getElementById('topSectionContent');
+            const enableProfilesEl = document.getElementById('enableProfiles');
+            const introText = document.getElementById('introText');
+            const summaryText = document.getElementById('summaryText');
+            const soundtrackUrl = document.getElementById('soundtrackUrl');
+            const soundtrackTitle = document.getElementById('soundtrackTitle');
+            const soundtrackArtist = document.getElementById('soundtrackArtist');
+            const enableCommentEl = document.getElementById('enableComment');
+            const commentText = document.getElementById('commentText');
+            const commentNickname = document.getElementById('commentNickname');
+            const commentContent = document.getElementById('commentContent');
+            const enableTagsEl = document.getElementById('enableTags');
 
-            document.getElementById('topSectionContent').style.display = data.enableTopSection ? 'block' : 'none';
+            if (coverFocusXValue) coverFocusXValue.textContent = (data.coverFocusX || 50) + '%';
+            if (coverFocusYValue) coverFocusYValue.textContent = (data.coverFocusY || 28) + '%';
 
-            document.getElementById('enableProfiles').checked = data.enableProfiles || false;
-            document.getElementById('introText').value = data.introText || '';
-            document.getElementById('summaryText').value = data.summaryText || '';
-            document.getElementById('soundtrackUrl').value = data.soundtrackUrl || '';
-            document.getElementById('soundtrackTitle').value = data.soundtrackTitle || '';
-            document.getElementById('soundtrackArtist').value = data.soundtrackArtist || '';
-            document.getElementById('enableComment').checked = data.enableComment || false;
-            document.getElementById('commentText').value = data.commentText || '';
-            document.getElementById('commentNickname').value = data.commentNickname || '';
-            document.getElementById('commentContent').style.display = data.enableComment ? 'block' : 'none';
-            document.getElementById('enableTags').checked = data.enableTags !== undefined ? data.enableTags : true;
+            if (topSectionContent) topSectionContent.style.display = data.enableTopSection ? 'block' : 'none';
+
+            if (enableProfilesEl) enableProfilesEl.checked = data.enableProfiles || false;
+            if (introText) introText.value = data.introText || '';
+            if (summaryText) summaryText.value = data.summaryText || '';
+            if (soundtrackUrl) soundtrackUrl.value = data.soundtrackUrl || '';
+            if (soundtrackTitle) soundtrackTitle.value = data.soundtrackTitle || '';
+            if (soundtrackArtist) soundtrackArtist.value = data.soundtrackArtist || '';
+            if (enableCommentEl) enableCommentEl.checked = data.enableComment || false;
+            if (commentText) commentText.value = data.commentText || '';
+            if (commentNickname) commentNickname.value = data.commentNickname || '';
+            if (commentContent) commentContent.style.display = data.enableComment ? 'block' : 'none';
+            if (enableTagsEl) enableTagsEl.checked = data.enableTags !== undefined ? data.enableTags : true;
 
             if (data.customColors) {
                 setColorInputValue('customBg', data.customColors.bg);
@@ -433,19 +412,22 @@ function loadFromStorage() {
             // 폰트 설정 로드
             if (data.fontFamily) {
                 fontFamily = data.fontFamily;
-                document.getElementById('fontFamily').value = fontFamily;
+                const fontFamilyEl = document.getElementById('fontFamily');
+                if (fontFamilyEl) fontFamilyEl.value = fontFamily;
             }
 
             // 전역 테마 설정 로드
             if (data.globalTheme) {
                 globalTheme = data.globalTheme;
-                document.getElementById('globalTheme').value = globalTheme;
+                const globalThemeEl = document.getElementById('globalTheme');
+                if (globalThemeEl) globalThemeEl.value = globalTheme;
             }
 
             // 페이지 번호 숨김 설정 로드
             if (data.hidePageNumbers !== undefined) {
                 hidePageNumbers = data.hidePageNumbers;
-                document.getElementById('hidePageNumbers').checked = hidePageNumbers;
+                const hidePageNumbersEl = document.getElementById('hidePageNumbers');
+                if (hidePageNumbersEl) hidePageNumbersEl.checked = hidePageNumbers;
             }
 
             if (data.profiles && data.profiles.length > 0) {
@@ -475,14 +457,21 @@ function loadFromStorage() {
                 }
             }
 
-            if (profiles.length > 0 && !document.getElementById('enableProfiles').checked) {
-                document.getElementById('enableProfiles').checked = true;
+            const enableProfiles = document.getElementById('enableProfiles');
+            const profileInputs = document.getElementById('profileInputs');
+            const enableTags = document.getElementById('enableTags');
+            const tagsInputs = document.getElementById('tagsInputs');
+
+            if (profiles.length > 0 && enableProfiles && !enableProfiles.checked) {
+                enableProfiles.checked = true;
             }
 
-            document.getElementById('profileInputs').style.display =
-                document.getElementById('enableProfiles').checked ? 'block' : 'none';
-            document.getElementById('tagsInputs').style.display =
-                document.getElementById('enableTags').checked ? 'block' : 'none';
+            if (profileInputs && enableProfiles) {
+                profileInputs.style.display = enableProfiles.checked ? 'block' : 'none';
+            }
+            if (tagsInputs && enableTags) {
+                tagsInputs.style.display = enableTags.checked ? 'block' : 'none';
+            }
 
             updateTagsList();
             updateReplacementsList();
@@ -751,7 +740,7 @@ function saveToStorage() {
             hidePageNumbers: hidePageNumbers
         };
 
-        safeStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
         console.error('Failed to save to storage:', e);
     }
@@ -3236,7 +3225,7 @@ async function copyToClipboard() {
     }
 
     // 초기 로드
-    const saved = safeStorage.getItem(THEME_KEY);
+    const saved = localStorage.getItem(THEME_KEY);
     applyTheme(saved || 'light');
 
     // 클릭 토글
@@ -3244,7 +3233,7 @@ async function copyToClipboard() {
         const isLight = document.body.classList.contains('light-mode');
         const next = isLight ? 'dark' : 'light';
         applyTheme(next);
-        safeStorage.setItem(THEME_KEY, next);
+        localStorage.setItem(THEME_KEY, next);
     });
 })();
 function moveProfileUp(index) {
