@@ -37,6 +37,59 @@ function normalizeImageUrl(url) {
     return url;
 }
 
+// ===== localStorage 안전 체크 함수 =====
+function isLocalStorageAvailable() {
+    try {
+        const test = '__localStorage_test__';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// 안전한 localStorage 래퍼 함수들
+const safeStorage = {
+    getItem: function(key) {
+        if (!isLocalStorageAvailable()) {
+            console.warn('localStorage is not available. Using default settings.');
+            return null;
+        }
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.error('Error reading from localStorage:', e);
+            return null;
+        }
+    },
+    setItem: function(key, value) {
+        if (!isLocalStorageAvailable()) {
+            console.warn('localStorage is not available. Settings will not be saved.');
+            return false;
+        }
+        try {
+            localStorage.setItem(key, value);
+            return true;
+        } catch (e) {
+            console.error('Error writing to localStorage:', e);
+            return false;
+        }
+    },
+    removeItem: function(key) {
+        if (!isLocalStorageAvailable()) {
+            return false;
+        }
+        try {
+            localStorage.removeItem(key);
+            return true;
+        } catch (e) {
+            console.error('Error removing from localStorage:', e);
+            return false;
+        }
+    }
+};
+
 // LocalStorage 키
 const STORAGE_KEY = 'rpLogEditorData';
 
@@ -255,7 +308,7 @@ function setupTabs() {
 // LocalStorage 로드
 function loadFromStorage() {
     try {
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = safeStorage.getItem(STORAGE_KEY);
         if (saved) {
             const data = JSON.parse(saved);
 
@@ -698,7 +751,7 @@ function saveToStorage() {
             hidePageNumbers: hidePageNumbers
         };
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        safeStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
         console.error('Failed to save to storage:', e);
     }
@@ -3183,7 +3236,7 @@ async function copyToClipboard() {
     }
 
     // 초기 로드
-    const saved = localStorage.getItem(THEME_KEY);
+    const saved = safeStorage.getItem(THEME_KEY);
     applyTheme(saved || 'light');
 
     // 클릭 토글
@@ -3191,7 +3244,7 @@ async function copyToClipboard() {
         const isLight = document.body.classList.contains('light-mode');
         const next = isLight ? 'dark' : 'light';
         applyTheme(next);
-        localStorage.setItem(THEME_KEY, next);
+        safeStorage.setItem(THEME_KEY, next);
     });
 })();
 function moveProfileUp(index) {
