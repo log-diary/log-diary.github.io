@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Diary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- 네비게이션 레일 -->
+        <nav class="nav-rail">
+            <div class="nav-brand">OWB</div>
+            <div class="nav-items">
+                <button class="nav-item active" data-tab="tab-format" title="서식">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 7V4h16v3M9 20h6M12 4v16" />
+                    </svg>
+                    <span>Format</span>
+                </button>
+                <button class="nav-item" data-tab="tab-intro" title="인트로">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <path d="M9 21V9" />
+                    </svg>
+                    <span>Intro</span>
+                </button>
+                <button class="nav-item" data-tab="tab-pages" title="페이지">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <span>Pages</span>
+                </button>
+                <button class="nav-item" data-tab="tab-comment" title="코멘트">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span>Comment</span>
+                </button>
+                <button class="nav-item" data-tab="tab-theme" title="테마">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="14.31" y1="8" x2="20.05" y2="17.94" />
+                        <line x1="9.69" y1="8" x2="21.17" y2="8" />
+                        <line x1="7.38" y1="12" x2="13.12" y2="2.06" />
+                        <line x1="9.69" y1="16" x2="3.95" y2="6.06" />
+                        <line x1="14.31" y1="16" x2="2.83" y2="16" />
+                        <line x1="16.62" y1="12" x2="10.88" y2="21.94" />
+                    </svg>
+                    <span>Theme</span>
+                </button>
+                <button class="nav-item" data-tab="tab-credit" title="크레딧">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    <span>Credit</span>
+                </button>
+
+            </div>
+            <div class="nav-footer">
+                <button id="copyToClipboard" class="btn-icon-only" title="HTML 복사">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 에디터 패널 (탭 컨텐츠) -->
+        <div class="editor-panel">
+            <header class="panel-header">
+                <h1>Log Diary</h1>
+                <h3 style="color: #2d5af0; font-size: 14px;">Old World Blues</h3>
+                <button id="themeToggle" class="btn-theme-toggle" title="라이트/다크 모드 전환">
+                    <!-- 다크 모드일 때 (밝은 아이콘 표시 → 라이트로 전환) -->
+                    <svg id="icon-theme-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        style="display: none;">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <!-- 라이트 모드일 때 (달 아이콘 표시 → 다크로 전환) -->
+                    <svg id="icon-theme-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        style="display: block;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+                <button id="soundToggle" class="btn-sound-toggle" title="빗소리 켜기/끄기">
+                    <!-- 기본값: 소리 꺼짐 아이콘 -->
+                    <svg id="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        style="display: block;">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                        <line x1="23" y1="9" x2="17" y2="15" />
+                        <line x1="17" y1="9" x2="23" y2="15" />
+                    </svg>
+                    <!-- 소리 켜짐 아이콘 -->
+                    <svg id="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        style="display: none;">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    </svg>
+                </button>
+                <div class="header-decoration"></div>
+            </header>
+
+            <!-- 1. 텍스트 서식 탭 -->
+            <div id="tab-format" class="tab-content active">
+                <div class="section-title">
+                    <h2>Text Formatting</h2>
+                    <span class="deco-line"></span>
+                </div>
+                <div class="control-grid">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="useRoundedQuotes">
+                        <label for="useRoundedQuotes">둥근 따옴표 (" " → “ ”)</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="useTextIndent">
+                        <label for="useTextIndent">문단 첫 줄 들여쓰기</label>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>FONT FAMILY</h3>
+                    <div class="control-grid">
+                        <div class="input-group">
+                            <label>본문 폰트</label>
+                            <div class="select-wrapper">
+                                <select id="fontFamily">
+                                    <option value="Noto Serif KR">Noto Serif KR</option>
+                                    <option value="Pretendard">Pretendard</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-section">
+                    <h3>WORD REPLACEMENT</h3>
+                    <div id="replacementsList" class="styled-list"></div>
+                    <button id="addReplacement" class="btn-ghost full-width">+ 치환 규칙 추가</button>
+                </div>
+
+            </div>
+
+            <!-- 2. 인트로 탭 -->
+            <div id="tab-intro" class="tab-content">
+                <div class="section-title">
+                    <h2>Introduction</h2>
+                    <span class="deco-line"></span>
+                </div>
+                <div class="control-row">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="enableTopSection">
+                        <label for="enableTopSection">인트로 활성화</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>테마 선택</label>
+                    <div class="select-wrapper">
+                        <select id="topTheme">
+                            <option value="basic"> 베이직</option>
+                            <option value="user">그레이</option>
+                            <option value="char">다크</option>
+                            <option value="custom">커스텀</option>
+                            <option value="oldMoneyLight">올드머니 라이트</option>
+                            <option value="oldMoneyDark">올드머니 다크</option>
+                            <option value="rose">로즈</option>
+                            <option value="ocean">오션</option>
+                            <option value="forest">포레스트</option>
+                            <option value="lavender">라벤더</option>
+                            <option value="warm">따뜻한 톤</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="topSectionContent" style="display: none;">
+                    <!-- 표지 섹션 -->
+                    <div class="sub-section">
+                        <h3>COVER</h3>
+                        <div class="control-row">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="enableCover">
+                                <label for="enableCover">표지 사용</label>
+                            </div>
+                        </div>
+
+                        <div id="coverContent" style="display: none; margin-top: 15px;">
+                            <div class="input-group">
+                                <label>배경 이미지 URL
+                                    <span class="image-url-tooltip">
+                                        <span class="tooltip-icon">?</span>
+                                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
+                                    </span>
+                                </label>
+                                <input type="text" id="coverImage" placeholder=" ">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Focus X (좌우) <span id="coverFocusXValue"
+                                        style="color:var(--accent-blue);">50%</span></label>
+                                <input type="range" id="coverFocusX" class="spacing-slider" min="0" max="100" value="50"
+                                    style="width: 100%;">
+                            </div>
+                            <div class="input-group">
+                                <label>Focus Y (상하) <span id="coverFocusYValue"
+                                        style="color:var(--accent-blue);">28%</span></label>
+                                <input type="range" id="coverFocusY" class="spacing-slider" min="0" max="100" value="28"
+                                    style="width: 100%;">
+                            </div>
+
+                            <div class="input-group">
+                                <label>아카이브 번호</label>
+                                <input type="text" id="coverArchiveNo" placeholder=" " value="ARCHIVE NO.001">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="input-group">
+                                <label>표지 제목</label>
+                                <input type="text" id="coverTitle" placeholder=" ">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="input-group">
+                                <label>표지 부제</label>
+                                <input type="text" id="coverSubtitle" placeholder=" ">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <!-- 태그를 표지 안에 표시 -->
+                            <div class="control-row" style="margin-top: 15px;">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" id="enableTags" checked>
+                                    <label for="enableTags">태그 표시</label>
+                                </div>
+                            </div>
+                            <div id="tagsInputs" style="margin-top: 10px;">
+                                <div id="tagsList" class="styled-list"></div>
+                                <button id="addTag" class="btn-ghost full-width">+ 태그 추가</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-section">
+                        <h3>PROFILES</h3>
+                        <div class="control-grid">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="enableProfiles">
+                                <label for="enableProfiles">프로필 표시</label>
+                            </div>
+                        </div>
+
+                        <div id="profileInputs" style="display: none; margin-top: 10px;">
+                            <div id="profilesList" class="styled-list"></div>
+                            <button id="addProfile" class="btn-ghost full-width">+ 프로필 추가 (Max 6)</button>
+                        </div>
+                    </div>
+
+                    <div class="sub-section">
+                        <div class="input-group area-group">
+                            <label>부가 소개글 (Additional Description)</label>
+                            <textarea id="introText" rows="4" placeholder="소개 내용을 입력하세요..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="sub-section">
+                        <h3>STORY SO FAR</h3>
+                        <div class="input-group area-group">
+                            <textarea id="summaryText" rows="8" placeholder="지금까지의 이야기를 정리하세요..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="sub-section">
+                        <h3>SOUNDTRACK</h3>
+                        <div class="input-group">
+                            <label>YouTube URL
+                                <span class="image-url-tooltip">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">유튜브 영상 URL을 입력하세요. 다양한 형식의 링크를 자동으로 변환합니다. (예: https://www.youtube.com/watch?v=... 또는 https://youtu.be/...)</span>
+                                </span>
+                            </label>
+                            <input type="text" id="soundtrackUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            <span class="focus-border"></span>
+                        </div>
+                        <div class="input-group">
+                            <label>노래 제목</label>
+                            <input type="text" id="soundtrackTitle" placeholder="Song Title">
+                            <span class="focus-border"></span>
+                        </div>
+                        <div class="input-group">
+                            <label>아티스트</label>
+                            <input type="text" id="soundtrackArtist" placeholder="Artist Name">
+                            <span class="focus-border"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 페이지 탭 -->
+            <div id="tab-pages" class="tab-content">
+                <div class="section-title">
+                    <h2>Dialogue Pages</h2>
+                    <span class="deco-line"></span>
+                </div>
+                <div class="control-grid" style="margin-bottom: 15px;">
+                    <button id="addSection" class="btn-ghost">
+                        <span>+ NEW SECTION</span>
+                    </button>
+                    <button id="addPage" class="btn-accent">
+                        <span>+ NEW PAGE</span>
+                    </button>
+                </div>
+                <div id="pagesList" class="cards-list"></div>
+            </div>
+
+            <!-- 4. 코멘트 탭 -->
+            <div id="tab-comment" class="tab-content">
+                <div class="section-title">
+                    <h2>Comment Section</h2>
+                    <span class="deco-line"></span>
+                </div>
+                
+                <div class="control-row">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="enableComment">
+                        <label for="enableComment">코멘트 섹션 활성화</label>
+                    </div>
+                </div>
+
+                <div id="commentContent" style="display: none; margin-top: 20px;">
+                    <div class="input-group">
+                        <label>테마 선택</label>
+                        <div class="select-wrapper">
+                            <select id="commentTheme">
+                                <option value="basic">베이직</option>
+                                <option value="user">그레이</option>
+                                <option value="char">다크</option>
+                                <option value="custom">커스텀</option>
+                                <option value="oldMoneyLight">올드머니 라이트</option>
+                                <option value="oldMoneyDark">올드머니 다크</option>
+                                <option value="rose">로즈</option>
+                                <option value="ocean">오션</option>
+                                <option value="forest">포레스트</option>
+                                <option value="lavender">라벤더</option>
+                                <option value="warm">따뜻한 톤</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>작성자 닉네임 (BY)</label>
+                        <input type="text" id="commentNickname" placeholder="닉네임을 입력하세요...">
+                        <span class="focus-border"></span>
+                    </div>
+
+                    <div class="input-group area-group">
+                        <label>코멘트 내용</label>
+                        <textarea id="commentText" rows="10" placeholder="코멘트를 입력하세요..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 테마 탭 -->
+            <div id="tab-theme" class="tab-content">
+                <div class="section-title">
+                    <h2>Custom Theme</h2>
+                    <span class="deco-line"></span>
+                </div>
+
+                <div id="customThemeInputs" class="theme-color-grid">
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">배경색</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customBg" value="#ececed">
+                            <input type="text" id="customBgText" class="theme-hex-input" value="#ececed"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">기본 텍스트</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customText" value="#555555">
+                            <input type="text" id="customTextText" class="theme-hex-input" value="#555555"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">이탤릭</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customEm" value="#666666">
+                            <input type="text" id="customEmText" class="theme-hex-input" value="#666666"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">헤더 (제목/라인)</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customHeader" value="#333333">
+                            <input type="text" id="customHeaderText" class="theme-hex-input" value="#333333"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">생각 배경</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customQuote1Bg" value="#e0e0e0">
+                            <input type="text" id="customQuote1BgText" class="theme-hex-input" value="#e0e0e0"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">생각 텍스트</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customQuote1Text" value="#444444">
+                            <input type="text" id="customQuote1TextText" class="theme-hex-input" value="#444444"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">대사 배경</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customQuote2Bg" value="#dcdcdc">
+                            <input type="text" id="customQuote2BgText" class="theme-hex-input" value="#dcdcdc"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">대사 텍스트</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customQuote2Text" value="#222222">
+                            <input type="text" id="customQuote2TextText" class="theme-hex-input" value="#222222"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">부제목/인물 태그</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customTagText" value="#6c8da8">
+                            <input type="text" id="customTagTextText" class="theme-hex-input" value="#6c8da8"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                    <div class="theme-color-item">
+                        <label class="theme-color-label">구분선</label>
+                        <div class="theme-color-input-wrapper">
+                            <input type="color" id="customDivider" value="#c8d6e0">
+                            <input type="text" id="customDividerText" class="theme-hex-input" value="#c8d6e0"
+                                placeholder="#000000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>SAVED THEMES</h3>
+                    <div id="customThemesList" class="styled-list"></div>
+                    <button id="addCustomTheme" class="btn-ghost full-width" style="margin-top: 15px;">+ 현재 테마
+                        저장</button>
+                </div>
+            </div>
+            <!-- 6. 크레딧 탭 -->
+            <div id="tab-credit" class="tab-content">
+                <div class="section-title">
+                    <h2>Credits & Reference</h2>
+                    <span class="deco-line"></span>
+                </div>
+
+                <div class="credit-list">
+                    <div class="credit-item">
+                        <span class="credit-role">INSPIRED BY</span>
+                        <a href="https://arca.live/b/characterai/143509698" target="_blank" class="credit-link">Viewer
+                            Extension</a>
+                        <a href="https://arca.live/b/characterai/151793818" target="_blank" class="credit-link">LOG
+                            ATELIER WEB</a>
+                        <a href="https://arca.live/b/characterai/120217477" target="_blank" class="credit-link">Log
+                            Generator Pro 1.1</a>
+                        <a href="https://arca.live/b/characterai/157048976" target="_blank" class="credit-link">Log
+                            Studio</a>
+                         <a href="https://arca.live/b/characterai/159949150" target="_blank" class="credit-link">Logs of Glenna</a>   
+                        <p class="credit-desc">디자인 및 레이아웃, 주요 기능 긴빠이</p>
+                    </div>
+
+                    <div class="credit-item">
+                        <span class="credit-role">ASSETS</span>
+                        <a href="https://fonts.google.com/" target="_blank" class="credit-link">Google Fonts</a>
+                        <a href="https://pixabay.com/ko/sound-effects/%ec%9e%90%ec%97%b0-rain-sound-and-forest-and-nature-sounds-18259/"
+                            target="_blank" class="credit-link">Pixabay</a>
+                        <a href="https://arca.live/b/characterai/154605913" target="_blank" class="credit-link">Default
+                            Images - NovelAI Tags</a>
+                        <p class="credit-desc">Noto Serif KR, Cinzel<br>Rain Sound and Forest and Nature Sounds<br>4.5F) 얼헌 애니 스샷 그림체 공유</p>
+                    </div>
+
+                    <div class="credit-item">
+                        <span class="credit-role">SPECIAL THANKS</span>
+                        <span class="credit-text">아카라이브 AI 채팅 채널</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 미리보기 패널 -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h2>PREVIEW</h2>
+                <div class="preview-deco"></div>
+            </div>
+            <div id="preview" class="preview-content"></div>
+        </div>
+
+        <!-- 모바일용 프리뷰 토글 버튼 -->
+        <button id="togglePreview" class="btn-toggle-preview" title="미리보기 보기">
+            <!-- 눈 아이콘 (미리보기 열기) -->
+            <svg id="icon-preview-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="display: block;">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+            <!-- 연필 아이콘 (편집으로 돌아가기) -->
+            <svg id="icon-preview-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="display: none;">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- 페이지 편집 모달 -->
+    <div id="pageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>EDIT PAGE</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- index.html의 해당 부분 교체 -->
+                <div class="control-grid">
+                    <div class="input-group">
+                        <label>페이지 제목</label>
+                        <input type="text" id="pageTitle" placeholder=" ">
+                    </div>
+                    <div class="input-group">
+                        <label>페이지 부제목</label>
+                        <input type="text" id="pageSubtitle" placeholder=" ">
+                    </div>
+                </div>
+                <div class="control-grid">
+                    <div class="input-group">
+                        <label>테마</label>
+                        <div class="select-wrapper">
+                            <select id="pageType">
+                                <option value="basic"> 베이직</option>
+                                <option value="user">그레이</option>
+                                <option value="char">다크</option>
+                                <option value="custom">커스텀</option>
+                                <option value="oldMoneyLight">올드머니 라이트</option>
+                                <option value="oldMoneyDark">올드머니 다크</option>
+                                <option value="rose">로즈</option>
+                                <option value="ocean">오션</option>
+                                <option value="forest">포레스트</option>
+                                <option value="lavender">라벤더</option>
+                                <option value="warm">따뜻한 톤</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button id="insertDivider" class="btn-tool">구분선 (HR)</button>
+                    <button id="insertFootnote" class="btn-tool">주석 (FN)</button>
+                    <button id="insertImage" class="btn-tool">이미지 (IMG)</button>
+                    <span class="image-url-tooltip" style="margin-left: 5px;">
+                        <span class="tooltip-icon">?</span>
+                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
+                    </span>
+                </div>
+
+                <textarea id="pageContent" class="editor-textarea" placeholder="내용을 입력하세요..." rows="12"></textarea>
+
+                <div class="modal-footer">
+                    <button id="deletePage" class="btn-danger">DELETE</button>
+                    <button id="savePage" class="btn-accent">SAVE CHANGE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 섹션 편집 모달 -->
+    <div id="sectionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>EDIT SECTION</h2>
+                <span class="close-section">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="control-grid">
+                    <div class="input-group">
+                        <label>섹션 제목</label>
+                        <input type="text" id="sectionTitle" placeholder=" ">
+                    </div>
+                    <div class="input-group">
+                        <label>섹션 부제목</label>
+                        <input type="text" id="sectionSubtitle" placeholder=" ">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>이미지 URL
+                        <span class="image-url-tooltip">
+                            <span class="tooltip-icon">?</span>
+                            <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
+                        </span>
+                    </label>
+                    <input type="text" id="sectionImage" placeholder=" ">
+                </div>
+
+                <div class="input-group">
+                    <label>Focus X (좌우) <span id="sectionFocusXValue"
+                            style="color:var(--accent-blue);">50%</span></label>
+                    <input type="range" id="sectionFocusX" class="spacing-slider" min="0" max="100" value="50"
+                        style="width: 100%;">
+                </div>
+                <div class="input-group">
+                    <label>Focus Y (상하) <span id="sectionFocusYValue"
+                            style="color:var(--accent-blue);">50%</span></label>
+                    <input type="range" id="sectionFocusY" class="spacing-slider" min="0" max="100" value="50"
+                        style="width: 100%;">
+                </div>
+
+                <div class="modal-footer">
+                    <button id="deleteSection" class="btn-danger">DELETE</button>
+                    <button id="saveSection" class="btn-accent">SAVE CHANGE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    <script src="script.js"></script>
+    <!-- 빗소리 오디오 (Loop 설정) -->
+    <!-- 로컬 파일 사용으로 변경 -->
+    <audio id="rainAudio" loop>
+        <source src="rain-sound-and-forest-and-nature-sounds-18259.mp3" type="audio/mpeg">
+    </audio>
+</body>
+
+</html>
