@@ -161,6 +161,20 @@
                     <button id="addReplacement" class="btn-ghost full-width">+ 치환 규칙 추가</button>
                 </div>
 
+                <div class="sub-section">
+                    <h3>DATA MANAGEMENT</h3>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">현재 작업 중인 데이터를 JSON 파일로 저장하거나 불러올 수 있습니다.</p>
+                    <div class="control-grid" style="gap: 10px;">
+                        <button id="exportData" class="btn-ghost full-width">
+                            <span>📥 데이터 내보내기</span>
+                        </button>
+                        <button id="importData" class="btn-ghost full-width">
+                            <span>📤 데이터 불러오기</span>
+                        </button>
+                    </div>
+                    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                </div>
+
             </div>
 
             <!-- 2. 인트로 탭 -->
@@ -173,25 +187,6 @@
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="enableTopSection">
                         <label for="enableTopSection">인트로 활성화</label>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>테마 선택</label>
-                    <div class="select-wrapper">
-                        <select id="topTheme">
-                            <option value="basic"> 베이직</option>
-                            <option value="user">그레이</option>
-                            <option value="char">다크</option>
-                            <option value="custom">커스텀</option>
-                            <option value="oldMoneyLight">올드머니 라이트</option>
-                            <option value="oldMoneyDark">올드머니 다크</option>
-                            <option value="rose">로즈</option>
-                            <option value="ocean">오션</option>
-                            <option value="forest">포레스트</option>
-                            <option value="lavender">라벤더</option>
-                            <option value="warm">따뜻한 톤</option>
-                        </select>
                     </div>
                 </div>
 
@@ -333,6 +328,13 @@
                     </button>
                 </div>
                 <div id="pagesList" class="cards-list"></div>
+                
+                <div class="control-grid" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="hidePageNumbers">
+                        <label for="hidePageNumbers">페이지 헤더 번호 지우기</label>
+                    </div>
+                </div>
             </div>
 
             <!-- 4. 코멘트 탭 -->
@@ -351,25 +353,6 @@
 
                 <div id="commentContent" style="display: none; margin-top: 20px;">
                     <div class="input-group">
-                        <label>테마 선택</label>
-                        <div class="select-wrapper">
-                            <select id="commentTheme">
-                                <option value="basic">베이직</option>
-                                <option value="user">그레이</option>
-                                <option value="char">다크</option>
-                                <option value="custom">커스텀</option>
-                                <option value="oldMoneyLight">올드머니 라이트</option>
-                                <option value="oldMoneyDark">올드머니 다크</option>
-                                <option value="rose">로즈</option>
-                                <option value="ocean">오션</option>
-                                <option value="forest">포레스트</option>
-                                <option value="lavender">라벤더</option>
-                                <option value="warm">따뜻한 톤</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
                         <label>작성자 닉네임 (BY)</label>
                         <input type="text" id="commentNickname" placeholder="닉네임을 입력하세요...">
                         <span class="focus-border"></span>
@@ -385,8 +368,35 @@
             <!-- 5. 테마 탭 -->
             <div id="tab-theme" class="tab-content">
                 <div class="section-title">
-                    <h2>Custom Theme</h2>
+                    <h2>Theme Settings</h2>
                     <span class="deco-line"></span>
+                </div>
+
+                <div class="sub-section">
+                    <h3>GLOBAL THEME</h3>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">모든 컨테이너(인트로/페이지/코멘트)에 적용될 테마를 선택하세요.</p>
+                    <div class="input-group">
+                        <label>전역 테마</label>
+                        <div class="select-wrapper">
+                            <select id="globalTheme">
+                                <option value="basic">베이직</option>
+                                <option value="user">그레이</option>
+                                <option value="char">다크</option>
+                                <option value="custom">커스텀</option>
+                                <option value="oldMoneyLight">올드머니 라이트</option>
+                                <option value="oldMoneyDark">올드머니 다크</option>
+                                <option value="rose">로즈</option>
+                                <option value="ocean">오션</option>
+                                <option value="forest">포레스트</option>
+                                <option value="lavender">라벤더</option>
+                                <option value="warm">따뜻한 톤</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>CUSTOM THEME EDITOR</h3>
                 </div>
 
                 <div id="customThemeInputs" class="theme-color-grid">
@@ -562,26 +572,6 @@
                     <div class="input-group">
                         <label>페이지 부제목</label>
                         <input type="text" id="pageSubtitle" placeholder=" ">
-                    </div>
-                </div>
-                <div class="control-grid">
-                    <div class="input-group">
-                        <label>테마</label>
-                        <div class="select-wrapper">
-                            <select id="pageType">
-                                <option value="basic"> 베이직</option>
-                                <option value="user">그레이</option>
-                                <option value="char">다크</option>
-                                <option value="custom">커스텀</option>
-                                <option value="oldMoneyLight">올드머니 라이트</option>
-                                <option value="oldMoneyDark">올드머니 다크</option>
-                                <option value="rose">로즈</option>
-                                <option value="ocean">오션</option>
-                                <option value="forest">포레스트</option>
-                                <option value="lavender">라벤더</option>
-                                <option value="warm">따뜻한 톤</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
 

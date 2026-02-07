@@ -6,6 +6,8 @@ let customThemes = [];
 let profiles = []; // 프로필 목록 (최대 6개)
 let currentEditingIndex = null;
 let tempPageTags = [];
+let globalTheme = 'basic'; // 전역 테마 설정
+let hidePageNumbers = false; // 페이지 헤더 번호 숨김 여부
 
 // 텍스트 간격 설정
 let textSpacing = {
@@ -286,11 +288,8 @@ function loadFromStorage() {
             document.getElementById('enableComment').checked = data.enableComment || false;
             document.getElementById('commentText').value = data.commentText || '';
             document.getElementById('commentNickname').value = data.commentNickname || '';
-            document.getElementById('commentTheme').value = data.commentTheme || 'basic';
             document.getElementById('commentContent').style.display = data.enableComment ? 'block' : 'none';
             document.getElementById('enableTags').checked = data.enableTags !== undefined ? data.enableTags : true;
-
-            document.getElementById('topTheme').value = data.topTheme || 'user';
 
             if (data.customColors) {
                 setColorInputValue('customBg', data.customColors.bg);
@@ -384,6 +383,18 @@ function loadFromStorage() {
                 document.getElementById('fontFamily').value = fontFamily;
             }
 
+            // 전역 테마 설정 로드
+            if (data.globalTheme) {
+                globalTheme = data.globalTheme;
+                document.getElementById('globalTheme').value = globalTheme;
+            }
+
+            // 페이지 번호 숨김 설정 로드
+            if (data.hidePageNumbers !== undefined) {
+                hidePageNumbers = data.hidePageNumbers;
+                document.getElementById('hidePageNumbers').checked = hidePageNumbers;
+            }
+
             if (data.profiles && data.profiles.length > 0) {
                 profiles = JSON.parse(JSON.stringify(data.profiles));
             } else {
@@ -440,28 +451,45 @@ function loadDefaultSettings() {
     // ===== 사용자 커스텀 초기값 =====
 
     // 기본 서식 설정
-    document.getElementById('useRoundedQuotes').checked = true;
-    document.getElementById('useTextIndent').checked = false;
+    const useRoundedQuotes = document.getElementById('useRoundedQuotes');
+    const useTextIndent = document.getElementById('useTextIndent');
+    if (useRoundedQuotes) useRoundedQuotes.checked = true;
+    if (useTextIndent) useTextIndent.checked = false;
 
     // 인트로 섹션 활성화
-    document.getElementById('enableTopSection').checked = true;
-    document.getElementById('topSectionContent').style.display = 'block';
+    const enableTopSection = document.getElementById('enableTopSection');
+    const topSectionContent = document.getElementById('topSectionContent');
+    if (enableTopSection) enableTopSection.checked = true;
+    if (topSectionContent) topSectionContent.style.display = 'block';
 
     // 표지 설정
-    document.getElementById('enableCover').checked = true;
-    document.getElementById('coverImage').value = 'DefaultCover.png';
-    document.getElementById('coverFocusX').value = 50;
-    document.getElementById('coverFocusY').value = 30;
-    document.getElementById('coverArchiveNo').value = 'ARCHIVE NO.001';
-    document.getElementById('coverTitle').value = 'Yuzu';
-    document.getElementById('coverSubtitle').value = '귀여운 고양이 메이드';
-    document.getElementById('coverContent').style.display = 'block';
-    document.getElementById('coverFocusXValue').textContent = '50%';
-    document.getElementById('coverFocusYValue').textContent = '30%';
+    const enableCover = document.getElementById('enableCover');
+    const coverImage = document.getElementById('coverImage');
+    const coverFocusX = document.getElementById('coverFocusX');
+    const coverFocusY = document.getElementById('coverFocusY');
+    const coverArchiveNo = document.getElementById('coverArchiveNo');
+    const coverTitle = document.getElementById('coverTitle');
+    const coverSubtitle = document.getElementById('coverSubtitle');
+    const coverContent = document.getElementById('coverContent');
+    const coverFocusXValue = document.getElementById('coverFocusXValue');
+    const coverFocusYValue = document.getElementById('coverFocusYValue');
+    
+    if (enableCover) enableCover.checked = true;
+    if (coverImage) coverImage.value = 'DefaultCover.png';
+    if (coverFocusX) coverFocusX.value = 50;
+    if (coverFocusY) coverFocusY.value = 30;
+    if (coverArchiveNo) coverArchiveNo.value = 'ARCHIVE NO.001';
+    if (coverTitle) coverTitle.value = 'Yuzu';
+    if (coverSubtitle) coverSubtitle.value = '귀여운 고양이 메이드';
+    if (coverContent) coverContent.style.display = 'block';
+    if (coverFocusXValue) coverFocusXValue.textContent = '50%';
+    if (coverFocusYValue) coverFocusYValue.textContent = '30%';
 
     // 프로필 활성화
-    document.getElementById('enableProfiles').checked = true;
-    document.getElementById('profileInputs').style.display = 'block';
+    const enableProfiles = document.getElementById('enableProfiles');
+    const profileInputs = document.getElementById('profileInputs');
+    if (enableProfiles) enableProfiles.checked = true;
+    if (profileInputs) profileInputs.style.display = 'block';
 
     // 프로필 데이터
     profiles = [
@@ -484,12 +512,16 @@ function loadDefaultSettings() {
     ];
 
     // 인트로/요약 텍스트
-    document.getElementById('introText').value = '';
-    document.getElementById('summaryText').value = '';
+    const introText = document.getElementById('introText');
+    const summaryText = document.getElementById('summaryText');
+    if (introText) introText.value = '';
+    if (summaryText) summaryText.value = '';
 
     // 태그 활성화
-    document.getElementById('enableTags').checked = true;
-    document.getElementById('tagsInputs').style.display = 'block';
+    const enableTags = document.getElementById('enableTags');
+    const tagsInputs = document.getElementById('tagsInputs');
+    if (enableTags) enableTags.checked = true;
+    if (tagsInputs) tagsInputs.style.display = 'block';
     tags = [
         { name: 'Bot', value: 'Bot', link: '' },
         { name: 'Model', value: 'Model', link: '' },
@@ -498,7 +530,8 @@ function loadDefaultSettings() {
     ];
 
     // 테마 설정
-    document.getElementById('topTheme').value = 'basic';
+    const topTheme = document.getElementById('topTheme');
+    if (topTheme) topTheme.value = 'basic';
 
     // 커스텀 컬러 (basic 테마)
     setColorInputValue('customBg', '#ffffff');
@@ -578,7 +611,8 @@ function loadDefaultSettings() {
 
     // 폰트 설정
     fontFamily = 'Noto Serif KR';
-    document.getElementById('fontFamily').value = fontFamily;
+    const fontFamilySelect = document.getElementById('fontFamily');
+    if (fontFamilySelect) fontFamilySelect.value = fontFamily;
 
     // UI 업데이트
     updateTagsList();
@@ -605,29 +639,42 @@ function getColorValue(baseId) {
 
 function saveToStorage() {
     try {
+        const getChecked = (id) => {
+            const el = document.getElementById(id);
+            return el ? el.checked : false;
+        };
+        
+        const getValue = (id, defaultValue = '') => {
+            const el = document.getElementById(id);
+            return el ? el.value : defaultValue;
+        };
+        
+        const getIntValue = (id, defaultValue = 0) => {
+            const el = document.getElementById(id);
+            return el ? parseInt(el.value) : defaultValue;
+        };
+        
         const data = {
-            useRoundedQuotes: document.getElementById('useRoundedQuotes').checked,
-            useTextIndent: document.getElementById('useTextIndent').checked,
-            enableTopSection: document.getElementById('enableTopSection').checked,
-            enableCover: document.getElementById('enableCover').checked,
-            coverImage: document.getElementById('coverImage').value,
-            coverFocusX: parseInt(document.getElementById('coverFocusX').value),
-            coverFocusY: parseInt(document.getElementById('coverFocusY').value),
-            coverArchiveNo: document.getElementById('coverArchiveNo').value,
-            coverTitle: document.getElementById('coverTitle').value,
-            coverSubtitle: document.getElementById('coverSubtitle').value,
-            enableProfiles: document.getElementById('enableProfiles').checked,
-            introText: document.getElementById('introText').value,
-            summaryText: document.getElementById('summaryText').value,
-            soundtrackUrl: document.getElementById('soundtrackUrl').value,
-            soundtrackTitle: document.getElementById('soundtrackTitle').value,
-            soundtrackArtist: document.getElementById('soundtrackArtist').value,
-            enableComment: document.getElementById('enableComment').checked,
-            commentText: document.getElementById('commentText').value,
-            commentNickname: document.getElementById('commentNickname').value,
-            commentTheme: document.getElementById('commentTheme').value,
-            enableTags: document.getElementById('enableTags').checked,
-            topTheme: document.getElementById('topTheme').value,
+            useRoundedQuotes: getChecked('useRoundedQuotes'),
+            useTextIndent: getChecked('useTextIndent'),
+            enableTopSection: getChecked('enableTopSection'),
+            enableCover: getChecked('enableCover'),
+            coverImage: getValue('coverImage'),
+            coverFocusX: getIntValue('coverFocusX', 50),
+            coverFocusY: getIntValue('coverFocusY', 30),
+            coverArchiveNo: getValue('coverArchiveNo'),
+            coverTitle: getValue('coverTitle'),
+            coverSubtitle: getValue('coverSubtitle'),
+            enableProfiles: getChecked('enableProfiles'),
+            introText: getValue('introText'),
+            summaryText: getValue('summaryText'),
+            soundtrackUrl: getValue('soundtrackUrl'),
+            soundtrackTitle: getValue('soundtrackTitle'),
+            soundtrackArtist: getValue('soundtrackArtist'),
+            enableComment: getChecked('enableComment'),
+            commentText: getValue('commentText'),
+            commentNickname: getValue('commentNickname'),
+            enableTags: getChecked('enableTags'),
             customColors: {
                 bg: getColorValue('customBg'),
                 text: getColorValue('customText'),
@@ -646,7 +693,9 @@ function saveToStorage() {
             customThemes: customThemes,
             profiles: profiles,
             textSpacing: textSpacing,
-            fontFamily: fontFamily
+            fontFamily: fontFamily,
+            globalTheme: globalTheme,
+            hidePageNumbers: hidePageNumbers
         };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -673,7 +722,8 @@ function setupEventListeners() {
 
     if (coverFocusX) {
         coverFocusX.addEventListener('input', function () {
-            document.getElementById('coverFocusXValue').textContent = this.value + '%';
+            const coverFocusXValue = document.getElementById('coverFocusXValue');
+            if (coverFocusXValue) coverFocusXValue.textContent = this.value + '%';
             updatePreview();
             saveToStorage();
         });
@@ -681,7 +731,8 @@ function setupEventListeners() {
 
     if (coverFocusY) {
         coverFocusY.addEventListener('input', function () {
-            document.getElementById('coverFocusYValue').textContent = this.value + '%';
+            const coverFocusYValue = document.getElementById('coverFocusYValue');
+            if (coverFocusYValue) coverFocusYValue.textContent = this.value + '%';
             updatePreview();
             saveToStorage();
         });
@@ -691,17 +742,19 @@ function setupEventListeners() {
     const enableCover = document.getElementById('enableCover');
     if (enableCover) {
         enableCover.addEventListener('change', function () {
-            document.getElementById('coverContent').style.display = this.checked ? 'block' : 'none';
+            const coverContent = document.getElementById('coverContent');
+            if (coverContent) coverContent.style.display = this.checked ? 'block' : 'none';
             updatePreview();
             saveToStorage();
         });
     }
 
-    // topTheme 변경 시 커스텀 색상에도 반영
-    const topThemeEl = document.getElementById('topTheme');
-    if (topThemeEl) {
-        topThemeEl.addEventListener('change', function () {
-            const selectedTheme = topThemeEl.value;
+    // globalTheme 변경 시 커스텀 색상에도 반영
+    const globalThemeEl = document.getElementById('globalTheme');
+    if (globalThemeEl) {
+        globalThemeEl.addEventListener('change', function () {
+            globalTheme = globalThemeEl.value;
+            const selectedTheme = globalTheme;
             let themeToApply = null;
 
             if (selectedTheme === 'user') {
@@ -725,6 +778,16 @@ function setupEventListeners() {
                 setColorInputValue('customTagText', theme.tagText || theme.text);
                 setColorInputValue('customDivider', theme.divider || theme.tagText || theme.text);
             }
+            updatePreview();
+            saveToStorage();
+        });
+    }
+
+    // hidePageNumbers 체크박스 이벤트
+    const hidePageNumbersEl = document.getElementById('hidePageNumbers');
+    if (hidePageNumbersEl) {
+        hidePageNumbersEl.addEventListener('change', function () {
+            hidePageNumbers = hidePageNumbersEl.checked;
             updatePreview();
             saveToStorage();
         });
@@ -805,7 +868,6 @@ function setupEventListeners() {
     if (addPageBtn) {
         addPageBtn.addEventListener('click', function () {
             currentEditingIndex = null;
-            document.getElementById('pageType').value = 'basic';
             document.getElementById('pageTitle').value = '';
             document.getElementById('pageSubtitle').value = '';
             document.getElementById('pageContent').value = '';
@@ -1100,6 +1162,30 @@ function setupEventListeners() {
             }
         });
     }
+
+    // 데이터 내보내기 버튼
+    const exportDataBtn = document.getElementById('exportData');
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', exportDataToJSON);
+    }
+
+    // 데이터 불러오기 버튼
+    const importDataBtn = document.getElementById('importData');
+    const importFileInput = document.getElementById('importFileInput');
+    if (importDataBtn && importFileInput) {
+        importDataBtn.addEventListener('click', function () {
+            importFileInput.click();
+        });
+
+        importFileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                importDataFromJSON(file);
+                // 파일 입력 초기화 (같은 파일 다시 선택 가능하도록)
+                e.target.value = '';
+            }
+        });
+    }
 }
 
 function showNotification(message) {
@@ -1107,6 +1193,243 @@ function showNotification(message) {
     notification.textContent = message;
     notification.classList.add('show');
     setTimeout(function () { notification.classList.remove('show'); }, 2000);
+}
+
+// 데이터를 JSON 파일로 내보내기
+function exportDataToJSON() {
+    try {
+        // 현재 상태를 JSON으로 저장
+        const data = {
+            useRoundedQuotes: document.getElementById('useRoundedQuotes').checked,
+            useTextIndent: document.getElementById('useTextIndent').checked,
+            enableTopSection: document.getElementById('enableTopSection').checked,
+            enableCover: document.getElementById('enableCover').checked,
+            coverImage: document.getElementById('coverImage').value,
+            coverFocusX: parseInt(document.getElementById('coverFocusX').value),
+            coverFocusY: parseInt(document.getElementById('coverFocusY').value),
+            coverArchiveNo: document.getElementById('coverArchiveNo').value,
+            coverTitle: document.getElementById('coverTitle').value,
+            coverSubtitle: document.getElementById('coverSubtitle').value,
+            enableProfiles: document.getElementById('enableProfiles').checked,
+            introText: document.getElementById('introText').value,
+            summaryText: document.getElementById('summaryText').value,
+            soundtrackUrl: document.getElementById('soundtrackUrl').value,
+            soundtrackTitle: document.getElementById('soundtrackTitle').value,
+            soundtrackArtist: document.getElementById('soundtrackArtist').value,
+            enableComment: document.getElementById('enableComment').checked,
+            commentText: document.getElementById('commentText').value,
+            commentNickname: document.getElementById('commentNickname').value,
+            enableTags: document.getElementById('enableTags').checked,
+            customColors: {
+                bg: getColorValue('customBg'),
+                text: getColorValue('customText'),
+                em: getColorValue('customEm'),
+                header: getColorValue('customHeader'),
+                quote1Bg: getColorValue('customQuote1Bg'),
+                quote1Text: getColorValue('customQuote1Text'),
+                quote2Bg: getColorValue('customQuote2Bg'),
+                quote2Text: getColorValue('customQuote2Text'),
+                tagText: getColorValue('customTagText'),
+                divider: getColorValue('customDivider')
+            },
+            pages: pages,
+            tags: tags,
+            replacements: replacements,
+            customThemes: customThemes,
+            profiles: profiles,
+            textSpacing: textSpacing,
+            fontFamily: fontFamily,
+            globalTheme: globalTheme,
+            hidePageNumbers: hidePageNumbers,
+            exportDate: new Date().toISOString(),
+            version: '1.0'
+        };
+
+        // JSON 문자열로 변환
+        const jsonStr = JSON.stringify(data, null, 2);
+
+        // Blob 생성
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+
+        // 다운로드 링크 생성
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // 파일명: log-diary-backup-YYYY-MM-DD-HHMMSS.json
+        const now = new Date();
+        const dateStr = now.getFullYear() + '-' + 
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(now.getDate()).padStart(2, '0') + '-' +
+                       String(now.getHours()).padStart(2, '0') + 
+                       String(now.getMinutes()).padStart(2, '0') + 
+                       String(now.getSeconds()).padStart(2, '0');
+        a.download = 'log-diary-backup-' + dateStr + '.json';
+        
+        // 다운로드 실행
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('데이터가 JSON 파일로 내보내졌습니다!');
+    } catch (e) {
+        console.error('Export failed:', e);
+        showNotification('내보내기 실패: ' + e.message);
+    }
+}
+
+// JSON 파일에서 데이터 불러오기
+function importDataFromJSON(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            // 데이터 유효성 검사
+            if (!data || typeof data !== 'object') {
+                throw new Error('유효하지 않은 데이터 형식입니다.');
+            }
+
+            // 확인 대화상자
+            if (!confirm('현재 작업 중인 데이터가 모두 사라집니다. 불러오시겠습니까?')) {
+                return;
+            }
+
+            // 데이터 복원
+            if (data.useRoundedQuotes !== undefined) document.getElementById('useRoundedQuotes').checked = data.useRoundedQuotes;
+            if (data.useTextIndent !== undefined) document.getElementById('useTextIndent').checked = data.useTextIndent;
+            if (data.enableTopSection !== undefined) {
+                document.getElementById('enableTopSection').checked = data.enableTopSection;
+                document.getElementById('topSectionContent').style.display = data.enableTopSection ? 'block' : 'none';
+            }
+            
+            if (data.enableCover !== undefined) {
+                document.getElementById('enableCover').checked = data.enableCover;
+                document.getElementById('coverContent').style.display = data.enableCover ? 'block' : 'none';
+            }
+            if (data.coverImage !== undefined) document.getElementById('coverImage').value = data.coverImage;
+            if (data.coverFocusX !== undefined) {
+                document.getElementById('coverFocusX').value = data.coverFocusX;
+                document.getElementById('coverFocusXValue').textContent = data.coverFocusX + '%';
+            }
+            if (data.coverFocusY !== undefined) {
+                document.getElementById('coverFocusY').value = data.coverFocusY;
+                document.getElementById('coverFocusYValue').textContent = data.coverFocusY + '%';
+            }
+            if (data.coverArchiveNo !== undefined) document.getElementById('coverArchiveNo').value = data.coverArchiveNo;
+            if (data.coverTitle !== undefined) document.getElementById('coverTitle').value = data.coverTitle;
+            if (data.coverSubtitle !== undefined) document.getElementById('coverSubtitle').value = data.coverSubtitle;
+            
+            if (data.enableProfiles !== undefined) {
+                document.getElementById('enableProfiles').checked = data.enableProfiles;
+                document.getElementById('profileInputs').style.display = data.enableProfiles ? 'block' : 'none';
+            }
+            if (data.introText !== undefined) document.getElementById('introText').value = data.introText;
+            if (data.summaryText !== undefined) document.getElementById('summaryText').value = data.summaryText;
+            if (data.soundtrackUrl !== undefined) document.getElementById('soundtrackUrl').value = data.soundtrackUrl;
+            if (data.soundtrackTitle !== undefined) document.getElementById('soundtrackTitle').value = data.soundtrackTitle;
+            if (data.soundtrackArtist !== undefined) document.getElementById('soundtrackArtist').value = data.soundtrackArtist;
+            
+            if (data.enableComment !== undefined) {
+                document.getElementById('enableComment').checked = data.enableComment;
+                document.getElementById('commentContent').style.display = data.enableComment ? 'block' : 'none';
+            }
+            if (data.commentText !== undefined) document.getElementById('commentText').value = data.commentText;
+            if (data.commentNickname !== undefined) document.getElementById('commentNickname').value = data.commentNickname;
+            
+            if (data.enableTags !== undefined) {
+                document.getElementById('enableTags').checked = data.enableTags;
+                document.getElementById('tagsInputs').style.display = data.enableTags ? 'block' : 'none';
+            }
+
+            // 커스텀 색상 복원
+            if (data.customColors) {
+                setColorInputValue('customBg', data.customColors.bg);
+                setColorInputValue('customText', data.customColors.text);
+                setColorInputValue('customEm', data.customColors.em);
+                setColorInputValue('customHeader', data.customColors.header);
+                setColorInputValue('customQuote1Bg', data.customColors.quote1Bg);
+                setColorInputValue('customQuote1Text', data.customColors.quote1Text);
+                setColorInputValue('customQuote2Bg', data.customColors.quote2Bg);
+                setColorInputValue('customQuote2Text', data.customColors.quote2Text);
+                setColorInputValue('customTagText', data.customColors.tagText);
+                setColorInputValue('customDivider', data.customColors.divider);
+            }
+
+            // 배열 데이터 복원
+            if (data.pages) pages = data.pages;
+            if (data.tags) tags = data.tags;
+            if (data.replacements) replacements = data.replacements;
+            if (data.customThemes) customThemes = data.customThemes;
+            if (data.profiles) profiles = data.profiles;
+
+            // 텍스트 간격 복원
+            if (data.textSpacing) {
+                textSpacing = { ...textSpacing, ...data.textSpacing };
+                const textSizeInput = document.getElementById('textSizeInput');
+                const textSizeSlider = document.getElementById('textSizeSlider');
+                const lineHeightInput = document.getElementById('lineHeightInput');
+                const lineHeightSlider = document.getElementById('lineHeightSlider');
+                const letterSpacingInput = document.getElementById('letterSpacingInput');
+                const letterSpacingSlider = document.getElementById('letterSpacingSlider');
+                const paragraphSpacingInput = document.getElementById('paragraphSpacingInput');
+                const paragraphSpacingSlider = document.getElementById('paragraphSpacingSlider');
+                const textIndentInput = document.getElementById('textIndentInput');
+                const textIndentSlider = document.getElementById('textIndentSlider');
+
+                if (textSizeInput) textSizeInput.value = textSpacing.fontSize;
+                if (textSizeSlider) textSizeSlider.value = textSpacing.fontSize;
+                if (lineHeightInput) lineHeightInput.value = textSpacing.lineHeight;
+                if (lineHeightSlider) lineHeightSlider.value = textSpacing.lineHeight;
+                if (letterSpacingInput) letterSpacingInput.value = textSpacing.letterSpacing;
+                if (letterSpacingSlider) letterSpacingSlider.value = textSpacing.letterSpacing;
+                if (paragraphSpacingInput) paragraphSpacingInput.value = textSpacing.paragraphSpacing;
+                if (paragraphSpacingSlider) paragraphSpacingSlider.value = textSpacing.paragraphSpacing;
+                if (textIndentInput) textIndentInput.value = textSpacing.textIndent;
+                if (textIndentSlider) textIndentSlider.value = textSpacing.textIndent;
+            }
+
+            // 폰트 설정 복원
+            if (data.fontFamily) {
+                fontFamily = data.fontFamily;
+                document.getElementById('fontFamily').value = fontFamily;
+            }
+
+            // 전역 테마 복원
+            if (data.globalTheme) {
+                globalTheme = data.globalTheme;
+                document.getElementById('globalTheme').value = globalTheme;
+            }
+
+            // 페이지 번호 숨김 복원
+            if (data.hidePageNumbers !== undefined) {
+                hidePageNumbers = data.hidePageNumbers;
+                document.getElementById('hidePageNumbers').checked = hidePageNumbers;
+            }
+
+            // UI 업데이트
+            updateTagsList();
+            updateReplacementsList();
+            updatePagesList();
+            updateCustomThemesList();
+            updateProfilesList();
+            updatePreview();
+            saveToStorage();
+
+            showNotification('데이터를 성공적으로 불러왔습니다!');
+        } catch (e) {
+            console.error('Import failed:', e);
+            showNotification('불러오기 실패: ' + e.message);
+        }
+    };
+
+    reader.onerror = function() {
+        showNotification('파일 읽기 실패');
+    };
+
+    reader.readAsText(file);
 }
 
 function getTheme(type) {
@@ -1486,7 +1809,8 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
     // Create layout: number on left (large), title/subtitle on right
     let headerHtml = '';
 
-    if (pageNum) {
+    // hidePageNumbers가 true면 번호를 표시하지 않음
+    if (pageNum && !hidePageNumbers) {
         // Layout with number
         headerHtml += '<div style="display: table; width: 100%; padding: clamp(15px, 3vw, 20px) 0; ">';
         headerHtml += '<div style="display: table-cell; width: clamp(70px, 15vw, 100px); vertical-align: center; padding-left: clamp(30px, 5vw, 50px);padding-right: clamp(20px, 3vw, 30px);">';
@@ -1500,6 +1824,22 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
             headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + (themeStyle.tagText || themeStyle.text) + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
+        headerHtml += '</div>';
+    } else if (hidePageNumbers && (pageTitle || pageSubtitle)) {
+        // 번호 숨김이지만 제목이나 부제목이 있는 경우 - 좌측 정렬
+        headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
+        if (pageTitle) {
+            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + themeStyle.header + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+        }
+        if (pageSubtitle) {
+            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + (themeStyle.tagText || themeStyle.text) + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+        }
+        headerHtml += '</div>';
+    } else if (hidePageNumbers && pageNum) {
+        // 번호 숨김이고 제목/부제목이 없는 경우 - "Page n" 표시 (좌측 정렬)
+        const pageNumber = pageNum.replace('#', '');
+        headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
+        headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + themeStyle.header + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
         headerHtml += '</div>';
     } else {
         // Fallback to centered layout if no number
@@ -1674,7 +2014,7 @@ function createSoundtrackSection(youtubeUrl, songTitle, artistName, themeStyle, 
 
 
 function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHtml, hasTopImage) {
-    const theme = getTheme(type);
+    const theme = getTheme(globalTheme);
 
     // hasTopImage가 true면 상단 패딩 0, 아니면 하단과 동일하게
     const topPadding = hasTopImage ? '0' : 'clamp(20px, 4vw, 30px)';
@@ -2101,7 +2441,6 @@ function deleteCustomTheme(index) {
 }
 
 function savePageData() {
-    const pageType = document.getElementById('pageType').value;
     const pageTitle = document.getElementById('pageTitle').value.trim();
     const pageSubtitle = document.getElementById('pageSubtitle').value.trim();
     const content = document.getElementById('pageContent').value;
@@ -2113,7 +2452,7 @@ function savePageData() {
 
     const pageData = {
         itemType: 'page', // 페이지 타입 식별자
-        type: pageType,
+        type: globalTheme,
         title: pageTitle,
         subtitle: pageSubtitle,
         content: content,
@@ -2298,7 +2637,6 @@ function updatePagesList() {
                 if (e.target.closest('.btn-move') || e.target.closest('.btn-delete-page')) return;
 
                 currentEditingIndex = index;
-                document.getElementById('pageType').value = item.type;
                 document.getElementById('pageTitle').value = item.title || '';
                 document.getElementById('pageSubtitle').value = item.subtitle || '';
                 document.getElementById('pageContent').value = item.content;
@@ -2373,7 +2711,7 @@ function generateHTML(isPreview) {
     }
 
     if (enableTopSection) {
-        const themeType = document.getElementById('topTheme').value;
+        const themeType = globalTheme;
         const theme = getTheme(themeType);
 
         let topContent = '';
@@ -2587,9 +2925,9 @@ function generateHTML(isPreview) {
 
             // 다음 페이지가 있고 그것이 페이지(section이 아닌)라면 테마 미리 가져오기
             if (index + 1 < pages.length && pages[index + 1].itemType !== 'section') {
-                currentSectionTheme = getTheme(pages[index + 1].type);
+                currentSectionTheme = getTheme(globalTheme);
             } else {
-                currentSectionTheme = getTheme('basic'); // 기본 테마
+                currentSectionTheme = getTheme(globalTheme); // globalTheme 사용
                 isInSection = false; // 섹션 다음에 페이지가 없으면 컨테이너 불필요
             }
 
@@ -2601,14 +2939,17 @@ function generateHTML(isPreview) {
                 const focusX = item.focusX || 50;
                 const focusY = item.focusY || 50;
                 const sectionImage = normalizeImageUrl(item.image);
+                
+                // 섹션 내에 페이지가 있을 때만 margin-bottom 추가, border-radius도 조건부 적용
+                const sectionMarginBottom = isInSection ? 'margin-bottom:20px;' : '';
+                const sectionBorderRadius = isInSection ? 'border-radius:10px 10px 0 0;' : 'border-radius:10px;';
 
-                // 부제목이 비어있으면 자동으로 SECTION 번호 추가
-                const displaySubtitle = (item.subtitle && item.subtitle.trim()) ? item.subtitle : 'SECTION ' + sectionNumber;
+                sectionHtml += '<div style="width:100%;height:15vh;display:table;background-color:#1a1a1a;background-image:url(\'' + sectionImage + '\');background-size:cover;background-position:' + focusX + '% ' + focusY + '%;background-repeat:no-repeat;' + sectionBorderRadius + sectionMarginBottom + '">';
+                sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);' + sectionBorderRadius + 'text-align:center;">';
 
-                sectionHtml += '<div style="width:100%;height:15vh;display:table;background-color:#1a1a1a;background-image:url(\'' + sectionImage + '\');background-size:cover;background-position:' + focusX + '% ' + focusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;margin-bottom:20px;">';
-                sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);border-radius:10px 10px 0 0;text-align:center;">';
-
-                sectionHtml += '<div style="font-size:clamp(10px, 1.8vw, 11px);line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + displaySubtitle + '</div>';
+                if (item.subtitle && item.subtitle.trim()) {
+                    sectionHtml += '<div style="font-size:clamp(10px, 1.8vw, 11px);line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + item.subtitle + '</div>';
+                }
 
                 if (item.title) {
                     sectionHtml += '<h1 style="font-size:clamp(20px, 4vw, 28px);color:rgba(255, 255, 255, 1.0);margin:0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.2;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + item.title + '</h1>';
@@ -2618,14 +2959,16 @@ function generateHTML(isPreview) {
             }
             // 이미지가 없는 경우
             else {
-                // 부제목이 비어있으면 자동으로 SECTION 번호 추가
-                const displaySubtitle = (item.subtitle && item.subtitle.trim()) ? item.subtitle : 'SECTION ' + sectionNumber;
-
-                sectionHtml += '<div style="width: 100%; padding: clamp(20px, 4vw, 30px) clamp(15px, 3vw, 20px); text-align: center; background-color: #1a1a1d; border: 1px solid #2a2a2f; border-radius: 10px 10px 0 0;margin-bottom:20px;">';
-                sectionHtml += '<div style="font-size: clamp(10px, 1.8vw, 11px); color: #999999; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + displaySubtitle + '</div>';
-                if (item.title) {
-                    sectionHtml += '<div style="font-size: clamp(16px, 3vw, 20px); font-weight: 700; color: #ffffff; letter-spacing: clamp(0.5px, 0.2vw, 1px);">' + item.title + '</div>';
+                sectionHtml += '<div style="width: 100%; padding: clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px); text-align: center;">';
+                
+                if (item.subtitle && item.subtitle.trim()) {
+                    sectionHtml += '<div style="font-size: clamp(10px, 1.8vw, 11px); color: ' + currentSectionTheme.tagText + '; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + item.subtitle + '</div>';
                 }
+                
+                if (item.title) {
+                    sectionHtml += '<div style="font-size: clamp(16px, 3vw, 20px); font-weight: 700; color: ' + currentSectionTheme.header + '; letter-spacing: clamp(0.5px, 0.2vw, 1px);">' + item.title + '</div>';
+                }
+                
                 sectionHtml += '</div>';
             }
 
@@ -2633,10 +2976,9 @@ function generateHTML(isPreview) {
             if (isInSection) {
                 sectionContainerHtml += sectionHtml;
             } else {
-                html += '<div style="box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 20px auto; border-radius: 10px; background: transparent;">';
+                html += '<div style="box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 10px; background-color: ' + currentSectionTheme.bg + '; padding: 0;">';
                 html += sectionHtml;
                 html += '</div>';
-                html += '<br>';
             }
         }
         // 페이지인 경우
@@ -2648,7 +2990,7 @@ function generateHTML(isPreview) {
             if (currentEditingIndex === index && item.itemType !== 'section') {
                 currentPage = {
                     itemType: 'page',
-                    type: document.getElementById('pageType').value,
+                    type: globalTheme,
                     title: document.getElementById('pageTitle').value,
                     subtitle: document.getElementById('pageSubtitle').value,
                     content: document.getElementById('pageContent').value,
@@ -2662,7 +3004,7 @@ function generateHTML(isPreview) {
                 };
             }
 
-            const theme = getTheme(currentPage.type);
+            const theme = getTheme(globalTheme);
 
             // 페이지 헤더 텍스트 생성 (넘버 + 제목 + 부제목)
             let headerText = '#' + pageNumber;
@@ -2775,7 +3117,7 @@ function generateHTML(isPreview) {
     if (enableComment) {
         const commentText = document.getElementById('commentText').value;
         const commentNickname = document.getElementById('commentNickname').value;
-        const commentTheme = document.getElementById('commentTheme').value;
+        const commentTheme = globalTheme;
 
         if (commentText && commentText.trim()) {
             const theme = getTheme(commentTheme);
