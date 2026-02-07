@@ -1766,25 +1766,48 @@ details summary::marker {
     .modal {
         /* 실제 보이는 화면 영역만 사용 (브라우저 UI 제외) */
         height: 100dvh; /* dvh = dynamic viewport height */
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+        height: 100vh;
+        padding: 20px 0;
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), 80px); /* 최소 80px 여백 */
+        align-items: flex-start; /* 상단부터 배치 */
+        overflow-y: auto;
     }
     
     .modal-content {
-        max-height: calc(90dvh - env(safe-area-inset-bottom, 0px));
-        margin-bottom: env(safe-area-inset-bottom, 0px);
+        max-height: none; /* 최대 높이 제한 제거 */
+        margin: auto 0; /* 세로 중앙 배치 */
+        margin-bottom: max(env(safe-area-inset-bottom, 0px), 100px); /* 하단 여백 강제 */
     }
     
-    /* 모달 body에 여유 공간 확보 */
+    /* 모달 body - 스크롤 가능하게 */
     .modal-body {
-        padding-bottom: calc(35px + env(safe-area-inset-bottom, 20px));
+        max-height: calc(70vh - 200px); /* 충분한 여유 공간 */
+        padding: 25px;
+        padding-bottom: 40px;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
     }
     
-    /* 모달 푸터에 안전 영역 패딩 추가 */
+    /* 모달 헤더 - 상단 고정 */
+    .modal-header {
+        padding: 20px 25px;
+        background: var(--modal-bg);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--modal-border);
+    }
+    
+    /* 모달 푸터 - 큰 여백으로 버튼 보이도록 */
     .modal-footer {
-        padding-bottom: env(safe-area-inset-bottom, 20px);
+        padding: 20px 25px;
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), 40px); /* 최소 40px 하단 패딩 */
         margin-bottom: 0;
+        background: var(--modal-bg); /* 배경색 명확히 */
+        position: sticky; /* 스크롤해도 하단 고정 */
+        bottom: 0;
+        z-index: 10;
+        border-top: 1px solid var(--modal-border); /* 구분선 추가 */
     }
     
     /* 모바일에서 버튼 터치 영역 확보 */

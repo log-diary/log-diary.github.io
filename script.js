@@ -916,7 +916,15 @@ function setupEventListeners() {
 
             tempPageTags = [];
 
-            document.getElementById('pageModal').style.display = 'block';
+            const pageModal = document.getElementById('pageModal');
+            pageModal.style.display = 'block';
+            
+            // 모바일에서 모달과 body를 맨 위로 스크롤
+            setTimeout(function() {
+                pageModal.scrollTop = 0;
+                const modalBody = pageModal.querySelector('.modal-body');
+                if (modalBody) modalBody.scrollTop = 0;
+            }, 50);
         });
     }
 
@@ -933,7 +941,15 @@ function setupEventListeners() {
             document.getElementById('sectionFocusXValue').textContent = '50%';
             document.getElementById('sectionFocusYValue').textContent = '50%';
 
-            document.getElementById('sectionModal').style.display = 'block';
+            const sectionModal = document.getElementById('sectionModal');
+            sectionModal.style.display = 'block';
+            
+            // 모바일에서 모달과 body를 맨 위로 스크롤
+            setTimeout(function() {
+                sectionModal.scrollTop = 0;
+                const modalBody = sectionModal.querySelector('.modal-body');
+                if (modalBody) modalBody.scrollTop = 0;
+            }, 50);
         });
     }
 
@@ -2641,7 +2657,15 @@ function updatePagesList() {
                 document.getElementById('sectionFocusXValue').textContent = (item.focusX || 50) + '%';
                 document.getElementById('sectionFocusYValue').textContent = (item.focusY || 50) + '%';
 
-                document.getElementById('sectionModal').style.display = 'flex';
+                const sectionModal = document.getElementById('sectionModal');
+                sectionModal.style.display = 'flex';
+                
+                // 모바일에서 모달과 body를 맨 위로 스크롤
+                setTimeout(function() {
+                    sectionModal.scrollTop = 0;
+                    const modalBody = sectionModal.querySelector('.modal-body');
+                    if (modalBody) modalBody.scrollTop = 0;
+                }, 50);
             });
         }
         // 페이지인 경우
@@ -2685,7 +2709,15 @@ function updatePagesList() {
 
                 tempPageTags = [];
 
-                document.getElementById('pageModal').style.display = 'flex';
+                const pageModal = document.getElementById('pageModal');
+                pageModal.style.display = 'flex';
+                
+                // 모바일에서 모달과 body를 맨 위로 스크롤
+                setTimeout(function() {
+                    pageModal.scrollTop = 0;
+                    const modalBody = pageModal.querySelector('.modal-body');
+                    if (modalBody) modalBody.scrollTop = 0;
+                }, 50);
             });
         }
 
