@@ -984,7 +984,7 @@ input[type="color"] {
 .btn-sound-toggle {
     position: absolute;
     top: 35px;
-    right: 30px;
+    right: 70px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-muted);
@@ -1022,6 +1022,37 @@ input[type="color"] {
     0% { box-shadow: 0 0 0 0 rgba(45, 90, 240, 0.4); }
     70% { box-shadow: 0 0 0 6px rgba(45, 90, 240, 0); }
     100% { box-shadow: 0 0 0 0 rgba(45, 90, 240, 0); }
+}
+
+/* 크레딧 토글 버튼 (헤더 우측 상단 고정) */
+.btn-credit-toggle {
+    position: absolute;
+    top: 35px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 20;
+}
+
+.btn-credit-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-credit-toggle:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: var(--accent-blue-dim);
+    transform: scale(1.05);
 }
 
 /* 크레딧 리스트 스타일 */
@@ -1085,7 +1116,7 @@ input[type="color"] {
 .btn-theme-toggle {
     position: absolute;
     top: 35px;
-    right: 70px; /* 소리 버튼(right:30) 왼쪽에 배치 */
+    right: 110px; /* 소리 버튼(right:70), 크레딧 버튼(right:30) 왼쪽에 배치 */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-muted);
@@ -1119,6 +1150,11 @@ body.light-mode .btn-theme-toggle {
 
 /* 라이트 모드에서 소리 버튼 배경 보정 */
 body.light-mode .btn-sound-toggle {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* 라이트 모드에서 크레딧 버튼 배경 보정 */
+body.light-mode .btn-credit-toggle {
     background: rgba(0, 0, 0, 0.03);
 }
 
@@ -1750,22 +1786,28 @@ body.light-mode .btn-save-new-preset {
     }
 
     .btn-theme-toggle,
-    .btn-sound-toggle {
+    .btn-sound-toggle,
+    .btn-credit-toggle {
         width: 32px;
         height: 32px;
         top: 20px;
     }
 
     .btn-theme-toggle {
-        right: 60px;
+        right: 100px;
     }
 
     .btn-sound-toggle {
+        right: 60px;
+    }
+
+    .btn-credit-toggle {
         right: 20px;
     }
 
     .btn-theme-toggle svg,
-    .btn-sound-toggle svg {
+    .btn-sound-toggle svg,
+    .btn-credit-toggle svg {
         width: 16px;
         height: 16px;
     }

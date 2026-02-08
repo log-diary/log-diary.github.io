@@ -62,15 +62,6 @@
                     </svg>
                     <span>Theme</span>
                 </button>
-                <button class="nav-item" data-tab="tab-credit" title="크레딧">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                    <span>Credit</span>
-                </button>
 
             </div>
             <div class="nav-footer">
@@ -121,6 +112,14 @@
                         style="display: none;">
                         <path d="M11 5L6 9H2v6h4l5 4V5z" />
                         <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    </svg>
+                </button>
+                <button id="creditToggle" class="btn-credit-toggle" title="크레딧 보기">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                 </button>
                 <div class="header-decoration"></div>
@@ -534,44 +533,6 @@
                         저장</button>
                 </div>
             </div>
-            <!-- 6. 크레딧 탭 -->
-            <div id="tab-credit" class="tab-content">
-                <div class="section-title">
-                    <h2>Credits & Reference</h2>
-                    <span class="deco-line"></span>
-                </div>
-
-                <div class="credit-list">
-                    <div class="credit-item">
-                        <span class="credit-role">INSPIRED BY</span>
-                        <a href="https://arca.live/b/characterai/143509698" target="_blank" class="credit-link">Viewer
-                            Extension</a>
-                        <a href="https://arca.live/b/characterai/151793818" target="_blank" class="credit-link">LOG
-                            ATELIER WEB</a>
-                        <a href="https://arca.live/b/characterai/120217477" target="_blank" class="credit-link">Log
-                            Generator Pro 1.1</a>
-                        <a href="https://arca.live/b/characterai/157048976" target="_blank" class="credit-link">Log
-                            Studio</a>
-                         <a href="https://arca.live/b/characterai/159949150" target="_blank" class="credit-link">Logs of Glenna</a>   
-                        <p class="credit-desc">디자인 및 레이아웃, 주요 기능 긴빠이</p>
-                    </div>
-
-                    <div class="credit-item">
-                        <span class="credit-role">ASSETS</span>
-                        <a href="https://fonts.google.com/" target="_blank" class="credit-link">Google Fonts</a>
-                        <a href="https://pixabay.com/ko/sound-effects/%ec%9e%90%ec%97%b0-rain-sound-and-forest-and-nature-sounds-18259/"
-                            target="_blank" class="credit-link">Pixabay</a>
-                        <a href="https://arca.live/b/characterai/154605913" target="_blank" class="credit-link">Default
-                            Images - NovelAI Tags</a>
-                        <p class="credit-desc">Noto Serif KR, Cinzel<br>Rain Sound and Forest and Nature Sounds<br>4.5F) 얼헌 애니 스샷 그림체 공유</p>
-                    </div>
-
-                    <div class="credit-item">
-                        <span class="credit-role">SPECIAL THANKS</span>
-                        <span class="credit-text">아카라이브 AI 채팅 채널</span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- 오른쪽 미리보기 패널 -->
@@ -700,7 +661,73 @@
         </div>
     </div>
 
+    <!-- 크레딧 모달 -->
+    <div id="creditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>CREDITS & REFERENCE</h2>
+                <span class="close-credit">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="credit-list">
+                    <div class="credit-item">
+                        <span class="credit-role">INSPIRED BY</span>
+                        <a href="https://arca.live/b/characterai/143509698" target="_blank" class="credit-link">Viewer
+                            Extension</a>
+                        <a href="https://arca.live/b/characterai/151793818" target="_blank" class="credit-link">LOG
+                            ATELIER WEB</a>
+                        <a href="https://arca.live/b/characterai/120217477" target="_blank" class="credit-link">Log
+                            Generator Pro 1.1</a>
+                        <a href="https://arca.live/b/characterai/157048976" target="_blank" class="credit-link">Log
+                            Studio</a>
+                        <a href="https://arca.live/b/characterai/159949150" target="_blank" class="credit-link">Logs of Glenna</a>   
+                        <p class="credit-desc">디자인 및 레이아웃, 주요 기능 긴빠이</p>
+                    </div>
+
+                    <div class="credit-item">
+                        <span class="credit-role">ASSETS</span>
+                        <a href="https://fonts.google.com/" target="_blank" class="credit-link">Google Fonts</a>
+                        <a href="https://pixabay.com/ko/sound-effects/%ec%9e%90%ec%97%b0-rain-sound-and-forest-and-nature-sounds-18259/"
+                            target="_blank" class="credit-link">Pixabay</a>
+                        <a href="https://arca.live/b/characterai/154605913" target="_blank" class="credit-link">Default
+                            Images - NovelAI Tags</a>
+                        <p class="credit-desc">Noto Serif KR, Cinzel<br>Rain Sound and Forest and Nature Sounds<br>4.5F) 얼헌 애니 스샷 그림체 공유</p>
+                    </div>
+
+                    <div class="credit-item">
+                        <span class="credit-role">SPECIAL THANKS</span>
+                        <span class="credit-text">아카라이브 AI 채팅 채널</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="notification" class="notification"></div>
+    
+    <script>
+        // 크레딧 모달 제어
+        const creditModal = document.getElementById('creditModal');
+        const creditToggle = document.getElementById('creditToggle');
+        const closeCredit = document.querySelector('.close-credit');
+
+        // 크레딧 버튼 클릭 시 모달 열기
+        creditToggle.addEventListener('click', () => {
+            creditModal.style.display = 'flex';
+        });
+
+        // 닫기 버튼 클릭 시 모달 닫기
+        closeCredit.addEventListener('click', () => {
+            creditModal.style.display = 'none';
+        });
+
+        // 모달 바깥 영역 클릭 시 닫기
+        creditModal.addEventListener('click', (e) => {
+            if (e.target === creditModal) {
+                creditModal.style.display = 'none';
+            }
+        });
+    </script>
     <script src="script.js"></script>
     <!-- 빗소리 오디오 (Loop 설정) -->
     <!-- 로컬 파일 사용으로 변경 -->
