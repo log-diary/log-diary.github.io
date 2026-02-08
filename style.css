@@ -1290,43 +1290,94 @@ body.light-mode .spacing-slider::-moz-range-thumb:hover {
     flex-shrink: 0;
 }
 
-.custom-theme-item .btn-load-theme,
-.custom-theme-item .btn-delete-theme {
-    padding: 6px 12px;
-    font-size: 12px;
-    border: none;
+.custom-theme-item .theme-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: var(--page-controls-bg);
+    padding: 6px;
     border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.custom-theme-item .btn-load-theme,
+.custom-theme-item .btn-overwrite-theme {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    background: var(--btn-move-bg);
+    border: 1px solid var(--border-color);
+    color: var(--btn-move-color);
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
 }
 
-.custom-theme-item .btn-load-theme {
+.custom-theme-item .btn-load-theme:hover,
+.custom-theme-item .btn-overwrite-theme:hover {
     background: var(--accent-blue);
-    color: white;
+    color: #fff;
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
 }
 
-.custom-theme-item .btn-load-theme:hover {
-    background: #2650d8;
+.custom-theme-item .btn-rename-theme {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-move-bg);
+    border: 1px solid var(--border-color);
+    color: var(--btn-move-color);
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.custom-theme-item .btn-rename-theme:hover {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(45, 90, 240, 0.3);
 }
 
 .custom-theme-item .btn-delete-theme {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid transparent;
+    color: var(--danger);
+    border-radius: 4px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .custom-theme-item .btn-delete-theme:hover {
-    background: rgba(220, 38, 38, 0.1);
-    color: #dc2626;
-    border-color: #dc2626;
+    background: var(--danger);
+    color: white;
+    transform: scale(1.05);
 }
 
-body.light-mode .custom-theme-item .btn-load-theme:hover {
-    box-shadow: 0 2px 8px rgba(45, 90, 240, 0.2);
+.custom-theme-item .btn-load-theme:active,
+.custom-theme-item .btn-overwrite-theme:active,
+.custom-theme-item .btn-rename-theme:active {
+    transform: translateY(0);
+}
+
+.custom-theme-item .btn-delete-theme:active {
+    transform: scale(1);
 }
 
 
@@ -1341,6 +1392,250 @@ details summary::-webkit-details-marker {
 
 details summary::marker {
     display: none;
+}
+
+/* 프리셋 슬롯 스타일 */
+.preset-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-save-new-preset {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 14px;
+    font-size: 13px;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+}
+
+.btn-save-new-preset:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: var(--accent-blue-dim);
+    transform: translateY(-1px);
+}
+
+/* 라이트 모드에서 프리셋 저장 버튼 배경 보정 */
+body.light-mode .btn-save-new-preset {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.preset-slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    background: var(--page-item-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.preset-slot:hover {
+    background: var(--page-item-hover-bg);
+    border-color: var(--accent-blue);
+}
+
+.preset-slot.has-data {
+    border-color: var(--border-color);
+}
+
+.preset-slot.has-data:hover {
+    border-color: var(--accent-blue);
+}
+
+.preset-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    font-size: 14px;
+    color: var(--page-num-color);
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.preset-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.preset-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--page-item-name-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preset-date {
+    font-size: 13px;
+    color: var(--page-item-preview-color);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.preset-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: var(--page-controls-bg);
+    padding: 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.preset-slot .btn-save-preset,
+.preset-slot .btn-load-preset {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preset-slot .btn-save-preset {
+    background: var(--btn-move-bg);
+    border: 1px solid var(--border-color);
+    color: var(--btn-move-color);
+}
+
+.preset-slot .btn-save-preset:hover {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
+}
+
+.preset-slot .btn-load-preset {
+    background: var(--btn-move-bg);
+    border: 1px solid var(--border-color);
+    color: var(--btn-move-color);
+}
+
+.preset-slot .btn-load-preset:hover {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
+}
+
+.preset-slot .btn-rename-preset {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-move-bg);
+    border: 1px solid var(--border-color);
+    color: var(--btn-move-color);
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-slot .btn-rename-preset:hover {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
+}
+
+.preset-slot .btn-delete-preset {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid transparent;
+    color: var(--danger);
+    border-radius: 4px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-slot .btn-delete-preset:hover {
+    background: var(--danger);
+    color: white;
+    transform: scale(1.05);
+}
+
+.preset-slot .btn-save-preset:active,
+.preset-slot .btn-load-preset:active,
+.preset-slot .btn-rename-preset:active {
+    transform: translateY(0);
+}
+
+.preset-slot .btn-delete-preset:active {
+    transform: scale(1);
+}
+
+/* 모바일에서 프리셋 슬롯 반응형 */
+@media (max-width: 768px) {
+    .preset-slot {
+        flex-wrap: wrap;
+        padding: 15px;
+    }
+    
+    .preset-number {
+        min-width: 30px;
+        font-size: 13px;
+    }
+    
+    .preset-info {
+        width: calc(100% - 42px);
+    }
+    
+    .preset-actions {
+        width: 100%;
+        justify-content: stretch;
+        margin-top: 8px;
+    }
+    
+    .preset-slot .btn-save-preset,
+    .preset-slot .btn-load-preset {
+        flex: 1;
+        height: 36px;
+        padding: 0 10px;
+    }
+    
+    .preset-slot .btn-rename-preset,
+    .preset-slot .btn-delete-preset {
+        width: 36px;
+        height: 36px;
+    }
 }
 
 /* ========================================
