@@ -1289,11 +1289,28 @@ function setupEventListeners() {
     }
 }
 
+// 알림 타이머 전역 변수
+let notificationTimer = null;
+
 function showNotification(message) {
     const notification = document.getElementById('notification');
+    
+    // 기존 타이머가 있으면 제거
+    if (notificationTimer) {
+        clearTimeout(notificationTimer);
+        notification.classList.remove('show');
+    }
+    
+    // 강제로 리플로우를 발생시켜 애니메이션 재시작
+    void notification.offsetWidth;
+    
     notification.textContent = message;
     notification.classList.add('show');
-    setTimeout(function () { notification.classList.remove('show'); }, 2000);
+    
+    notificationTimer = setTimeout(function () { 
+        notification.classList.remove('show');
+        notificationTimer = null;
+    }, 2000);
 }
 
 // 데이터를 JSON 파일로 내보내기
