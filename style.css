@@ -231,6 +231,18 @@ body {
     font-size: 26px; /* 헤더 폰트 증가 */
     color: var(--panel-header-h1); letter-spacing: 3px;
 }
+
+/* 헤더 컨트롤 버튼 컨테이너 */
+.header-controls {
+    position: absolute;
+    top: 35px;
+    right: 30px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 20;
+}
+
 .header-decoration {
     width: 45px; height: 3px; background: var(--accent-blue);
     margin-top: 15px;
@@ -984,9 +996,6 @@ input[type="color"] {
 
 /* 소리 토글 버튼 (헤더 우측 상단 고정) */
 .btn-sound-toggle {
-    position: absolute;
-    top: 35px;
-    right: 70px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-muted);
@@ -998,7 +1007,6 @@ input[type="color"] {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    z-index: 20;
 }
 
 .btn-sound-toggle svg {
@@ -1026,11 +1034,8 @@ input[type="color"] {
     100% { box-shadow: 0 0 0 0 rgba(45, 90, 240, 0); }
 }
 
-/* 크레딧 토글 버튼 (헤더 우측 상단 고정) */
+/* 크레딧 토글 버튼 */
 .btn-credit-toggle {
-    position: absolute;
-    top: 35px;
-    right: 30px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-muted);
@@ -1042,7 +1047,6 @@ input[type="color"] {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    z-index: 20;
 }
 
 .btn-credit-toggle svg {
@@ -1116,9 +1120,6 @@ input[type="color"] {
 }
 /* ─── 라이트/다크 모드 토글 버튼 ─── */
 .btn-theme-toggle {
-    position: absolute;
-    top: 35px;
-    right: 110px; /* 소리 버튼(right:70), 크레딧 버튼(right:30) 왼쪽에 배치 */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-muted);
@@ -1130,7 +1131,6 @@ input[type="color"] {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    z-index: 20;
 }
 
 .btn-theme-toggle svg {
@@ -1787,24 +1787,17 @@ body.light-mode .btn-save-new-preset {
         letter-spacing: 2px;
     }
 
+    .header-controls {
+        top: 20px;
+        right: 20px;
+        gap: 8px;
+    }
+
     .btn-theme-toggle,
     .btn-sound-toggle,
     .btn-credit-toggle {
         width: 32px;
         height: 32px;
-        top: 20px;
-    }
-
-    .btn-theme-toggle {
-        right: 100px;
-    }
-
-    .btn-sound-toggle {
-        right: 60px;
-    }
-
-    .btn-credit-toggle {
-        right: 20px;
     }
 
     .btn-theme-toggle svg,
