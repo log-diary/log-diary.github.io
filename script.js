@@ -284,7 +284,7 @@ function loadFromStorage() {
             // 표지 관련 설정 로드
             if (enableCover) enableCover.checked = data.enableCover || false;
             if (coverImage) coverImage.value = data.coverImage || '';
-            if (coverZoom) coverZoom.value = data.coverZoom || 100;
+            if (coverZoom) coverZoom.value = data.coverZoom || 120;
             if (coverFocusX) coverFocusX.value = data.coverFocusX || 50;
             if (coverFocusY) coverFocusY.value = data.coverFocusY || 28;
             if (coverArchiveNo) coverArchiveNo.value = data.coverArchiveNo || 'ARCHIVE NO.001';
@@ -309,7 +309,7 @@ function loadFromStorage() {
             const commentContent = document.getElementById('commentContent');
             const enableTagsEl = document.getElementById('enableTags');
 
-            if (coverZoomValue) coverZoomValue.textContent = (data.coverZoom || 100) + '%';
+            if (coverZoomValue) coverZoomValue.textContent = (data.coverZoom || 120) + '%';
             if (coverFocusXValue) coverFocusXValue.textContent = (data.coverFocusX || 50) + '%';
             if (coverFocusYValue) coverFocusYValue.textContent = (data.coverFocusY || 28) + '%';
 
@@ -524,14 +524,14 @@ function loadDefaultSettings() {
     
     if (enableCover) enableCover.checked = true;
     if (coverImage) coverImage.value = 'DefaultCover.png';
-    if (coverZoom) coverZoom.value = 100;
+    if (coverZoom) coverZoom.value = 120;
     if (coverFocusX) coverFocusX.value = 50;
     if (coverFocusY) coverFocusY.value = 30;
     if (coverArchiveNo) coverArchiveNo.value = 'ARCHIVE NO.001';
     if (coverTitle) coverTitle.value = 'Yuzu';
     if (coverSubtitle) coverSubtitle.value = '귀여운 고양이 메이드';
     if (coverContent) coverContent.style.display = 'block';
-    if (coverZoomValue) coverZoomValue.textContent = '100%';
+    if (coverZoomValue) coverZoomValue.textContent = '120%';
     if (coverFocusXValue) coverFocusXValue.textContent = '50%';
     if (coverFocusYValue) coverFocusYValue.textContent = '30%';
 
@@ -712,7 +712,7 @@ function saveToStorage() {
             enableTopSection: getChecked('enableTopSection'),
             enableCover: getChecked('enableCover'),
             coverImage: getValue('coverImage'),
-            coverZoom: getIntValue('coverZoom', 100),
+            coverZoom: getIntValue('coverZoom', 120),
             coverFocusX: getIntValue('coverFocusX', 50),
             coverFocusY: getIntValue('coverFocusY', 30),
             coverArchiveNo: getValue('coverArchiveNo'),
