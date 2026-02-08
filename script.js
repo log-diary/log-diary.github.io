@@ -1316,6 +1316,10 @@ function showNotification(message) {
 // 데이터를 JSON 파일로 내보내기
 function exportDataToJSON() {
     try {
+        // 프리셋 데이터 가져오기
+        const savedPresets = localStorage.getItem(PRESET_STORAGE_KEY);
+        const presets = savedPresets ? JSON.parse(savedPresets) : {};
+        
         // 현재 상태를 JSON으로 저장
         const data = {
             useRoundedQuotes: document.getElementById('useRoundedQuotes').checked,
@@ -1323,6 +1327,7 @@ function exportDataToJSON() {
             enableTopSection: document.getElementById('enableTopSection').checked,
             enableCover: document.getElementById('enableCover').checked,
             coverImage: document.getElementById('coverImage').value,
+            coverZoom: parseInt(document.getElementById('coverZoom').value),
             coverFocusX: parseInt(document.getElementById('coverFocusX').value),
             coverFocusY: parseInt(document.getElementById('coverFocusY').value),
             coverArchiveNo: document.getElementById('coverArchiveNo').value,
@@ -1359,6 +1364,7 @@ function exportDataToJSON() {
             fontFamily: fontFamily,
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
+            presets: presets, // 프리셋 데이터 포함
             exportDate: new Date().toISOString(),
             version: '1.0'
         };
@@ -1428,6 +1434,10 @@ function importDataFromJSON(file) {
                 document.getElementById('coverContent').style.display = data.enableCover ? 'block' : 'none';
             }
             if (data.coverImage !== undefined) document.getElementById('coverImage').value = data.coverImage;
+            if (data.coverZoom !== undefined) {
+                document.getElementById('coverZoom').value = data.coverZoom;
+                document.getElementById('coverZoomValue').textContent = data.coverZoom + '%';
+            }
             if (data.coverFocusX !== undefined) {
                 document.getElementById('coverFocusX').value = data.coverFocusX;
                 document.getElementById('coverFocusXValue').textContent = data.coverFocusX + '%';
@@ -1527,6 +1537,12 @@ function importDataFromJSON(file) {
                 document.getElementById('hidePageNumbers').checked = hidePageNumbers;
             }
 
+            // 프리셋 데이터 복원
+            if (data.presets && typeof data.presets === 'object') {
+                localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(data.presets));
+                loadPresets(); // 프리셋 UI 업데이트
+            }
+
             // UI 업데이트
             updateTagsList();
             updateReplacementsList();
@@ -1624,7 +1640,9 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing) {
     const lineHeight = textSpacing.lineHeight;
     const letterSpacing = textSpacing.letterSpacing + 'px';
     const paragraphSpacing = reduceParagraphSpacing ? '5px' : textSpacing.paragraphSpacing + 'px';
-    const indent = (useTextIndent && !skipIndent) ? textSpacing.textIndent + 'em' : '0';
+    // useTextIndent 체크 시 기본값 1em 적용, textIndent 값이 있으면 그 값 사용
+    const indentValue = textSpacing.textIndent > 0 ? textSpacing.textIndent : 1;
+    const indent = (useTextIndent && !skipIndent) ? indentValue + 'em' : '0';
 
     const textIndentStyle = indent !== '0' ? ' text-indent: ' + indent + ';' : '';
     const paragraphMargin = '0 0 ' + paragraphSpacing + ' 0';
@@ -3714,6 +3732,7 @@ function saveNewPreset() {
             enableTopSection: document.getElementById('enableTopSection')?.checked,
             enableCover: document.getElementById('enableCover')?.checked,
             coverImage: document.getElementById('coverImage')?.value,
+            coverZoom: parseInt(document.getElementById('coverZoom')?.value || 120),
             coverFocusX: parseInt(document.getElementById('coverFocusX')?.value || 50),
             coverFocusY: parseInt(document.getElementById('coverFocusY')?.value || 50),
             coverArchiveNo: document.getElementById('coverArchiveNo')?.value,
@@ -3781,6 +3800,7 @@ function savePreset(slotIndex) {
             enableTopSection: document.getElementById('enableTopSection')?.checked,
             enableCover: document.getElementById('enableCover')?.checked,
             coverImage: document.getElementById('coverImage')?.value,
+            coverZoom: parseInt(document.getElementById('coverZoom')?.value || 120),
             coverFocusX: parseInt(document.getElementById('coverFocusX')?.value || 50),
             coverFocusY: parseInt(document.getElementById('coverFocusY')?.value || 50),
             coverArchiveNo: document.getElementById('coverArchiveNo')?.value,
@@ -3873,6 +3893,10 @@ function loadPreset(slotIndex) {
             document.getElementById('coverContent').style.display = data.enableCover ? 'block' : 'none';
         }
         if (data.coverImage !== undefined) document.getElementById('coverImage').value = data.coverImage;
+        if (data.coverZoom !== undefined) {
+            document.getElementById('coverZoom').value = data.coverZoom;
+            document.getElementById('coverZoomValue').textContent = data.coverZoom + '%';
+        }
         if (data.coverFocusX !== undefined) {
             document.getElementById('coverFocusX').value = data.coverFocusX;
             document.getElementById('coverFocusXValue').textContent = data.coverFocusX + '%';
