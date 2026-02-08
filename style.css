@@ -1,6 +1,7 @@
 :root {
     --bg-main: #1e1e1e;
     --bg-panel: #252526;
+    --bg-secondary: #2d2d30;
     --bg-input: #2d2d30;
     --bg-input-hover: #3a3a3d;
     --text-main: #d4d4d4;
@@ -53,6 +54,7 @@
 body.light-mode {
     --bg-main: #f0f0f2;
     --bg-panel: #ffffff;
+    --bg-secondary: #f4f4f6;
     --bg-input: #f4f4f6;
     --bg-input-hover: #e8e8ec;
     --text-main: #333333;
@@ -556,7 +558,7 @@ button { font-family: var(--font-display); letter-spacing: 1px; cursor: pointer;
 .modal-header h2 { font-family: var(--font-display); font-size: 20px; letter-spacing: 2px; }
 .close { font-size: 30px; cursor: pointer; color: var(--modal-close-color); }
 .close:hover { color: var(--modal-close-hover); }
-.modal-body { padding: 35px; overflow-y: auto; }
+.modal-body { padding: 35px; overflow-y: auto; overflow-x: hidden; }
 
 .editor-textarea {
     width: 100%; background: var(--editor-textarea-bg); border: 1px solid var(--editor-textarea-border);
@@ -1385,6 +1387,7 @@ details summary::marker {
         padding: 20px;
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .editor-textarea {
@@ -1890,4 +1893,49 @@ details summary::marker {
             max-height: calc(-webkit-fill-available - 400px);
         }
     }
+}
+
+/* 통계 표시 영역 스타일 */
+#pageStats,
+#totalStats {
+    line-height: 1.6;
+    box-sizing: border-box;
+}
+
+#pageStats {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+#totalStats {
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* 모바일에서 통계 표시 개선 */
+@media (max-width: 768px) {
+    #pageStats,
+    #totalStats {
+        font-size: 12px;
+        line-height: 1.7;
+    }
+    
+    #pageStats {
+        padding: 8px;
+        margin-top: 8px;
+    }
+    
+    #totalStats {
+        padding: 10px;
+    }
+    
+    /* 모바일에서는 제목 줄바꿈 없이 표시 */
 }

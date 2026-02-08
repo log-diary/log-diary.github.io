@@ -269,6 +269,7 @@ function loadFromStorage() {
             const enableTopSection = document.getElementById('enableTopSection');
             const enableCover = document.getElementById('enableCover');
             const coverImage = document.getElementById('coverImage');
+            const coverZoom = document.getElementById('coverZoom');
             const coverFocusX = document.getElementById('coverFocusX');
             const coverFocusY = document.getElementById('coverFocusY');
             const coverArchiveNo = document.getElementById('coverArchiveNo');
@@ -283,6 +284,7 @@ function loadFromStorage() {
             // 표지 관련 설정 로드
             if (enableCover) enableCover.checked = data.enableCover || false;
             if (coverImage) coverImage.value = data.coverImage || '';
+            if (coverZoom) coverZoom.value = data.coverZoom || 100;
             if (coverFocusX) coverFocusX.value = data.coverFocusX || 50;
             if (coverFocusY) coverFocusY.value = data.coverFocusY || 28;
             if (coverArchiveNo) coverArchiveNo.value = data.coverArchiveNo || 'ARCHIVE NO.001';
@@ -291,6 +293,7 @@ function loadFromStorage() {
             if (coverContent) coverContent.style.display = data.enableCover ? 'block' : 'none';
 
             // Focus 값 표시 업데이트
+            const coverZoomValue = document.getElementById('coverZoomValue');
             const coverFocusXValue = document.getElementById('coverFocusXValue');
             const coverFocusYValue = document.getElementById('coverFocusYValue');
             const topSectionContent = document.getElementById('topSectionContent');
@@ -306,6 +309,7 @@ function loadFromStorage() {
             const commentContent = document.getElementById('commentContent');
             const enableTagsEl = document.getElementById('enableTags');
 
+            if (coverZoomValue) coverZoomValue.textContent = (data.coverZoom || 100) + '%';
             if (coverFocusXValue) coverFocusXValue.textContent = (data.coverFocusX || 50) + '%';
             if (coverFocusYValue) coverFocusYValue.textContent = (data.coverFocusY || 28) + '%';
 
@@ -507,23 +511,27 @@ function loadDefaultSettings() {
     // 표지 설정
     const enableCover = document.getElementById('enableCover');
     const coverImage = document.getElementById('coverImage');
+    const coverZoom = document.getElementById('coverZoom');
     const coverFocusX = document.getElementById('coverFocusX');
     const coverFocusY = document.getElementById('coverFocusY');
     const coverArchiveNo = document.getElementById('coverArchiveNo');
     const coverTitle = document.getElementById('coverTitle');
     const coverSubtitle = document.getElementById('coverSubtitle');
     const coverContent = document.getElementById('coverContent');
+    const coverZoomValue = document.getElementById('coverZoomValue');
     const coverFocusXValue = document.getElementById('coverFocusXValue');
     const coverFocusYValue = document.getElementById('coverFocusYValue');
     
     if (enableCover) enableCover.checked = true;
     if (coverImage) coverImage.value = 'DefaultCover.png';
+    if (coverZoom) coverZoom.value = 100;
     if (coverFocusX) coverFocusX.value = 50;
     if (coverFocusY) coverFocusY.value = 30;
     if (coverArchiveNo) coverArchiveNo.value = 'ARCHIVE NO.001';
     if (coverTitle) coverTitle.value = 'Yuzu';
     if (coverSubtitle) coverSubtitle.value = '귀여운 고양이 메이드';
     if (coverContent) coverContent.style.display = 'block';
+    if (coverZoomValue) coverZoomValue.textContent = '100%';
     if (coverFocusXValue) coverFocusXValue.textContent = '50%';
     if (coverFocusYValue) coverFocusYValue.textContent = '30%';
 
@@ -538,6 +546,7 @@ function loadDefaultSettings() {
         {
             name: 'Yuzu',
             imageUrl: 'DefaultProfile1.png',
+            zoom: 100,
             focusX: 50,
             focusY: 30,
             desc: ' Profile 1 Description',
@@ -546,6 +555,7 @@ function loadDefaultSettings() {
         {
             name: 'Jong-won',
             imageUrl: 'DefaultProfile2.png',
+            zoom: 100,
             focusX: 50,
             focusY: 10,
             desc: 'Profile 2 Description',
@@ -702,6 +712,7 @@ function saveToStorage() {
             enableTopSection: getChecked('enableTopSection'),
             enableCover: getChecked('enableCover'),
             coverImage: getValue('coverImage'),
+            coverZoom: getIntValue('coverZoom', 100),
             coverFocusX: getIntValue('coverFocusX', 50),
             coverFocusY: getIntValue('coverFocusY', 30),
             coverArchiveNo: getValue('coverArchiveNo'),
@@ -759,8 +770,18 @@ function setupEventListeners() {
     });
 
     // 표지 Focus 슬라이더 이벤트
+    const coverZoom = document.getElementById('coverZoom');
     const coverFocusX = document.getElementById('coverFocusX');
     const coverFocusY = document.getElementById('coverFocusY');
+
+    if (coverZoom) {
+        coverZoom.addEventListener('input', function () {
+            const coverZoomValue = document.getElementById('coverZoomValue');
+            if (coverZoomValue) coverZoomValue.textContent = this.value + '%';
+            updatePreview();
+            saveToStorage();
+        });
+    }
 
     if (coverFocusX) {
         coverFocusX.addEventListener('input', function () {
@@ -919,6 +940,9 @@ function setupEventListeners() {
             const pageModal = document.getElementById('pageModal');
             pageModal.style.display = 'block';
             
+            // 페이지 통계 초기화
+            updatePageStats();
+            
             // 모바일에서 모달과 body를 맨 위로 스크롤
             setTimeout(function() {
                 pageModal.scrollTop = 0;
@@ -936,8 +960,10 @@ function setupEventListeners() {
             document.getElementById('sectionTitle').value = '';
             document.getElementById('sectionSubtitle').value = '';
             document.getElementById('sectionImage').value = '';
+            document.getElementById('sectionZoom').value = 100;
             document.getElementById('sectionFocusX').value = 50;
             document.getElementById('sectionFocusY').value = 50;
+            document.getElementById('sectionZoomValue').textContent = '100%';
             document.getElementById('sectionFocusXValue').textContent = '50%';
             document.getElementById('sectionFocusYValue').textContent = '50%';
 
@@ -987,8 +1013,22 @@ function setupEventListeners() {
         deleteSection.addEventListener('click', deleteSectionData);
     }
 
+    // 페이지 컨텐츠 입력 시 실시간 통계 업데이트
+    const pageContent = document.getElementById('pageContent');
+    if (pageContent) {
+        pageContent.addEventListener('input', function() {
+            updatePageStats();
+        });
+    }
 
     // 섹션 Focus 슬라이더 이벤트
+    const sectionZoom = document.getElementById('sectionZoom');
+    if (sectionZoom) {
+        sectionZoom.addEventListener('input', function () {
+            document.getElementById('sectionZoomValue').textContent = this.value + '%';
+        });
+    }
+
     const sectionFocusX = document.getElementById('sectionFocusX');
     if (sectionFocusX) {
         sectionFocusX.addEventListener('input', function () {
@@ -1076,6 +1116,7 @@ function setupEventListeners() {
                 profiles.push({
                     name: '',
                     imageUrl: '',
+                    zoom: 100,
                     focusX: 50,
                     focusY: 30,
                     desc: '',
@@ -2245,6 +2286,8 @@ function updateProfilesList() {
         const focusYId = 'profile' + index + 'FocusY';
         const focusXValueId = 'profile' + index + 'FocusXValue';
         const focusYValueId = 'profile' + index + 'FocusYValue';
+        const zoomId = 'profile' + index + 'Zoom';
+        const zoomValueId = 'profile' + index + 'ZoomValue';
 
         // [수정됨] 페이지 목록(page-controls) 스타일을 그대로 차용
         profileSection.innerHTML =
@@ -2268,6 +2311,10 @@ function updateProfilesList() {
             '</span>' +
             '</label>' +
             '<input type="text" class="profile-image-input" placeholder="https://..." value="' + (profile.imageUrl || '') + '" data-index="' + index + '">' +
+            '</div>' +
+            '<div class="input-group">' +
+            '<label>Zoom <span id="' + zoomValueId + '" style="color:var(--accent-blue);">' + (profile.zoom || 100) + '%</span></label>' +
+            '<input type="range" id="' + zoomId + '" class="profile-zoom-input spacing-slider" min="100" max="300" value="' + (profile.zoom || 100) + '" data-index="' + index + '" style="width: 100%;">' +
             '</div>' +
             '<div class="input-group">' +
             '<label>Focus X (좌우) <span id="' + focusXValueId + '" style="color:var(--accent-blue);">' + (profile.focusX || 50) + '%</span></label>' +
@@ -2312,6 +2359,14 @@ function attachProfileEvents(profilesList) {
     profilesList.querySelectorAll('.profile-image-input').forEach(input => {
         input.addEventListener('input', e => {
             profiles[parseInt(e.target.dataset.index)].imageUrl = e.target.value;
+            updatePreview(); saveToStorage();
+        });
+    });
+    profilesList.querySelectorAll('.profile-zoom-input').forEach(input => {
+        input.addEventListener('input', e => {
+            const idx = parseInt(e.target.dataset.index);
+            profiles[idx].zoom = parseInt(e.target.value);
+            document.getElementById('profile' + idx + 'ZoomValue').textContent = e.target.value + '%';
             updatePreview(); saveToStorage();
         });
     });
@@ -2540,6 +2595,7 @@ function saveSectionData() {
     const sectionTitle = document.getElementById('sectionTitle').value.trim();
     const sectionSubtitle = document.getElementById('sectionSubtitle').value.trim();
     const sectionImage = document.getElementById('sectionImage').value.trim();
+    const sectionZoom = parseInt(document.getElementById('sectionZoom').value);
     const sectionFocusX = parseInt(document.getElementById('sectionFocusX').value);
     const sectionFocusY = parseInt(document.getElementById('sectionFocusY').value);
 
@@ -2553,6 +2609,7 @@ function saveSectionData() {
         title: sectionTitle,
         subtitle: sectionSubtitle,
         image: sectionImage,
+        zoom: sectionZoom,
         focusX: sectionFocusX,
         focusY: sectionFocusY
     };
@@ -2612,6 +2669,89 @@ function movePageDown(index) {
     }
 }
 
+// 텍스트 통계 계산 함수
+function calculateTextStats(text) {
+    if (!text || !text.trim()) {
+        return {
+            charCountNoSpace: 0,
+            charCountWithSpace: 0,
+            wordCount: 0
+        };
+    }
+
+    // 본문 텍스트만 추출 (태그 및 마크업 제거)
+    let cleanText = text;
+    
+    // [HR], [IMG:...], [FN:...][/FN] 등의 태그 제거
+    cleanText = cleanText.replace(/\[HR\]/g, '');
+    cleanText = cleanText.replace(/\[IMG:[^\]]*\]/g, '');
+    cleanText = cleanText.replace(/\[FN:[^\]]*\].*?\[\/FN\]/g, '');
+    
+    // 공백 정리
+    cleanText = cleanText.trim();
+    
+    // 글자 수 계산 (공백 제외)
+    const charCountNoSpace = cleanText.replace(/\s/g, '').length;
+    
+    // 글자 수 계산 (공백 포함)
+    const charCountWithSpace = cleanText.length;
+    
+    // 단어 수 계산 (한글은 어절 단위, 영문은 단어 단위)
+    const wordCount = cleanText.split(/\s+/).filter(word => word.length > 0).length;
+    
+    return {
+        charCountNoSpace: charCountNoSpace,
+        charCountWithSpace: charCountWithSpace,
+        wordCount: wordCount
+    };
+}
+
+// 페이지별 통계 업데이트
+function updatePageStats() {
+    const pageContent = document.getElementById('pageContent');
+    const pageStats = document.getElementById('pageStats');
+    
+    if (!pageContent || !pageStats) return;
+    
+    const stats = calculateTextStats(pageContent.value);
+    
+    pageStats.innerHTML = 
+        '<strong>현재 페이지:</strong><br>' +
+        '글자 수 (공백 제외): <span style="color: var(--accent-blue);">' + stats.charCountNoSpace.toLocaleString() + '자</span><br>' +
+        '글자 수 (공백 포함): <span style="color: var(--accent-blue);">' + stats.charCountWithSpace.toLocaleString() + '자</span><br>' +
+        '단어 수: <span style="color: var(--accent-blue);">' + stats.wordCount.toLocaleString() + '개</span>';
+}
+
+// 전체 페이지 통계 업데이트
+function updateTotalStats() {
+    const totalStats = document.getElementById('totalStats');
+    if (!totalStats) return;
+    
+    let totalCharCountNoSpace = 0;
+    let totalCharCountWithSpace = 0;
+    let totalWordCount = 0;
+    
+    pages.forEach(function(item) {
+        // 페이지만 카운트 (섹션은 제외)
+        if (item.itemType !== 'section' && item.content) {
+            const stats = calculateTextStats(item.content);
+            totalCharCountNoSpace += stats.charCountNoSpace;
+            totalCharCountWithSpace += stats.charCountWithSpace;
+            totalWordCount += stats.wordCount;
+        }
+    });
+    
+    if (totalCharCountNoSpace === 0) {
+        totalStats.innerHTML = '<strong>전체 페이지 통계:</strong> 페이지가 없습니다.';
+    } else {
+        totalStats.innerHTML = 
+            '<strong>전체 페이지 통계:</strong><br>' +
+            '글자 수 (공백 제외): <span style="color: var(--accent-blue);">' + totalCharCountNoSpace.toLocaleString() + '자</span><br>' +
+            '글자 수 (공백 포함): <span style="color: var(--accent-blue);">' + totalCharCountWithSpace.toLocaleString() + '자</span><br>' +
+            '단어 수: <span style="color: var(--accent-blue);">' + totalWordCount.toLocaleString() + '개</span>';
+    }
+}
+
 function updatePagesList() {
     const pagesList = document.getElementById('pagesList');
     pagesList.innerHTML = '';
@@ -2652,8 +2792,10 @@ function updatePagesList() {
                 document.getElementById('sectionTitle').value = item.title || '';
                 document.getElementById('sectionSubtitle').value = item.subtitle || '';
                 document.getElementById('sectionImage').value = item.image || '';
+                document.getElementById('sectionZoom').value = item.zoom || 100;
                 document.getElementById('sectionFocusX').value = item.focusX || 50;
                 document.getElementById('sectionFocusY').value = item.focusY || 50;
+                document.getElementById('sectionZoomValue').textContent = (item.zoom || 100) + '%';
                 document.getElementById('sectionFocusXValue').textContent = (item.focusX || 50) + '%';
                 document.getElementById('sectionFocusYValue').textContent = (item.focusY || 50) + '%';
 
@@ -2712,6 +2854,9 @@ function updatePagesList() {
                 const pageModal = document.getElementById('pageModal');
                 pageModal.style.display = 'flex';
                 
+                // 페이지 통계 업데이트
+                updatePageStats();
+                
                 // 모바일에서 모달과 body를 맨 위로 스크롤
                 setTimeout(function() {
                     pageModal.scrollTop = 0;
@@ -2766,6 +2911,9 @@ function updatePagesList() {
             }
         });
     });
+    
+    // 전체 통계 업데이트
+    updateTotalStats();
 }
 
 function generateHTML(isPreview) {
@@ -2811,6 +2959,7 @@ function generateHTML(isPreview) {
 
         // 표지 생성
         if (enableCover) {
+            const coverZoom = document.getElementById('coverZoom').value;
             const coverFocusX = document.getElementById('coverFocusX').value;
             const coverFocusY = document.getElementById('coverFocusY').value;
             const coverArchiveNo = document.getElementById('coverArchiveNo').value;
@@ -2820,7 +2969,7 @@ function generateHTML(isPreview) {
             if (coverImage) {
                 const normalizedCoverImage = normalizeImageUrl(coverImage);
                 topContent += '<div style="width:100%;margin:0 0 30px 0;box-sizing:border-box;background:transparent;">';
-                topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:cover;background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
+                topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + coverZoom + '% auto;background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
                 topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:10px 10px 0 0;">';
 
                 if (coverArchiveNo) {
@@ -2891,7 +3040,8 @@ function generateHTML(isPreview) {
                     if (hasImage) {
                         topContent += '<div style="' + imgWrapperStyle + '">';
                         const bgPosition = (profile.focusX || 50) + '% ' + (profile.focusY || 30) + '%';
-                        topContent += '<div style="' + imgCircleStyleBase + ' background: url(\'' + profileImageUrl + '\') ' + bgPosition + ' / cover no-repeat;"></div>';
+                        const bgSize = (profile.zoom || 100) + '% auto';
+                        topContent += '<div style="' + imgCircleStyleBase + ' background: url(\'' + profileImageUrl + '\') ' + bgPosition + ' / ' + bgSize + ' no-repeat;"></div>';
                         topContent += '</div>';
                     }
 
@@ -3010,6 +3160,7 @@ function generateHTML(isPreview) {
 
             // 섹션 이미지가 있는 경우 - 표지와 유사한 레이아웃 사용
             if (item.image && item.image.trim()) {
+                const zoom = item.zoom || 100;
                 const focusX = item.focusX || 50;
                 const focusY = item.focusY || 50;
                 const sectionImage = normalizeImageUrl(item.image);
@@ -3018,7 +3169,7 @@ function generateHTML(isPreview) {
                 const sectionMarginBottom = isInSection ? 'margin-bottom:20px;' : '';
                 const sectionBorderRadius = isInSection ? 'border-radius:10px 10px 0 0;' : 'border-radius:10px;';
 
-                sectionHtml += '<div style="width:100%;height:15vh;display:table;background-color:#1a1a1a;background-image:url(\'' + sectionImage + '\');background-size:cover;background-position:' + focusX + '% ' + focusY + '%;background-repeat:no-repeat;' + sectionBorderRadius + sectionMarginBottom + '">';
+                sectionHtml += '<div style="width:100%;height:15vh;display:table;background-color:#1a1a1a;background-image:url(\'' + sectionImage + '\');background-size:' + zoom + '% auto;background-position:' + focusX + '% ' + focusY + '%;background-repeat:no-repeat;' + sectionBorderRadius + sectionMarginBottom + '">';
                 sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);' + sectionBorderRadius + 'text-align:center;">';
 
                 if (item.subtitle && item.subtitle.trim()) {
