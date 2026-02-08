@@ -691,7 +691,8 @@ button { font-family: var(--font-display); letter-spacing: 1px; cursor: pointer;
 
 /* 닫기 버튼 통일 (.close와 .close-section 모두 적용) */
 .close, 
-.close-section { 
+.close-section,
+.close-credit { 
     font-size: 28px;
     width: 28px;
     height: 28px;
@@ -707,7 +708,8 @@ button { font-family: var(--font-display); letter-spacing: 1px; cursor: pointer;
 }
 
 .close:hover,
-.close-section:hover { 
+.close-section:hover,
+.close-credit:hover { 
     color: var(--modal-close-hover);
     background: var(--accent-blue-dim);
 }
@@ -2378,7 +2380,8 @@ body.light-mode .btn-save-new-preset {
     
     /* 닫기 버튼 크기 조정 */
     .close,
-    .close-section {
+    .close-section,
+    .close-credit {
         font-size: 24px;
         width: 24px;
         height: 24px;
