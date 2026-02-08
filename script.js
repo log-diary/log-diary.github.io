@@ -1905,6 +1905,12 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         pageTitle = titlePart;
     }
 
+    // 표지 이미지 유무에 따른 색상 결정
+    const hasHeaderImage = headerImage && typeof headerImage === 'string' && headerImage.trim();
+    const numberColor = hasHeaderImage ? '#ffffff' : themeStyle.header;
+    const titleColor = hasHeaderImage ? '#ffffff' : themeStyle.header;
+    const subtitleColor = hasHeaderImage ? 'rgba(255, 255, 255, 0.85)' : (themeStyle.tagText || themeStyle.text);
+
     // Create layout: number on left (large), title/subtitle on right
     let headerHtml = '';
 
@@ -1913,14 +1919,14 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         // Layout with number
         headerHtml += '<div style="display: table; width: 100%; padding: clamp(15px, 3vw, 20px) 0; ">';
         headerHtml += '<div style="display: table-cell; width: clamp(70px, 15vw, 100px); vertical-align: center; padding-left: clamp(30px, 5vw, 50px);padding-right: clamp(20px, 3vw, 30px);">';
-        headerHtml += '<div style="font-size: clamp(32px, 7vw, 48px); font-weight: 700; color: ' + themeStyle.header + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1;">' + pageNum.replace('#', '') + '</div>';
+        headerHtml += '<div style="font-size: clamp(32px, 7vw, 48px); font-weight: 700; color: ' + numberColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1;">' + pageNum.replace('#', '') + '</div>';
         headerHtml += '</div>';
         headerHtml += '<div style="display: table-cell; vertical-align: middle; padding-top: 0;">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + themeStyle.header + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
-            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + (themeStyle.tagText || themeStyle.text) + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
         headerHtml += '</div>';
@@ -1928,23 +1934,23 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         // 번호 숨김이지만 제목이나 부제목이 있는 경우 - 좌측 정렬
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + themeStyle.header + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
-            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + (themeStyle.tagText || themeStyle.text) + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
     } else if (hidePageNumbers && pageNum) {
         // 번호 숨김이고 제목/부제목이 없는 경우 - "Page n" 표시 (좌측 정렬)
         const pageNumber = pageNum.replace('#', '');
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
-        headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + themeStyle.header + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
+        headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + titleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
         headerHtml += '</div>';
     } else {
         // Fallback to centered layout if no number
         const displayContent = text ? text.toUpperCase() : '';
-        const headerStyle = 'text-align: center; font-size: clamp(13px, 2.5vw, 16px); letter-spacing: clamp(2px, 0.5vw, 4px); font-weight: 600; color: ' + themeStyle.header + '; margin-bottom: 0; padding: clamp(15px, 3vw, 20px) 0; line-height: 1; white-space: nowrap;';
-        const lineStyle = 'display: inline-block; width: clamp(25px, 5vw, 40px); height: 0px; border-top: 1px solid ' + themeStyle.header + '; vertical-align: middle; font-size: 0px; line-height: 0px;';
+        const headerStyle = 'text-align: center; font-size: clamp(13px, 2.5vw, 16px); letter-spacing: clamp(2px, 0.5vw, 4px); font-weight: 600; color: ' + titleColor + '; margin-bottom: 0; padding: clamp(15px, 3vw, 20px) 0; line-height: 1; white-space: nowrap;';
+        const lineStyle = 'display: inline-block; width: clamp(25px, 5vw, 40px); height: 0px; border-top: 1px solid ' + titleColor + '; vertical-align: middle; font-size: 0px; line-height: 0px;';
         const textWrapperStyle = 'display: inline-block; margin: 0 clamp(10px, 2vw, 15px); vertical-align: middle;';
 
         headerHtml = '<div style="' + headerStyle + '">' +
@@ -1955,7 +1961,7 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
     }
 
     // 헤더 띠지 이미지가 있으면 추가
-    if (headerImage && typeof headerImage === 'string' && headerImage.trim()) {
+    if (hasHeaderImage) {
         const focusX = headerFocusX || 50;
         const focusY = headerFocusY || 50;
         const bannerStyle = 'width: calc(100% + clamp(30px, 6vw, 60px)); margin: 0 -' + 'clamp(15px, 3vw, 30px)' + '; height: 100px; background: url(\'' + headerImage + '\') ' + focusX + '% ' + focusY + '% / cover no-repeat; margin-bottom: 20px; margin-top: -20px;';
@@ -2155,17 +2161,10 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
         const collapsedHeaderHtml = headerHtml.replace('margin-bottom: 20px; padding-top: 20px;', 'margin: 0; padding: clamp(15px, 3vw, 20px) 0 clamp(15px, 3vw, 20px) 0;');
         const summaryStyle = 'cursor: pointer; list-style: none; outline: none; color: inherit; font-weight: normal;';
 
-        // INTRODUCTION 체크
-        const isIntroduction = headerHtml.toUpperCase().indexOf('INTRODUCTION') !== -1;
-
-        // 화살표 추가 (INTRODUCTION 제외)
-        let summaryContent = collapsedHeaderHtml;
-        if (!isIntroduction) {
-            // 화살표 wrapper 추가
-            const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-            const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: clamp(16px, 3vw, 20px); color: ' + theme.tagText + ';">⌵</span></div></div></div>';
-            summaryContent = arrowWrapperStart + collapsedHeaderHtml + arrowWrapperMid;
-        }
+        // 화살표 추가
+        const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
+        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: clamp(16px, 3vw, 20px); color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+        const summaryContent = arrowWrapperStart + collapsedHeaderHtml + arrowWrapperMid;
 
         let detailsHtml = '<details style="' + containerStyle + '">';
         detailsHtml += '<summary style="' + summaryStyle + '">';
@@ -2176,8 +2175,8 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
         return detailsHtml;
     }
 
-    // 단독 페이지 처리 (섹션 없을 때, INTRODUCTION 헤더 제외)
-    if (headerHtml && headerHtml.indexOf('INTRODUCTION') === -1) {
+    // 단독 페이지 처리 (섹션 없을 때)
+    if (headerHtml) {
         // 화살표로 감싼 header 생성
         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
         const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: clamp(16px, 3vw, 20px); color: ' + theme.tagText + ';">⌵</span></div></div></div>';
@@ -2185,11 +2184,6 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
         const headerWithArrow = arrowWrapperStart + headerHtml + arrowWrapperMid;
 
         return '<div style="' + containerStyle + '">' + headerWithArrow + content + '</div>';
-    }
-
-    // INTRODUCTION 헤더가 있는 경우 화살표 없이
-    if (headerHtml) {
-        return '<div style="' + containerStyle + '">' + headerHtml + content + '</div>';
     }
 
     return '<div style="' + containerStyle + '">' + content + '</div>';
@@ -2939,17 +2933,16 @@ function generateHTML(isPreview) {
         let topContent = '';
         const coverImage = coverImageUrl;
 
-        // INTRODUCTION 헤더는 커버 이미지가 없을 때만 생성
-        let topHeaderHtml = '';
-        if (!coverImage) {
-            topHeaderHtml = createHeader('INTRODUCTION', theme, null, null, null);
-        }
-
         const lineRgb = hexToRgb(theme.line);
         const lineColor = 'rgba(' + lineRgb.r + ', ' + lineRgb.g + ', ' + lineRgb.b + ', 0.6)';
 
+        // 표지 관련 정보 가져오기
+        const coverArchiveNo = document.getElementById('coverArchiveNo').value;
+        const coverTitle = document.getElementById('coverTitle').value;
+        const coverSubtitle = document.getElementById('coverSubtitle').value;
+
         // 표지 이미지를 제외한 실제 내용이 있는지 미리 확인
-        const hasRealContent = (enableProfiles && profiles.length > 0) || introText.trim() || summaryText.trim();
+        const hasRealContent = (enableProfiles && profiles.length > 0) || introText.trim() || summaryText.trim() || coverArchiveNo || coverTitle || coverSubtitle;
 
         // 인트로가 마지막 컨테이너인지 확인 (페이지도 없고 코멘트도 없으면)
         const enableComment = document.getElementById('enableComment').checked;
@@ -2962,56 +2955,96 @@ function generateHTML(isPreview) {
             const coverZoom = document.getElementById('coverZoom').value;
             const coverFocusX = document.getElementById('coverFocusX').value;
             const coverFocusY = document.getElementById('coverFocusY').value;
-            const coverArchiveNo = document.getElementById('coverArchiveNo').value;
-            const coverTitle = document.getElementById('coverTitle').value;
-            const coverSubtitle = document.getElementById('coverSubtitle').value;
 
-            if (coverImage) {
-                const normalizedCoverImage = normalizeImageUrl(coverImage);
-                topContent += '<div style="width:100%;margin:0 0 30px 0;box-sizing:border-box;background:transparent;">';
-                topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + coverZoom + '% auto;background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
-                topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:10px 10px 0 0;">';
+            // 표지 내용이 있는지 확인 (이미지, 제목, 부제목, 번호 중 하나라도 있으면)
+            const hasCoverContent = coverImage || coverArchiveNo || coverTitle || coverSubtitle;
 
-                if (coverArchiveNo) {
-                    topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
-                }
+            if (hasCoverContent) {
+                if (coverImage) {
+                    // 이미지가 있는 경우 - 기존 로직
+                    const normalizedCoverImage = normalizeImageUrl(coverImage);
+                    topContent += '<div style="width:100%;margin:0 0 30px 0;box-sizing:border-box;background:transparent;">';
+                    topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + coverZoom + '% auto;background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
+                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:10px 10px 0 0;">';
 
-                if (coverTitle) {
-                    // 부제가 있으면 타이틀 아래 여백 0, 없으면 10px
-                    const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
-                    topContent += '<h1 style="font-size:clamp(32px, 6vw, 52px);color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + coverTitle + '</h1>';
-                }
-
-                if (coverSubtitle) {
-                    topContent += '<div style="font-size:clamp(12px, 2.2vw, 14.2px);letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
-                }
-
-                // 태그를 표지에 표시
-                if (enableTags && tags && tags.length > 0) {
-                    const validTags = tags.filter(function (tag) {
-                        return tag.value && tag.value.trim();
-                    });
-
-                    if (validTags.length > 0) {
-                        topContent += '<div style="font-size:0;">';
-                        validTags.forEach(function (tag) {
-                            const tagContent = tag.link
-                                ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
-                                : tag.value;
-                            const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
-                            topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
-                        });
-                        topContent += '</div>';
+                    if (coverArchiveNo) {
+                        topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
                     }
-                }
 
-                topContent += '</div></div></div>';
+                    if (coverTitle) {
+                        const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
+                        topContent += '<h1 style="font-size:clamp(32px, 6vw, 52px);color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + coverTitle + '</h1>';
+                    }
+
+                    if (coverSubtitle) {
+                        topContent += '<div style="font-size:clamp(12px, 2.2vw, 14.2px);letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
+                    }
+
+                    // 태그를 표지에 표시
+                    if (enableTags && tags && tags.length > 0) {
+                        const validTags = tags.filter(function (tag) {
+                            return tag.value && tag.value.trim();
+                        });
+
+                        if (validTags.length > 0) {
+                            topContent += '<div style="font-size:0;">';
+                            validTags.forEach(function (tag) {
+                                const tagContent = tag.link
+                                    ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
+                                    : tag.value;
+                                const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+                                topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
+                            });
+                            topContent += '</div>';
+                        }
+                    }
+
+                    topContent += '</div></div></div>';
+                } else {
+                    // 이미지가 없지만 제목/부제목/번호가 있는 경우 - 텍스트만 표시 (테마 색상 사용)
+                    topContent += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 40px) clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);">';
+                    
+                    if (coverArchiveNo) {
+                        topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:' + theme.tagText + ';letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 8px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">' + coverArchiveNo + '</p>';
+                    }
+
+                    if (coverTitle) {
+                        const titleMargin = coverSubtitle ? '0 0 5px 0' : '0 0 15px 0';
+                        topContent += '<h1 style="font-size:clamp(32px, 6vw, 52px);color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;">' + coverTitle + '</h1>';
+                    }
+
+                    if (coverSubtitle) {
+                        topContent += '<div style="font-size:clamp(12px, 2.2vw, 14.2px);letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
+                    }
+
+                    // 태그를 표지에 표시
+                    if (enableTags && tags && tags.length > 0) {
+                        const validTags = tags.filter(function (tag) {
+                            return tag.value && tag.value.trim();
+                        });
+
+                        if (validTags.length > 0) {
+                            topContent += '<div style="font-size:0;margin-top:10px;">';
+                            validTags.forEach(function (tag) {
+                                const tagContent = tag.link
+                                    ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
+                                    : tag.value;
+                                const tagStyle = 'display:inline-block;background:' + theme.quote1Bg + ';color:' + theme.text + ';padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid ' + theme.divider + ';font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+                                topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
+                            });
+                            topContent += '</div>';
+                        }
+                    }
+
+                    topContent += '</div>';
+                }
             }
         }
 
         if (enableProfiles && profiles.length > 0) {
-            // 표지가 없을 때는 상단 여백 추가
-            const topPadding = enableCover ? '0px' : '30px';
+            // 표지 내용(이미지 또는 텍스트)이 없을 때는 상단 여백 추가
+            const hasCoverContent = coverImage || coverArchiveNo || coverTitle || coverSubtitle;
+            const topPadding = hasCoverContent ? '0px' : '30px';
             topContent += '<div style="padding: ' + topPadding + ' 0 10px 0;">';
             topContent += '<div style="padding: 0 clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px); text-align: center;">';
             topContent += '<span style="display: inline-block; font-size: clamp(11px, 2vw, 13px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + theme.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + theme.headerText + '; padding-bottom: 5px;margin-bottom:10px">Profile</span>';
@@ -3069,15 +3102,17 @@ function generateHTML(isPreview) {
         }
 
         if (introText.trim()) {
-            // 표지가 없고 프로필도 없을 때는 상단 여백 추가
-            const needTopPadding = !enableCover && (!enableProfiles || profiles.length === 0);
+            // 표지 내용(이미지 또는 텍스트)이 없고 프로필도 없을 때는 상단 여백 추가
+            const hasCoverContent = coverImage || coverArchiveNo || coverTitle || coverSubtitle;
+            const needTopPadding = !hasCoverContent && (!enableProfiles || profiles.length === 0);
             const topPadding = needTopPadding ? '30px' : '10px';
             topContent += '<div style="padding: ' + topPadding + ' clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px);">' + parseText(introText, theme, true, true) + '</div>';
         }
 
         if (summaryText.trim()) {
-            // 표지, 프로필, 인트로 텍스트가 모두 없을 때는 상단 여백 추가
-            const needTopPadding = !enableCover && (!enableProfiles || profiles.length === 0) && !introText.trim();
+            // 표지 내용, 프로필, 인트로 텍스트가 모두 없을 때는 상단 여백 추가
+            const hasCoverContent = coverImage || coverArchiveNo || coverTitle || coverSubtitle;
+            const needTopPadding = !hasCoverContent && (!enableProfiles || profiles.length === 0) && !introText.trim();
             const topPadding = needTopPadding ? '30px' : '20px';
 
             if (!enableProfiles || profiles.length === 0) {
@@ -3103,10 +3138,10 @@ function generateHTML(isPreview) {
         // 표지만 있고 다른 내용이 없으면 표지만 출력, 그 외의 경우 컨테이너로 감싸기
         if (enableCover && !hasRealContent) {
             // 표지만 있는 경우도 컨테이너로 감싸서 크기 유지
-            html += createContainer(topContent, themeType, null, false, topHeaderHtml, null, enableCover);
+            html += createContainer(topContent, themeType, null, false, null, null, !!coverImage);
         } else if (hasRealContent || enableCover) {
             // 내용이 있거나 표지와 함께 내용이 있는 경우
-            html += createContainer(topContent, themeType, null, false, topHeaderHtml, null, enableCover);
+            html += createContainer(topContent, themeType, null, false, null, null, !!coverImage);
         }
         // enableCover도 없고 내용도 없으면 아무것도 출력하지 않음
     }
