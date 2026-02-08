@@ -3171,7 +3171,7 @@ function generateHTML(isPreview) {
                 html += '<div style="box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 1rem; background-color: ' + currentSectionTheme.bg + '; padding: ' + topPadding + ' 0 clamp(20px, 4vw, 30px) 0; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; font-size: clamp(13px, 2.2vw, 14.2px);">';
                 html += sectionContainerHtml;
                 html += '</div>';
-                html += '<br>';
+                html += '<br>'; // 섹션 컨테이너 뒤에 간격 추가
                 sectionContainerHtml = '';
             }
 
@@ -3239,6 +3239,10 @@ function generateHTML(isPreview) {
                 html += '<div style="box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 10px; background-color: ' + currentSectionTheme.bg + '; padding: 0;">';
                 html += sectionHtml;
                 html += '</div>';
+                // 다음 항목도 섹션인 경우 간격 추가
+                if (index + 1 < pages.length && pages[index + 1].itemType === 'section') {
+                    html += '<br>';
+                }
             }
         }
         // 페이지인 경우
@@ -3352,7 +3356,7 @@ function generateHTML(isPreview) {
                 }
             }
 
-            // 섹션에 속하지 않은 페이지 뒤에만 <br> 추가
+            // 섹션에 속하지 않은 페이지 뒤 간격 처리
             if (!isInSection && index < pages.length - 1) {
                 html += '<br>';
             }
