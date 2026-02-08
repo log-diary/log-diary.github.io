@@ -187,6 +187,306 @@ const STYLES = {
         quote2Text: '#6a5545',
         tagText: '#a08a70',
         divider: '#e0d5c8'
+    },
+    // 세이지 테마 - 차분한 올리브그린 톤
+    sage: {
+        bg: '#f8faf7',
+        text: '#4a5547',
+        em: '#6b8e65',
+        header: '#3a4f35',
+        headerText: '#3a4f35',
+        line: '#3a4f35',
+        quote1Bg: '#f0f4ee',
+        quote1Text: '#4a5a45',
+        quote2Bg: '#e8f0e5',
+        quote2Text: '#3a4f38',
+        tagText: '#7a9a70',
+        divider: '#d5e0d0'
+    },
+    // 코랄 테마 - 생동감 있는 코랄 톤
+    coral: {
+        bg: '#fefaf9',
+        text: '#5a4845',
+        em: '#e07a5f',
+        header: '#8a5545',
+        headerText: '#8a5545',
+        line: '#8a5545',
+        quote1Bg: '#faf3f1',
+        quote1Text: '#6a5048',
+        quote2Bg: '#f7ebe8',
+        quote2Text: '#7a5848',
+        tagText: '#c08a75',
+        divider: '#e8d5d0'
+    },
+    // 민트 테마 - 상쾌한 민트그린 톤
+    mint: {
+        bg: '#f7fcfa',
+        text: '#3d5a54',
+        em: '#4a9d88',
+        header: '#2a5048',
+        headerText: '#2a5048',
+        line: '#2a5048',
+        quote1Bg: '#eef7f4',
+        quote1Text: '#3d5a50',
+        quote2Bg: '#e5f3ee',
+        quote2Text: '#2d5545',
+        tagText: '#6aaa95',
+        divider: '#d0e8dd'
+    },
+    // 머스타드 테마 - 따뜻한 머스타드 옐로우 톤
+    mustard: {
+        bg: '#fdfbf5',
+        text: '#5a5540',
+        em: '#d4a841',
+        header: '#6a5a35',
+        headerText: '#6a5a35',
+        line: '#6a5a35',
+        quote1Bg: '#f9f6ec',
+        quote1Text: '#5a5545',
+        quote2Bg: '#f5f0e0',
+        quote2Text: '#6a5a40',
+        tagText: '#b09860',
+        divider: '#e5ddc8'
+    },
+    // 플럼 테마 - 깊은 자두색 톤
+    plum: {
+        bg: '#faf8fb',
+        text: '#523f52',
+        em: '#9d5f8f',
+        header: '#6a4a65',
+        headerText: '#6a4a65',
+        line: '#6a4a65',
+        quote1Bg: '#f5f0f6',
+        quote1Text: '#5a4555',
+        quote2Bg: '#f0e8f2',
+        quote2Text: '#6a4a60',
+        tagText: '#aa7a9a',
+        divider: '#e0d0dc'
+    },
+    // 스카이 테마 - 밝은 하늘색 톤
+    sky: {
+        bg: '#f8fbfd',
+        text: '#3d5565',
+        em: '#5a9ace',
+        header: '#2a4a5a',
+        headerText: '#2a4a5a',
+        line: '#2a4a5a',
+        quote1Bg: '#f0f6fa',
+        quote1Text: '#3d5560',
+        quote2Bg: '#e8f2f8',
+        quote2Text: '#2d4f5a',
+        tagText: '#7aabce',
+        divider: '#d5e5ed'
+    },
+    // 테라코타 테마 - 따뜻한 적토색 톤
+    terracotta: {
+        bg: '#fdfaf8',
+        text: '#5a4840',
+        em: '#c87055',
+        header: '#7a5045',
+        headerText: '#7a5045',
+        line: '#7a5045',
+        quote1Bg: '#f9f3f0',
+        quote1Text: '#5a4a42',
+        quote2Bg: '#f5ebe5',
+        quote2Text: '#6a5040',
+        tagText: '#b08570',
+        divider: '#e5d5cc'
+    },
+    // 티크 테마 - 고급스러운 청록색 톤
+    teal: {
+        bg: '#f7fafb',
+        text: '#3d5558',
+        em: '#4a8a88',
+        header: '#2a5053',
+        headerText: '#2a5053',
+        line: '#2a5053',
+        quote1Bg: '#eff6f7',
+        quote1Text: '#3d5555',
+        quote2Bg: '#e7f2f3',
+        quote2Text: '#2d5250',
+        tagText: '#6a9d9a',
+        divider: '#d5e5e5'
+    },
+    // 피치 테마 - 부드러운 복숭아색 톤
+    peach: {
+        bg: '#fefbf9',
+        text: '#5a4d45',
+        em: '#e8a087',
+        header: '#8a5f4a',
+        headerText: '#8a5f4a',
+        line: '#8a5f4a',
+        quote1Bg: '#faf5f2',
+        quote1Text: '#5a4f48',
+        quote2Bg: '#f7efe9',
+        quote2Text: '#6a5545',
+        tagText: '#c09080',
+        divider: '#e8ddd5'
+    },
+    // 슬레이트 테마 - 세련된 청회색 톤
+    slate: {
+        bg: '#f8f9fa',
+        text: '#475259',
+        em: '#5a7a88',
+        header: '#354550',
+        headerText: '#354550',
+        line: '#354550',
+        quote1Bg: '#f2f4f5',
+        quote1Text: '#475560',
+        quote2Bg: '#eceff1',
+        quote2Text: '#3a4f58',
+        tagText: '#708a95',
+        divider: '#d8dfe3'
+    },
+    // 에스프레소 테마 - 깊은 브라운 톤
+    espresso: {
+        bg: '#faf8f6',
+        text: '#4a3d35',
+        em: '#8b6f47',
+        header: '#3a2920',
+        headerText: '#3a2920',
+        line: '#3a2920',
+        quote1Bg: '#f5f2ee',
+        quote1Text: '#503f35',
+        quote2Bg: '#efe8e0',
+        quote2Text: '#5a4535',
+        tagText: '#9a7f60',
+        divider: '#ddd0c0'
+    },
+    // 버건디 테마 - 우아한 와인 톤
+    burgundy: {
+        bg: '#fefbfc',
+        text: '#5a3d45',
+        em: '#a84860',
+        header: '#6a2d3f',
+        headerText: '#6a2d3f',
+        line: '#6a2d3f',
+        quote1Bg: '#faf5f7',
+        quote1Text: '#604048',
+        quote2Bg: '#f5eaed',
+        quote2Text: '#7a3d4a',
+        tagText: '#b86878',
+        divider: '#e8d0d8'
+    },
+    // 인디고 테마 - 차분한 남색 톤
+    indigo: {
+        bg: '#f8f9fc',
+        text: '#3d4560',
+        em: '#5a68a8',
+        header: '#2d355a',
+        headerText: '#2d355a',
+        line: '#2d355a',
+        quote1Bg: '#f0f2f8',
+        quote1Text: '#404a65',
+        quote2Bg: '#e8ebf5',
+        quote2Text: '#354060',
+        tagText: '#6a78b8',
+        divider: '#d0d8e8'
+    },
+    // 올리브 테마 - 고급스러운 카키 톤
+    olive: {
+        bg: '#fafaf5',
+        text: '#4a4d3d',
+        em: '#7a8050',
+        header: '#3a4030',
+        headerText: '#3a4030',
+        line: '#3a4030',
+        quote1Bg: '#f5f5ee',
+        quote1Text: '#4f5240',
+        quote2Bg: '#eff0e5',
+        quote2Text: '#45483a',
+        tagText: '#8a9060',
+        divider: '#dde0d0'
+    },
+    // 애쉬 테마 - 세련된 재 회색 톤
+    ash: {
+        bg: '#fafafa',
+        text: '#4a4a4a',
+        em: '#707070',
+        header: '#2a2a2a',
+        headerText: '#2a2a2a',
+        line: '#2a2a2a',
+        quote1Bg: '#f2f2f2',
+        quote1Text: '#505050',
+        quote2Bg: '#ebebeb',
+        quote2Text: '#3a3a3a',
+        tagText: '#8a8a8a',
+        divider: '#d5d5d5'
+    },
+    // 아쿠아 테마 - 맑은 청록 톤
+    aqua: {
+        bg: '#f7fbfc',
+        text: '#3d5558',
+        em: '#4a9a9a',
+        header: '#2a4a4d',
+        headerText: '#2a4a4d',
+        line: '#2a4a4d',
+        quote1Bg: '#eff6f7',
+        quote1Text: '#405a5a',
+        quote2Bg: '#e7f2f3',
+        quote2Text: '#355050',
+        tagText: '#6aaaaa',
+        divider: '#d0e5e7'
+    },
+    // 초콜릿 테마 - 진한 초콜릿 브라운 톤
+    chocolate: {
+        bg: '#fcfaf8',
+        text: '#4d3a2a',
+        em: '#9a6040',
+        header: '#3d2515',
+        headerText: '#3d2515',
+        line: '#3d2515',
+        quote1Bg: '#f7f4f0',
+        quote1Text: '#5a402a',
+        quote2Bg: '#f2ebe3',
+        quote2Text: '#6a4530',
+        tagText: '#aa7550',
+        divider: '#e0d0c0'
+    },
+    // 클래렛 테마 - 깊은 적갈색 톤
+    claret: {
+        bg: '#fdfafa',
+        text: '#5a3a3a',
+        em: '#b85050',
+        header: '#6a2525',
+        headerText: '#6a2525',
+        line: '#6a2525',
+        quote1Bg: '#faf3f3',
+        quote1Text: '#603f3f',
+        quote2Bg: '#f5e8e8',
+        quote2Text: '#7a3535',
+        tagText: '#c86868',
+        divider: '#e8d0d0'
+    },
+    // 차콜 테마 - 차분한 목탄 톤
+    charcoal: {
+        bg: '#f9f9f9',
+        text: '#454545',
+        em: '#656565',
+        header: '#252525',
+        headerText: '#252525',
+        line: '#252525',
+        quote1Bg: '#f1f1f1',
+        quote1Text: '#4a4a4a',
+        quote2Bg: '#e9e9e9',
+        quote2Text: '#353535',
+        tagText: '#858585',
+        divider: '#d3d3d3'
+    },
+    // 그레이프 테마 - 은은한 포도 톤
+    grape: {
+        bg: '#fbf9fc',
+        text: '#4a3f52',
+        em: '#8a68a0',
+        header: '#5a3a68',
+        headerText: '#5a3a68',
+        line: '#5a3a68',
+        quote1Bg: '#f5f0f8',
+        quote1Text: '#554560',
+        quote2Bg: '#efe8f5',
+        quote2Text: '#604a70',
+        tagText: '#9a78b0',
+        divider: '#dcd0e8'
     }
 };
 
