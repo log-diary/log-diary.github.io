@@ -36,11 +36,9 @@ function normalizeImageUrl(url) {
         url = 'https:' + url;
     }
     
-    // 나무위키나 특정 사이트의 이미지인 경우 CORS 프록시 사용
-    if (url.includes('namu.la') || url.includes('arca.live')) {
-        return 'https://corsproxy.io/?' + encodeURIComponent(url);
-    }
-    
+    // 나무위키나 특정 사이트의 이미지인 경우
+    // 직접 URL 반환 (프록시 없이) - onerror에서 폴백 처리
+    // CORS 문제가 있어도 일단 시도하고, 실패하면 폴백
     return url;
 }
 
@@ -2001,12 +1999,7 @@ function normalizeImageUrl(url) {
         return 'https:' + trimmed;
     }
     
-    // 나무위키나 특정 사이트의 이미지인 경우 CORS 프록시 사용
-    if (trimmed.includes('namu.la') || trimmed.includes('arca.live')) {
-        // CORS 프록시를 통해 이미지 로드
-        return 'https://corsproxy.io/?' + encodeURIComponent(trimmed);
-    }
-    
+    // URL 그대로 반환 (폴백은 onerror에서 처리)
     return trimmed;
 }
 
@@ -2248,7 +2241,24 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
                 if (imageUrl) {
                     // 이미지 스타일: 개별 또는 페이지별 너비 설정 적용
                     const imgStyle = 'max-width: ' + individualWidth + '%; height: auto; border-radius: 15px; display: block; margin: 0 auto;';
-                    html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" onerror="this.style.display=\'none\'"></div>';
+                    
+                    // 원본 URL 저장 (프록시 적용 전)
+                    const originalUrl = imgParts[0].trim();
+                    const needsProxy = originalUrl.includes('namu.la') || originalUrl.includes('arca.live');
+                    
+                    if (needsProxy) {
+                        // 여러 프록시 옵션을 data 속성에 저장
+                        const proxies = [
+                            originalUrl,  // 먼저 원본 시도
+                            'https://images.weserv.nl/?url=' + encodeURIComponent(originalUrl),
+                            'https://api.allorigins.win/raw?url=' + encodeURIComponent(originalUrl)
+                        ];
+                        const proxyList = proxies.join('|');
+                        
+                        html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" data-original="' + originalUrl + '" data-proxies="' + proxyList + '" data-proxy-index="0" onerror="(function(img){var proxies=img.dataset.proxies.split(\'|\');var idx=parseInt(img.dataset.proxyIndex||0);if(idx<proxies.length-1){img.dataset.proxyIndex=idx+1;img.src=proxies[idx+1];}else{img.style.display=\'none\';};})(this)"></div>';
+                    } else {
+                        html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" onerror="this.style.display=\'none\'"></div>';
+                    }
                 }
                 continue;
             }
@@ -3550,7 +3560,20 @@ function generateHTML(isPreview) {
     const enableCover = document.getElementById('enableCover').checked;
     const coverImageUrl = enableCover ? normalizeImageUrl(document.getElementById('coverImage').value) : '';
     if (enableCover && coverImageUrl) {
-        html += '<img style="width: 0px; height: 0px;" src="' + coverImageUrl + '" class="fr-fic fr-dii">';
+        const originalCoverUrl = document.getElementById('coverImage').value.trim();
+        const needsCoverProxy = originalCoverUrl.includes('namu.la') || originalCoverUrl.includes('arca.live');
+        
+        if (needsCoverProxy) {
+            const proxies = [
+                originalCoverUrl,
+                'https://images.weserv.nl/?url=' + encodeURIComponent(originalCoverUrl),
+                'https://api.allorigins.win/raw?url=' + encodeURIComponent(originalCoverUrl)
+            ];
+            const proxyList = proxies.join('|');
+            html += '<img style="width: 0px; height: 0px;" src="' + coverImageUrl + '" class="fr-fic fr-dii" data-proxies="' + proxyList + '" data-proxy-index="0" onerror="(function(img){var proxies=img.dataset.proxies.split(\'|\');var idx=parseInt(img.dataset.proxyIndex||0);if(idx<proxies.length-1){img.dataset.proxyIndex=idx+1;img.src=proxies[idx+1];}else{img.remove();};})(this)">';
+        } else {
+            html += '<img style="width: 0px; height: 0px;" src="' + coverImageUrl + '" class="fr-fic fr-dii">';
+        }
     }
 
     if (enableTopSection) {
