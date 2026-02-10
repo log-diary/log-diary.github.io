@@ -3398,7 +3398,19 @@ function updatePagesList() {
 
             // 확인 대화상자
             const itemType = pages[idx].itemType === 'section' ? '섹션' : '페이지';
-            const itemName = pages[idx].title || (pages[idx].itemType === 'section' ? 'Section' : '#' + (idx + 1));
+            let itemName;
+            if (pages[idx].itemType === 'section') {
+                itemName = pages[idx].title || 'Section';
+            } else {
+                // 섹션을 제외한 실제 페이지 번호 계산
+                let actualPageNumber = 0;
+                for (let i = 0; i <= idx; i++) {
+                    if (pages[i].itemType !== 'section') {
+                        actualPageNumber++;
+                    }
+                }
+                itemName = pages[idx].title || '#' + actualPageNumber;
+            }
 
             if (confirm(itemType + ' "' + itemName + '"을(를) 삭제하시겠습니까?')) {
                 pages.splice(idx, 1);
