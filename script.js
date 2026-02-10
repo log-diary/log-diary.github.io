@@ -2003,10 +2003,13 @@ function normalizeImageUrl(url) {
     return trimmed;
 }
 
-function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWidth) {
+function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWidth, isPreview) {
     if (!text) return '';
 
     let processedText = applyReplacements(text);
+    
+    // isPreview가 undefined면 기본값 false (복사용)
+    if (isPreview === undefined) isPreview = false;
 
     const useRoundedQuotes = document.getElementById('useRoundedQuotes').checked;
     const useTextIndent = document.getElementById('useTextIndent').checked;
@@ -2230,7 +2233,8 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             const imgMatch = line.match(/\[IMG:([^\]]+)\]/);
             if (imgMatch) {
                 const imgParts = imgMatch[1].split(':');
-                const imageUrl = normalizeImageUrl(imgParts[0]);
+                const originalImageUrl = imgParts[0].trim(); // 원본 URL
+                const imageUrl = normalizeImageUrl(originalImageUrl);
                 
                 // 개별 이미지 너비 설정 (두 번째 파라미터) 또는 페이지 기본값 사용
                 let individualWidth = imgWidth;
@@ -2242,22 +2246,27 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
                     // 이미지 스타일: 개별 또는 페이지별 너비 설정 적용
                     const imgStyle = 'max-width: ' + individualWidth + '%; height: auto; border-radius: 15px; display: block; margin: 0 auto;';
                     
-                    // 원본 URL 저장 (프록시 적용 전)
-                    const originalUrl = imgParts[0].trim();
-                    const needsProxy = originalUrl.includes('namu.la') || originalUrl.includes('arca.live');
-                    
-                    if (needsProxy) {
-                        // 여러 프록시 옵션을 data 속성에 저장
-                        const proxies = [
-                            originalUrl,  // 먼저 원본 시도
-                            'https://images.weserv.nl/?url=' + encodeURIComponent(originalUrl),
-                            'https://api.allorigins.win/raw?url=' + encodeURIComponent(originalUrl)
-                        ];
-                        const proxyList = proxies.join('|');
-                        
-                        html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" data-original="' + originalUrl + '" data-proxies="' + proxyList + '" data-proxy-index="0" onerror="(function(img){var proxies=img.dataset.proxies.split(\'|\');var idx=parseInt(img.dataset.proxyIndex||0);if(idx<proxies.length-1){img.dataset.proxyIndex=idx+1;img.src=proxies[idx+1];}else{img.style.display=\'none\';};})(this)"></div>';
+                    // 미리보기일 때는 Base64로 변환, 복사할 때는 원본 URL 사용
+                    if (isPreview) {
+                        // 미리보기: Base64로 변환 (품질 100%)
+                        html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" data-original-url="' + originalImageUrl + '" class="preview-image-base64" onerror="this.style.display=\'none\'"></div>';
                     } else {
-                        html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" onerror="this.style.display=\'none\'"></div>';
+                        // 복사: 원본 URL 사용
+                        const needsProxy = originalImageUrl.includes('namu.la') || originalImageUrl.includes('arca.live');
+                        
+                        if (needsProxy) {
+                            // 여러 프록시 옵션을 data 속성에 저장
+                            const proxies = [
+                                originalImageUrl,  // 먼저 원본 시도
+                                'https://images.weserv.nl/?url=' + encodeURIComponent(originalImageUrl),
+                                'https://api.allorigins.win/raw?url=' + encodeURIComponent(originalImageUrl)
+                            ];
+                            const proxyList = proxies.join('|');
+                            
+                            html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" data-original="' + originalImageUrl + '" data-proxies="' + proxyList + '" data-proxy-index="0" onerror="(function(img){var proxies=img.dataset.proxies.split(\'|\');var idx=parseInt(img.dataset.proxyIndex||0);if(idx<proxies.length-1){img.dataset.proxyIndex=idx+1;img.src=proxies[idx+1];}else{img.style.display=\'none\';};})(this)"></div>';
+                        } else {
+                            html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" onerror="this.style.display=\'none\'"></div>';
+                        }
                     }
                 }
                 continue;
@@ -2514,7 +2523,7 @@ function createCreditFooter() {
     return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: 0 auto;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
 }
 
-function createCommentSection(commentText, commentNickname, themeStyle) {
+function createCommentSection(commentText, commentNickname, themeStyle, isPreview) {
     let commentHtml = '';
 
     // 컨테이너 스타일 (다른 섹션과 통일)
@@ -2528,7 +2537,7 @@ function createCommentSection(commentText, commentNickname, themeStyle) {
     commentHtml += '</div>';
 
     // 코멘트 내용
-    commentHtml += '<div style="padding: 0 clamp(30px, 5vw, 50px);">' + parseText(commentText, themeStyle, true, true) + '</div>';
+    commentHtml += '<div style="padding: 0 clamp(30px, 5vw, 50px);">' + parseText(commentText, themeStyle, true, true, 100, isPreview) + '</div>';
 
     // 닉네임과 날짜
     const today = new Date();
@@ -3761,7 +3770,7 @@ function generateHTML(isPreview) {
             const hasCoverContent = coverImage || coverArchiveNo || coverTitle || coverSubtitle;
             const needTopPadding = !hasCoverContent && (!enableProfiles || profiles.length === 0);
             const topPadding = needTopPadding ? '30px' : '10px';
-            topContent += '<div style="padding: ' + topPadding + ' clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px);">' + parseText(introText, theme, true, true) + '</div>';
+            topContent += '<div style="padding: ' + topPadding + ' clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px);">' + parseText(introText, theme, true, true, 100, isPreview) + '</div>';
         }
 
         if (summaryText.trim()) {
@@ -3779,7 +3788,7 @@ function generateHTML(isPreview) {
             topContent += '<div style="padding: 0 clamp(20px, 3vw, 25px) 5px clamp(20px, 3vw, 25px); text-align: center;">';
             topContent += '<span style="display: inline-block; font-size: clamp(11px, 2vw, 13px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + theme.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + theme.headerText + '; padding-bottom: 5px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">Story So Far</span>';
             topContent += '</div>';
-            topContent += '<div style="padding: 10px clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px);">' + parseText(summaryText, theme, true, true) + '</div>';
+            topContent += '<div style="padding: 10px clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px);">' + parseText(summaryText, theme, true, true, 100, isPreview) + '</div>';
         }
 
         // 사운드트랙 섹션 추가
@@ -3949,10 +3958,10 @@ function generateHTML(isPreview) {
                 const pageImageWidth = (currentPage.imageWidth !== undefined && currentPage.imageWidth !== null) ? currentPage.imageWidth : 100;
                 console.log('Page', index, 'imageWidth:', currentPage.imageWidth, 'using:', pageImageWidth);
                 if (currentPage.bgImage) {
-                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
+                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth, isPreview) + '</div>';
                 } else {
                     // 단독 페이지는 header를 pageContentHtml에 포함하지 않음 (createContainer에서 처리)
-                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
+                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth, isPreview) + '</div>';
                 }
 
                 // 이 페이지가 마지막 컨테이너인지 확인 (섹션 밖의 단독 페이지이고, 이후에 페이지나 코멘트가 없음)
@@ -3983,7 +3992,7 @@ function generateHTML(isPreview) {
                 // 본문 내용을 미리 준비 (펼쳤을 때 보여질 내용)
                 const pageImageWidth = (currentPage.imageWidth !== undefined && currentPage.imageWidth !== null) ? currentPage.imageWidth : 100;
                 console.log('Page', index, 'imageWidth (collapsed):', currentPage.imageWidth, 'using:', pageImageWidth);
-                let collapsedContent = '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
+                let collapsedContent = '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth, isPreview) + '</div>';
 
                 // 이 페이지가 마지막 컨테이너인지 확인
                 const isLastStandalonePage = !isInSection && index === pages.length - 1 && !hasCommentAtEnd;
@@ -4047,7 +4056,7 @@ function generateHTML(isPreview) {
 
         if (commentText && commentText.trim()) {
             const theme = getTheme(commentTheme);
-            html += createCommentSection(commentText, commentNickname, theme);
+            html += createCommentSection(commentText, commentNickname, theme, isPreview);
         }
     }
 
@@ -4061,6 +4070,79 @@ function updatePreview() {
     const html = generateHTML(true);
     const preview = document.getElementById('preview');
     preview.innerHTML = html;
+    
+    // 미리보기의 모든 이미지를 Base64로 변환 (품질 100%)
+    convertPreviewImagesToBase64();
+}
+
+// 미리보기 이미지를 Base64로 변환하는 함수
+function convertPreviewImagesToBase64() {
+    const previewImages = document.querySelectorAll('.preview-image-base64');
+    
+    previewImages.forEach(function(img) {
+        const originalUrl = img.dataset.originalUrl;
+        if (!originalUrl) return;
+        
+        // 이미지를 로드하여 Base64로 변환
+        const tempImg = new Image();
+        tempImg.crossOrigin = 'anonymous';
+        
+        tempImg.onload = function() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = tempImg.naturalWidth;
+                canvas.height = tempImg.naturalHeight;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tempImg, 0, 0);
+                
+                // 품질 100%로 Base64 변환
+                const base64 = canvas.toDataURL('image/jpeg', 1.0);
+                img.src = base64;
+            } catch (e) {
+                console.error('Base64 변환 실패:', e);
+                // 변환 실패 시 원본 URL 유지
+            }
+        };
+        
+        tempImg.onerror = function() {
+            console.error('이미지 로드 실패:', originalUrl);
+            // 프록시 시도
+            const proxyUrl = 'https://images.weserv.nl/?url=' + encodeURIComponent(originalUrl);
+            const tempImg2 = new Image();
+            tempImg2.crossOrigin = 'anonymous';
+            
+            tempImg2.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = tempImg2.naturalWidth;
+                    canvas.height = tempImg2.naturalHeight;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(tempImg2, 0, 0);
+                    
+                    const base64 = canvas.toDataURL('image/jpeg', 1.0);
+                    img.src = base64;
+                } catch (e) {
+                    console.error('프록시 이미지 Base64 변환 실패:', e);
+                }
+            };
+            
+            tempImg2.onerror = function() {
+                console.error('프록시 이미지 로드도 실패:', proxyUrl);
+            };
+            
+            tempImg2.src = proxyUrl;
+        };
+        
+        // CORS 우회를 위해 프록시 먼저 시도
+        const needsProxy = originalUrl.includes('namu.la') || originalUrl.includes('arca.live');
+        if (needsProxy) {
+            tempImg.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(originalUrl);
+        } else {
+            tempImg.src = originalUrl;
+        }
+    });
 }
 
 async function copyToClipboard() {
