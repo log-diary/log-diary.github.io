@@ -229,23 +229,32 @@
                                 <span class="focus-border"></span>
                             </div>
 
-                            <div class="input-group">
-                                <label>Zoom <span id="coverZoomValue"
-                                        style="color:var(--accent-blue);">100%</span></label>
-                                <input type="range" id="coverZoom" class="spacing-slider" min="100" max="300" value="100"
-                                    style="width: 100%;">
+                            <div class="control-row" style="margin-top: 15px;">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" id="coverAutoFit" checked>
+                                    <label for="coverAutoFit">자동 크기 조절 (비율 유지하며 영역 꽉 채우기)</label>
+                                </div>
                             </div>
-                            <div class="input-group">
-                                <label>Focus X (좌우) <span id="coverFocusXValue"
-                                        style="color:var(--accent-blue);">50%</span></label>
-                                <input type="range" id="coverFocusX" class="spacing-slider" min="0" max="100" value="50"
-                                    style="width: 100%;">
-                            </div>
-                            <div class="input-group">
-                                <label>Focus Y (상하) <span id="coverFocusYValue"
-                                        style="color:var(--accent-blue);">28%</span></label>
-                                <input type="range" id="coverFocusY" class="spacing-slider" min="0" max="100" value="28"
-                                    style="width: 100%;">
+
+                            <div id="coverManualControls">
+                                <div class="input-group">
+                                    <label>Zoom <span id="coverZoomValue"
+                                            style="color:var(--accent-blue);">100%</span></label>
+                                    <input type="range" id="coverZoom" class="spacing-slider" min="100" max="300" value="100"
+                                        style="width: 100%;">
+                                </div>
+                                <div class="input-group">
+                                    <label>Focus X (좌우) <span id="coverFocusXValue"
+                                            style="color:var(--accent-blue);">50%</span></label>
+                                    <input type="range" id="coverFocusX" class="spacing-slider" min="0" max="100" value="50"
+                                        style="width: 100%;">
+                                </div>
+                                <div class="input-group">
+                                    <label>Focus Y (상하) <span id="coverFocusYValue"
+                                            style="color:var(--accent-blue);">28%</span></label>
+                                    <input type="range" id="coverFocusY" class="spacing-slider" min="0" max="100" value="28"
+                                        style="width: 100%;">
+                                </div>
                             </div>
 
                             <div class="input-group">
@@ -589,11 +598,25 @@
                     <button id="insertImage" class="btn-tool">이미지 (IMG)</button>
                     <span class="image-url-tooltip" style="margin-left: 5px;">
                         <span class="tooltip-icon">?</span>
-                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
+                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 삽입된 이미지는 자동으로 아래 '페이지 내 이미지 크기 조절' 값을 따릅니다. 개별 이미지 크기를 조정하려면 [IMG:URL:크기] 형식으로 직접 편집하세요 (예: [IMG:주소:70] → 70% 크기).</span>
                     </span>
                 </div>
 
                 <textarea id="pageContent" class="editor-textarea" placeholder="내용을 입력하세요..." rows="20"></textarea>
+
+                <div class="sub-section" style="margin-top: 20px;">
+                    <h3>페이지 내 이미지 크기 조절</h3>
+                    <div class="input-group">
+                        <label>이미지 기본 너비 (화면 대비) <span id="pageImageWidthValue"
+                                style="color:var(--accent-blue);">100%</span></label>
+                        <input type="range" id="pageImageWidth" class="spacing-slider" min="30" max="100" value="100"
+                            style="width: 100%;">
+                        <p style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            • 이 설정은 모든 이미지의 기본 크기입니다.<br>
+                            • 개별 이미지 크기 조정: [IMG:URL:크기] 형식으로 직접 편집 (예: [IMG:주소:70])
+                        </p>
+                    </div>
+                </div>
 
                 <div id="pageStats">
                     <!-- 페이지 통계가 여기 표시됩니다 -->
@@ -623,6 +646,17 @@
                     <div class="input-group">
                         <label>섹션 부제목</label>
                         <input type="text" id="sectionSubtitle" placeholder=" ">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>텍스트 정렬</label>
+                    <div class="select-wrapper">
+                        <select id="sectionAlign">
+                            <option value="center">가운데 정렬</option>
+                            <option value="left">왼쪽 정렬</option>
+                            <option value="right">오른쪽 정렬</option>
+                        </select>
                     </div>
                 </div>
 

@@ -509,6 +509,15 @@ function initializeApp() {
         setupEventListeners();
         setupTabs(); // 탭 설정 추가
         initializePresets(); // 프리셋 초기화 추가
+        
+        // coverAutoFit 초기 상태 설정 (저장된 데이터가 없을 경우 기본값 true)
+        const coverAutoFit = document.getElementById('coverAutoFit');
+        const coverManualControls = document.getElementById('coverManualControls');
+        if (coverAutoFit && coverManualControls) {
+            // localStorage에 저장된 값이 없으면 기본값(checked=true) 유지
+            coverManualControls.style.display = coverAutoFit.checked ? 'none' : 'block';
+        }
+        
         updatePreview();
     } catch (error) {
         console.error('초기화 중 오류 발생:', error);
@@ -574,6 +583,7 @@ function loadFromStorage() {
             const coverZoom = document.getElementById('coverZoom');
             const coverFocusX = document.getElementById('coverFocusX');
             const coverFocusY = document.getElementById('coverFocusY');
+            const coverAutoFit = document.getElementById('coverAutoFit');
             const coverArchiveNo = document.getElementById('coverArchiveNo');
             const coverTitle = document.getElementById('coverTitle');
             const coverSubtitle = document.getElementById('coverSubtitle');
@@ -586,6 +596,7 @@ function loadFromStorage() {
             // 표지 관련 설정 로드
             if (enableCover) enableCover.checked = data.enableCover || false;
             if (coverImage) coverImage.value = data.coverImage || '';
+            if (coverAutoFit) coverAutoFit.checked = data.coverAutoFit || false;
             if (coverZoom) coverZoom.value = data.coverZoom || 120;
             if (coverFocusX) coverFocusX.value = data.coverFocusX || 50;
             if (coverFocusY) coverFocusY.value = data.coverFocusY || 28;
@@ -593,6 +604,12 @@ function loadFromStorage() {
             if (coverTitle) coverTitle.value = data.coverTitle || '';
             if (coverSubtitle) coverSubtitle.value = data.coverSubtitle || '';
             if (coverContent) coverContent.style.display = data.enableCover ? 'block' : 'none';
+
+            // 자동 크기 조절 상태에 따라 수동 컨트롤 표시/숨김
+            const coverManualControls = document.getElementById('coverManualControls');
+            if (coverManualControls) {
+                coverManualControls.style.display = (data.coverAutoFit) ? 'none' : 'block';
+            }
 
             // Focus 값 표시 업데이트
             const coverZoomValue = document.getElementById('coverZoomValue');
@@ -649,6 +666,10 @@ function loadFromStorage() {
             pages = pages.map(function (item) {
                 if (!item.itemType) {
                     item.itemType = 'page';
+                }
+                // imageWidth가 없는 페이지는 기본값 100으로 설정
+                if (item.itemType === 'page' && (item.imageWidth === undefined || item.imageWidth === null)) {
+                    item.imageWidth = 100;
                 }
                 return item;
             });
@@ -1014,6 +1035,7 @@ function saveToStorage() {
             enableTopSection: getChecked('enableTopSection'),
             enableCover: getChecked('enableCover'),
             coverImage: getValue('coverImage'),
+            coverAutoFit: getChecked('coverAutoFit'),
             coverZoom: getIntValue('coverZoom', 120),
             coverFocusX: getIntValue('coverFocusX', 50),
             coverFocusY: getIntValue('coverFocusY', 30),
@@ -1098,6 +1120,19 @@ function setupEventListeners() {
         coverFocusY.addEventListener('input', function () {
             const coverFocusYValue = document.getElementById('coverFocusYValue');
             if (coverFocusYValue) coverFocusYValue.textContent = this.value + '%';
+            updatePreview();
+            saveToStorage();
+        });
+    }
+
+    // 표지 자동 크기 조절 체크박스
+    const coverAutoFit = document.getElementById('coverAutoFit');
+    if (coverAutoFit) {
+        coverAutoFit.addEventListener('change', function () {
+            const coverManualControls = document.getElementById('coverManualControls');
+            if (coverManualControls) {
+                coverManualControls.style.display = this.checked ? 'none' : 'block';
+            }
             updatePreview();
             saveToStorage();
         });
@@ -1237,6 +1272,14 @@ function setupEventListeners() {
             document.getElementById('pageSubtitle').value = '';
             document.getElementById('pageContent').value = '';
 
+            // 이미지 크기 슬라이더 초기화
+            const pageImageWidth = document.getElementById('pageImageWidth');
+            const pageImageWidthValue = document.getElementById('pageImageWidthValue');
+            if (pageImageWidth && pageImageWidthValue) {
+                pageImageWidth.value = 100;
+                pageImageWidthValue.textContent = '100%';
+            }
+
             tempPageTags = [];
 
             const pageModal = document.getElementById('pageModal');
@@ -1262,6 +1305,7 @@ function setupEventListeners() {
             document.getElementById('sectionTitle').value = '';
             document.getElementById('sectionSubtitle').value = '';
             document.getElementById('sectionImage').value = '';
+            document.getElementById('sectionAlign').value = 'center';
             document.getElementById('sectionZoom').value = 100;
             document.getElementById('sectionFocusX').value = 50;
             document.getElementById('sectionFocusY').value = 50;
@@ -1345,6 +1389,17 @@ function setupEventListeners() {
         });
     }
 
+    // 페이지 이미지 크기 슬라이더 이벤트
+    const pageImageWidth = document.getElementById('pageImageWidth');
+    if (pageImageWidth) {
+        pageImageWidth.addEventListener('input', function () {
+            const pageImageWidthValue = document.getElementById('pageImageWidthValue');
+            if (pageImageWidthValue) {
+                pageImageWidthValue.textContent = this.value + '%';
+            }
+        });
+    }
+
     const insertImage = document.getElementById('insertImage');
     if (insertImage) {
         insertImage.addEventListener('click', function () {
@@ -1353,7 +1408,11 @@ function setupEventListeners() {
                 const pageContent = document.getElementById('pageContent');
                 const cursorPos = pageContent.selectionStart;
                 const text = pageContent.value;
-                pageContent.value = text.slice(0, cursorPos) + '[IMG:' + url + ']' + text.slice(cursorPos);
+                
+                // 기본적으로 페이지 설정을 사용하는 이미지 태그 삽입
+                let imgTag = '[IMG:' + url + ']';
+                
+                pageContent.value = text.slice(0, cursorPos) + imgTag + text.slice(cursorPos);
             }
         });
     }
@@ -1627,6 +1686,7 @@ function exportDataToJSON() {
             enableTopSection: document.getElementById('enableTopSection').checked,
             enableCover: document.getElementById('enableCover').checked,
             coverImage: document.getElementById('coverImage').value,
+            coverAutoFit: document.getElementById('coverAutoFit').checked,
             coverZoom: parseInt(document.getElementById('coverZoom').value),
             coverFocusX: parseInt(document.getElementById('coverFocusX').value),
             coverFocusY: parseInt(document.getElementById('coverFocusY').value),
@@ -1734,6 +1794,13 @@ function importDataFromJSON(file) {
                 document.getElementById('coverContent').style.display = data.enableCover ? 'block' : 'none';
             }
             if (data.coverImage !== undefined) document.getElementById('coverImage').value = data.coverImage;
+            if (data.coverAutoFit !== undefined) {
+                document.getElementById('coverAutoFit').checked = data.coverAutoFit;
+                const coverManualControls = document.getElementById('coverManualControls');
+                if (coverManualControls) {
+                    coverManualControls.style.display = data.coverAutoFit ? 'none' : 'block';
+                }
+            }
             if (data.coverZoom !== undefined) {
                 document.getElementById('coverZoom').value = data.coverZoom;
                 document.getElementById('coverZoomValue').textContent = data.coverZoom + '%';
@@ -1927,13 +1994,16 @@ function normalizeImageUrl(url) {
     return trimmed;
 }
 
-function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing) {
+function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWidth) {
     if (!text) return '';
 
     let processedText = applyReplacements(text);
 
     const useRoundedQuotes = document.getElementById('useRoundedQuotes').checked;
     const useTextIndent = document.getElementById('useTextIndent').checked;
+    
+    // 이미지 너비 설정 (기본값 100%)
+    const imgWidth = imageWidth || 100;
 
     // 텍스트 간격 설정 적용
     const fontSize = textSpacing.fontSize + 'px';
@@ -2108,9 +2178,19 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing) {
         if (line.includes('[IMG:')) {
             const imgMatch = line.match(/\[IMG:([^\]]+)\]/);
             if (imgMatch) {
-                const imageUrl = normalizeImageUrl(imgMatch[1]);
+                const imgParts = imgMatch[1].split(':');
+                const imageUrl = normalizeImageUrl(imgParts[0]);
+                
+                // 개별 이미지 너비 설정 (두 번째 파라미터) 또는 페이지 기본값 사용
+                let individualWidth = imgWidth;
+                if (imgParts.length > 1 && !isNaN(parseInt(imgParts[1]))) {
+                    individualWidth = Math.max(30, Math.min(100, parseInt(imgParts[1])));
+                }
+                
                 if (imageUrl) {
-                    html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="max-width: 100%; height: auto; border-radius: 15px;" onerror="this.style.display=\'none\'"></div>';
+                    // 이미지 스타일: 개별 또는 페이지별 너비 설정 적용
+                    const imgStyle = 'max-width: ' + individualWidth + '%; height: auto; border-radius: 15px; display: block; margin: 0 auto;';
+                    html += '<div style="text-align: center; margin: 20px 0;"><img src="' + imageUrl + '" style="' + imgStyle + '" onerror="this.style.display=\'none\'"></div>';
                 }
                 continue;
             }
@@ -2323,7 +2403,7 @@ function createCommentSection(commentText, commentNickname, themeStyle) {
 
     // COMMENT 헤더
     commentHtml += '<div style="padding: 0 clamp(30px, 5vw, 50px) clamp(10px, 2vw, 15px) clamp(30px, 5vw, 50px); text-align: center;">';
-    commentHtml += '<span style="display: inline-block; font-size: clamp(10px, 1.8vw, 12px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + themeStyle.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + themeStyle.headerText + '; padding-bottom: 5px;">Comment</span>';
+    commentHtml += '<span style="display: inline-block; font-size: clamp(10px, 1.8vw, 12px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + themeStyle.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + themeStyle.headerText + '; padding-bottom: 5px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">Comment</span>';
     commentHtml += '</div>';
 
     // 코멘트 내용
@@ -2333,7 +2413,7 @@ function createCommentSection(commentText, commentNickname, themeStyle) {
     const today = new Date();
     const dateStr = today.getFullYear() + '.' + String(today.getMonth() + 1).padStart(2, '0') + '.' + String(today.getDate()).padStart(2, '0');
 
-    commentHtml += '<div style="text-align: right; padding: clamp(10px, 2vw, 15px) clamp(30px, 5vw, 50px) 0 clamp(30px, 5vw, 50px); font-size: clamp(9px, 1.5vw, 10px); color: ' + (themeStyle.tagText || themeStyle.text) + ';">';
+    commentHtml += '<div style="text-align: right; padding: clamp(10px, 2vw, 15px) clamp(30px, 5vw, 50px) 0 clamp(30px, 5vw, 50px); font-size: clamp(9px, 1.5vw, 10px); color: ' + (themeStyle.tagText || themeStyle.text) + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">';
 
     if (commentNickname && commentNickname.trim()) {
         commentHtml += 'BY ' + commentNickname + ' • ' + dateStr;
@@ -2380,7 +2460,7 @@ function createSoundtrackSection(youtubeUrl, songTitle, artistName, themeStyle, 
 
     // SOUNDTRACK 헤더
     html += '<div style="text-align: center; padding-bottom: clamp(15px, 3vw, 20px);">';
-    html += '<span style="display: inline-block; font-size: clamp(11px, 2vw, 13px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + themeStyle.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + themeStyle.headerText + '; padding-bottom: 5px;">Soundtrack</span>';
+    html += '<span style="display: inline-block; font-size: clamp(11px, 2vw, 13px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + themeStyle.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + themeStyle.headerText + '; padding-bottom: 5px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">Soundtrack</span>';
     html += '</div>';
 
     // 뮤직플레이어 컨테이너
@@ -2413,10 +2493,10 @@ function createSoundtrackSection(youtubeUrl, songTitle, artistName, themeStyle, 
     if (songTitle || artistName) {
         html += '<div style="max-width: 300px; margin: clamp(12px, 2.5vw, 18px) auto 0; text-align: center;">';
         if (songTitle) {
-            html += '<div style="font-size: clamp(13px, 2.5vw, 15px); font-weight: 600; color: ' + (themeStyle.header || themeStyle.text) + '; line-height: 1.4;">' + songTitle + '</div>';
+            html += '<div style="font-size: clamp(13px, 2.5vw, 15px); font-weight: 600; color: ' + (themeStyle.header || themeStyle.text) + '; line-height: 1.4; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">' + songTitle + '</div>';
         }
         if (artistName) {
-            html += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + (themeStyle.tagText || '#888') + '; margin-top: 4px;">' + artistName + '</div>';
+            html += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + (themeStyle.tagText || '#888') + '; margin-top: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">' + artistName + '</div>';
         }
         html += '</div>';
     }
@@ -2953,31 +3033,41 @@ function savePageData() {
     const pageTitle = document.getElementById('pageTitle').value.trim();
     const pageSubtitle = document.getElementById('pageSubtitle').value.trim();
     const content = document.getElementById('pageContent').value;
+    const pageImageWidthInput = document.getElementById('pageImageWidth');
+    const pageImageWidth = pageImageWidthInput ? parseInt(pageImageWidthInput.value) : 100;
 
     if (!content.trim()) {
         alert('내용을 입력해주세요.');
         return;
     }
 
-    const pageData = {
-        itemType: 'page', // 페이지 타입 식별자
-        type: globalTheme,
-        title: pageTitle,
-        subtitle: pageSubtitle,
-        content: content,
-        bgImage: null,
-        collapsed: false, // false = 접힌 상태 (기본값)
-        useGlobalTags: true,
-        tags: [],
-        headerImage: null,
-        headerFocusX: 50,
-        headerFocusY: 50
-    };
-
     if (currentEditingIndex === null) {
+        // 새 페이지 추가
+        const pageData = {
+            itemType: 'page',
+            type: globalTheme,
+            title: pageTitle,
+            subtitle: pageSubtitle,
+            content: content,
+            imageWidth: pageImageWidth,
+            bgImage: null,
+            collapsed: false,
+            useGlobalTags: true,
+            tags: [],
+            headerImage: null,
+            headerFocusX: 50,
+            headerFocusY: 50
+        };
         pages.push(pageData);
+        console.log('Added new page with imageWidth:', pageData.imageWidth);
     } else {
-        pages[currentEditingIndex] = pageData;
+        // 기존 페이지 수정 - 기존 객체 유지하고 속성만 업데이트
+        const existingPage = pages[currentEditingIndex];
+        existingPage.title = pageTitle;
+        existingPage.subtitle = pageSubtitle;
+        existingPage.content = content;
+        existingPage.imageWidth = pageImageWidth;
+        console.log('Updated page', currentEditingIndex, 'imageWidth:', existingPage.imageWidth);
     }
 
     document.getElementById('pageModal').style.display = 'none';
@@ -2991,6 +3081,7 @@ function saveSectionData() {
     const sectionTitle = document.getElementById('sectionTitle').value.trim();
     const sectionSubtitle = document.getElementById('sectionSubtitle').value.trim();
     const sectionImage = document.getElementById('sectionImage').value.trim();
+    const sectionAlign = document.getElementById('sectionAlign').value;
     const sectionZoom = parseInt(document.getElementById('sectionZoom').value);
     const sectionFocusX = parseInt(document.getElementById('sectionFocusX').value);
     const sectionFocusY = parseInt(document.getElementById('sectionFocusY').value);
@@ -3005,6 +3096,7 @@ function saveSectionData() {
         title: sectionTitle,
         subtitle: sectionSubtitle,
         image: sectionImage,
+        align: sectionAlign || 'center', // 정렬 옵션 추가 (기본값: center)
         zoom: sectionZoom,
         focusX: sectionFocusX,
         focusY: sectionFocusY
@@ -3188,6 +3280,7 @@ function updatePagesList() {
                 document.getElementById('sectionTitle').value = item.title || '';
                 document.getElementById('sectionSubtitle').value = item.subtitle || '';
                 document.getElementById('sectionImage').value = item.image || '';
+                document.getElementById('sectionAlign').value = item.align || 'center';
                 document.getElementById('sectionZoom').value = item.zoom || 100;
                 document.getElementById('sectionFocusX').value = item.focusX || 50;
                 document.getElementById('sectionFocusY').value = item.focusY || 50;
@@ -3244,6 +3337,15 @@ function updatePagesList() {
                 document.getElementById('pageTitle').value = item.title || '';
                 document.getElementById('pageSubtitle').value = item.subtitle || '';
                 document.getElementById('pageContent').value = item.content;
+                
+                // 이미지 크기 슬라이더 값 설정
+                const pageImageWidth = document.getElementById('pageImageWidth');
+                const pageImageWidthValue = document.getElementById('pageImageWidthValue');
+                if (pageImageWidth && pageImageWidthValue) {
+                    const widthValue = item.imageWidth || 100;
+                    pageImageWidth.value = widthValue;
+                    pageImageWidthValue.textContent = widthValue + '%';
+                }
 
                 tempPageTags = [];
 
@@ -3354,6 +3456,7 @@ function generateHTML(isPreview) {
 
         // 표지 생성
         if (enableCover) {
+            const coverAutoFit = document.getElementById('coverAutoFit').checked;
             const coverZoom = document.getElementById('coverZoom').value;
             const coverFocusX = document.getElementById('coverFocusX').value;
             const coverFocusY = document.getElementById('coverFocusY').value;
@@ -3365,8 +3468,12 @@ function generateHTML(isPreview) {
                 if (coverImage) {
                     // 이미지가 있는 경우 - 기존 로직
                     const normalizedCoverImage = normalizeImageUrl(coverImage);
+                    
+                    // 자동 크기 조절 여부에 따라 background-size 결정
+                    const backgroundSize = coverAutoFit ? 'cover' : (coverZoom + '% auto');
+                    
                     topContent += '<div style="width:100%;margin:0 0 30px 0;box-sizing:border-box;background:transparent;">';
-                    topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + coverZoom + '% auto;background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
+                    topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + backgroundSize + ';background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
                     topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:10px 10px 0 0;">';
 
                     if (coverArchiveNo) {
@@ -3458,8 +3565,8 @@ function generateHTML(isPreview) {
             const imgCircleStyleBase = 'width: 100%; height: 0; padding-bottom: 100%; border-radius: 50%; margin: 0 auto;';
             const textContainerStyle = 'text-align: center;';
             const nameStyle = 'display: block; font-size: clamp(13px, 2.5vw, 18px); font-weight: 700; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; color: ' + theme.headerText + '; line-height: 1.2; margin-bottom: clamp(6px, 1.5vw, 10px);';
-            const tagStyle = 'font-size: clamp(8px, 1.3vw, 10px); color: ' + theme.tagText + '; margin-bottom: 3px; font-weight: 600; text-transform: uppercase;';
-            const descStyle = 'font-size: clamp(11px, 2vw, 12px); line-height: 1.6; color: ' + theme.text + '; word-break: keep-all; text-align: center; padding: 0 5px;';
+            const tagStyle = 'font-size: clamp(8px, 1.3vw, 10px); color: ' + theme.tagText + '; margin-bottom: 3px; font-weight: 600; text-transform: uppercase; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+            const descStyle = 'font-size: clamp(11px, 2vw, 12px); line-height: 1.6; color: ' + theme.text + '; word-break: keep-all; text-align: center; padding: 0 5px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
             const leftStyle = 'text-align: left; padding: 0 clamp(15px, 4vw, 25px);';
 
             topContent += '<div style="' + profileRowStyle + '">';
@@ -3524,7 +3631,7 @@ function generateHTML(isPreview) {
                 topContent += '<br>';
             }
             topContent += '<div style="padding: 0 clamp(20px, 3vw, 25px) 5px clamp(20px, 3vw, 25px); text-align: center;">';
-            topContent += '<span style="display: inline-block; font-size: clamp(11px, 2vw, 13px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + theme.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + theme.headerText + '; padding-bottom: 5px;">Story So Far</span>';
+            topContent += '<span style="display: inline-block; font-size: clamp(11px, 2vw, 13px); font-weight: 600; letter-spacing: clamp(1.5px, 0.3vw, 2px); color: ' + theme.headerText + '; text-transform: uppercase; border-bottom: 1px solid ' + theme.headerText + '; padding-bottom: 5px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">Story So Far</span>';
             topContent += '</div>';
             topContent += '<div style="padding: 10px clamp(30px, 5vw, 50px) 10px clamp(30px, 5vw, 50px);">' + parseText(summaryText, theme, true, true) + '</div>';
         }
@@ -3600,6 +3707,7 @@ function generateHTML(isPreview) {
                 const zoom = item.zoom || 100;
                 const focusX = item.focusX || 50;
                 const focusY = item.focusY || 50;
+                const textAlign = item.align || 'center';
                 const sectionImage = normalizeImageUrl(item.image);
                 
                 // 섹션 내에 페이지가 있을 때만 margin-bottom 추가, border-radius도 조건부 적용
@@ -3607,7 +3715,7 @@ function generateHTML(isPreview) {
                 const sectionBorderRadius = isInSection ? 'border-radius:10px 10px 0 0;' : 'border-radius:10px;';
 
                 sectionHtml += '<div style="width:100%;height:15vh;display:table;background-color:#1a1a1a;background-image:url(\'' + sectionImage + '\');background-size:' + zoom + '% auto;background-position:' + focusX + '% ' + focusY + '%;background-repeat:no-repeat;' + sectionBorderRadius + sectionMarginBottom + '">';
-                sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);' + sectionBorderRadius + 'text-align:center;">';
+                sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);' + sectionBorderRadius + 'text-align:' + textAlign + ';">';
 
                 if (item.subtitle && item.subtitle.trim()) {
                     sectionHtml += '<div style="font-size:clamp(10px, 1.8vw, 11px);line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + item.subtitle + '</div>';
@@ -3621,7 +3729,8 @@ function generateHTML(isPreview) {
             }
             // 이미지가 없는 경우
             else {
-                sectionHtml += '<div style="width: 100%; padding: clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px); text-align: center;">';
+                const textAlign = item.align || 'center';
+                sectionHtml += '<div style="width: 100%; padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px); text-align: ' + textAlign + ';">';
                 
                 if (item.subtitle && item.subtitle.trim()) {
                     sectionHtml += '<div style="font-size: clamp(10px, 1.8vw, 11px); color: ' + currentSectionTheme.tagText + '; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + item.subtitle + '</div>';
@@ -3638,7 +3747,7 @@ function generateHTML(isPreview) {
             if (isInSection) {
                 sectionContainerHtml += sectionHtml;
             } else {
-                html += '<div style="box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 10px; background-color: ' + currentSectionTheme.bg + '; padding: 0;">';
+                html += '<div style="box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 10px; background-color: ' + currentSectionTheme.bg + '; padding: 0; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">';
                 html += sectionHtml;
                 html += '</div>';
                 // 다음 항목도 섹션인 경우 간격 추가
@@ -3660,6 +3769,7 @@ function generateHTML(isPreview) {
                     title: document.getElementById('pageTitle').value,
                     subtitle: document.getElementById('pageSubtitle').value,
                     content: document.getElementById('pageContent').value,
+                    imageWidth: currentEditingIndex !== null && pages[currentEditingIndex] ? pages[currentEditingIndex].imageWidth : 100,
                     bgImage: null,
                     collapsed: false, // 기본값: 접힌 상태
                     useGlobalTags: true,
@@ -3690,11 +3800,13 @@ function generateHTML(isPreview) {
 
             if (isExpanded) {
                 // 펼쳐진 상태: 헤더 + 본문 표시
+                const pageImageWidth = (currentPage.imageWidth !== undefined && currentPage.imageWidth !== null) ? currentPage.imageWidth : 100;
+                console.log('Page', index, 'imageWidth:', currentPage.imageWidth, 'using:', pageImageWidth);
                 if (currentPage.bgImage) {
-                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme) + '</div>';
+                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
                 } else {
                     // 단독 페이지는 header를 pageContentHtml에 포함하지 않음 (createContainer에서 처리)
-                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme) + '</div>';
+                    pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
                 }
 
                 // 이 페이지가 마지막 컨테이너인지 확인 (섹션 밖의 단독 페이지이고, 이후에 페이지나 코멘트가 없음)
@@ -3723,7 +3835,9 @@ function generateHTML(isPreview) {
             } else {
                 // 접힌 상태: 헤더만 summary로, 본문은 접힌 내용으로
                 // 본문 내용을 미리 준비 (펼쳤을 때 보여질 내용)
-                let collapsedContent = '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme) + '</div>';
+                const pageImageWidth = (currentPage.imageWidth !== undefined && currentPage.imageWidth !== null) ? currentPage.imageWidth : 100;
+                console.log('Page', index, 'imageWidth (collapsed):', currentPage.imageWidth, 'using:', pageImageWidth);
+                let collapsedContent = '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
 
                 // 이 페이지가 마지막 컨테이너인지 확인
                 const isLastStandalonePage = !isInSection && index === pages.length - 1 && !hasCommentAtEnd;
@@ -4100,6 +4214,7 @@ function savePreset(slotIndex) {
             enableTopSection: document.getElementById('enableTopSection')?.checked,
             enableCover: document.getElementById('enableCover')?.checked,
             coverImage: document.getElementById('coverImage')?.value,
+            coverAutoFit: document.getElementById('coverAutoFit')?.checked,
             coverZoom: parseInt(document.getElementById('coverZoom')?.value || 120),
             coverFocusX: parseInt(document.getElementById('coverFocusX')?.value || 50),
             coverFocusY: parseInt(document.getElementById('coverFocusY')?.value || 50),
@@ -4193,6 +4308,13 @@ function loadPreset(slotIndex) {
             document.getElementById('coverContent').style.display = data.enableCover ? 'block' : 'none';
         }
         if (data.coverImage !== undefined) document.getElementById('coverImage').value = data.coverImage;
+        if (data.coverAutoFit !== undefined) {
+            document.getElementById('coverAutoFit').checked = data.coverAutoFit;
+            const coverManualControls = document.getElementById('coverManualControls');
+            if (coverManualControls) {
+                coverManualControls.style.display = data.coverAutoFit ? 'none' : 'block';
+            }
+        }
         if (data.coverZoom !== undefined) {
             document.getElementById('coverZoom').value = data.coverZoom;
             document.getElementById('coverZoomValue').textContent = data.coverZoom + '%';

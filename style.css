@@ -2087,12 +2087,16 @@ body.light-mode .btn-save-new-preset {
         top: 18px;
     }
 
-    .btn-theme-toggle {
-        right: 52px;
+    .btn-credit-toggle {
+        right: 16px;
     }
 
     .btn-sound-toggle {
-        right: 16px;
+        right: calc(16px + 28px + 8px); /* 크레딧 버튼 + 간격 */
+    }
+
+    .btn-theme-toggle {
+        right: calc(16px + 28px + 8px + 28px + 8px); /* 크레딧 + 사운드 + 간격들 */
     }
 
     .btn-theme-toggle svg,
