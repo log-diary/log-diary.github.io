@@ -2019,7 +2019,8 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
     const pStyle = 'margin: ' + paragraphMargin + '; color: ' + themeStyle.text + '; line-height: ' + lineHeight + '; letter-spacing: ' + letterSpacing + '; font-size: ' + fontSize + ';' + textIndentStyle;
     const emStyle = 'font-style: italic; color: ' + themeStyle.em + ';';
     const q1Style = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0 3px; border-radius: 2px;';
-    const q2Style = 'background-color: ' + themeStyle.quote2Bg + '; color: ' + themeStyle.quote2Text + '; font-weight: 600; padding: 0 3px; border-radius: 2px;';
+    const q1StyleNested = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; border-radius: 2px;'; // 큰따옴표 안의 작은따옴표용 (padding 없음)
+    const q2Style = 'background-color: ' + themeStyle.quote2Bg + '; color: ' + themeStyle.quote2Text + '; font-weight: 600; border-radius: 2px;'; // padding 제거 테스트
     const footnoteStyle = 'font-size: 11px; color: ' + themeStyle.tagText + '; margin: -8px 0 10px 0; line-height: 1.4;';
 
     let detailsBlocks = [];
@@ -2033,10 +2034,24 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
         const quotePlaceholders = [];
         let quoteIndex = 0;
 
+        // ===== 단위 표현을 먼저 보호 =====
+        const detailsUnitPlaceholders = [];
+        let detailsUnitIndex = 0;
+        
+        result = result.replace(/(\d+)\s*['′]\s*(\d+)\s*["″]/g, function(m) {
+            const ph = '{{DETAILS_UNIT_FULL_' + (detailsUnitIndex++) + '}}';
+            detailsUnitPlaceholders.push(m);
+            return ph;
+        });
+        result = result.replace(/(\d+)\s*['′]/g, function(m) {
+            const ph = '{{DETAILS_UNIT_FEET_' + (detailsUnitIndex++) + '}}';
+            detailsUnitPlaceholders.push(m);
+            return ph;
+        });
+
         if (useRoundedQuotes) {
             // 먼저 큰따옴표 안의 작은따옴표 처리
             result = result.replace(/\u201c([^\u201d]*)\u201d/g, function (match, content) {
-                // 큰따옴표 안의 작은따옴표를 먼저 처리
                 const innerProcessed = content.replace(/\u2018(.*?)\u2019/g, function (m, c) {
                     const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
                     quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + c + '\u2019</span>');
@@ -2052,28 +2067,38 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
                 quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + content + '\u2019</span>');
                 return ph;
             });
-            // 일반 큰따옴표 안의 작은따옴표 처리
-            result = result.replace(/"([^"]*)"/g, function (match, content) {
-                // 큰따옴표 안의 작은따옴표를 먼저 처리
-                const innerProcessed = content.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, function (m, prefix, c) {
+            // 일반 큰따옴표 처리
+            result = result.replace(/"([^"]*)"/g, function (match, content, offset) {
+                if (offset > 0 && /\d/.test(result[offset - 1])) {
+                    return match;
+                }
+                
+                if (/^\d+['′]\s*\d*["″]?$/.test(content.trim())) {
+                    return match;
+                }
+                
+                const innerProcessed = content.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function (m, c) {
                     const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
-                    quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + c + '\u2019</span>');
-                    return prefix + ph;
+                    quotePlaceholders.push('<span style="' + q1StyleNested + '">\u2018' + c + '\u2019</span>');
+                    return ph;
                 });
+                
                 const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
                 quotePlaceholders.push('<span style="' + q2Style + '">\u201c' + innerProcessed + '\u201d</span>');
                 return ph;
             });
             // 남아있는 단독 작은따옴표 처리
-            result = result.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, function (match, prefix, content) {
+            result = result.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function (match, content, offset) {
+                if (offset > 0 && /\d/.test(result[offset - 1])) {
+                    return match;
+                }
                 const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
                 quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + content + '\u2019</span>');
-                return prefix + ph;
+                return ph;
             });
         } else {
             // 먼저 큰따옴표 안의 작은따옴표 처리
             result = result.replace(/\u201c([^\u201d]*)\u201d/g, function (match, content) {
-                // 큰따옴표 안의 작은따옴표를 먼저 처리
                 const innerProcessed = content.replace(/\u2018(.*?)\u2019/g, function (m, c) {
                     const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
                     quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + c + '\u2019</span>');
@@ -2089,23 +2114,34 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
                 quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + content + '\u2019</span>');
                 return ph;
             });
-            // 일반 큰따옴표 안의 작은따옴표 처리
-            result = result.replace(/"([^"]*)"/g, function (match, content) {
-                // 큰따옴표 안의 작은따옴표를 먼저 처리
-                const innerProcessed = content.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, function (m, prefix, c) {
+            // 일반 큰따옴표 처리
+            result = result.replace(/"([^"]*)"/g, function (match, content, offset) {
+                if (offset > 0 && /\d/.test(result[offset - 1])) {
+                    return match;
+                }
+                
+                if (/^\d+['′]\s*\d*["″]?$/.test(content.trim())) {
+                    return match;
+                }
+                
+                const innerProcessed = content.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function (m, c) {
                     const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
-                    quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + c + '\u2019</span>');
-                    return prefix + ph;
+                    quotePlaceholders.push('<span style="' + q1StyleNested + '">\'' + c + '\'</span>');
+                    return ph;
                 });
+                
                 const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
                 quotePlaceholders.push('<span style="' + q2Style + '">"' + innerProcessed + '"</span>');
                 return ph;
             });
             // 남아있는 단독 작은따옴표 처리
-            result = result.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, function (match, prefix, content) {
+            result = result.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function (match, content, offset) {
+                if (offset > 0 && /\d/.test(result[offset - 1])) {
+                    return match;
+                }
                 const ph = '{{QUOTE_PH_' + (quoteIndex++) + '}}';
-                quotePlaceholders.push('<span style="' + q1Style + '">\u2018' + content + '\u2019</span>');
-                return prefix + ph;
+                quotePlaceholders.push('<span style="' + q1Style + '">\'' + content + '\'</span>');
+                return ph;
             });
         }
 
@@ -2150,6 +2186,12 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             result = result.replace('{{FN_PH_' + i + '}}', function () {
                 return fnPlaceholders[i];
             });
+        }
+
+        // 단위 플레이스홀더 복원
+        for (let i = detailsUnitPlaceholders.length - 1; i >= 0; i--) {
+            result = result.replace('{{DETAILS_UNIT_FULL_' + i + '}}', detailsUnitPlaceholders[i]);
+            result = result.replace('{{DETAILS_UNIT_FEET_' + i + '}}', detailsUnitPlaceholders[i]);
         }
 
         // 줄바꿈 처리
@@ -2243,34 +2285,79 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             return '{{ROUND_QUOTE_' + pairIndex + '}}';
         });
 
+        // ===== 핵심 변경: 단위 표현을 먼저 보호 =====
+        const unitPlaceholders = [];
+        let unitIndex = 0;
+        
+        // 단위 패턴 보호 (큰따옴표 매칭 전에 실행)
+        line = line.replace(/(\d+)\s*['′]\s*(\d+)\s*["″]/g, function(m) {
+            const ph = '{{UNIT_FULL_' + (unitIndex++) + '}}';
+            unitPlaceholders.push(m);
+            return ph;
+        });
+        line = line.replace(/(\d+)\s*['′]/g, function(m) {
+            const ph = '{{UNIT_FEET_' + (unitIndex++) + '}}';
+            unitPlaceholders.push(m);
+            return ph;
+        });
+
         if (useRoundedQuotes) {
             // 일반 큰따옴표 안의 작은따옴표 처리
-            line = line.replace(/"([^"]*)"/g, function (match, content) {
-                // 큰따옴표 안의 작은따옴표를 먼저 찾아서 플레이스홀더로 변환
-                const innerProcessed = content.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, function (m, prefix, c) {
+            line = line.replace(/"([^"]*)"/g, function (match, content, offset) {
+                // 숫자 바로 뒤의 " (인치 표시)는 이미 위에서 처리됨
+                if (offset > 0 && /\d/.test(line[offset - 1])) {
+                    return match;
+                }
+                
+                // 내용 전체가 단위 표현인지 확인
+                if (/^\d+['′]\s*\d*["″]?$/.test(content.trim())) {
+                    return match;
+                }
+                
+                // 작은따옴표 처리 - lookahead/lookbehind 사용
+                const innerProcessed = content.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function (m, c) {
                     pairIndex++;
-                    roundedQuotePairs.push({ type: 'single', content: c });
-                    return prefix + '{{ROUND_QUOTE_' + pairIndex + '}}';
+                    roundedQuotePairs.push({ type: 'single', content: c, nested: true }); // nested 플래그 추가
+                    return '{{ROUND_QUOTE_' + pairIndex + '}}';
                 });
+                
                 pairIndex++;
                 roundedQuotePairs.push({ type: 'double', content: innerProcessed });
                 return '{{ROUND_QUOTE_' + pairIndex + '}}';
             });
             // 남은 단독 작은따옴표 처리
-            line = line.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, function (match, prefix, content) {
+            line = line.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function (match, content, offset) {
+                if (offset > 0 && /\d/.test(line[offset - 1])) {
+                    return match;
+                }
                 pairIndex++;
                 roundedQuotePairs.push({ type: 'single', content: content });
-                return prefix + '{{ROUND_QUOTE_' + pairIndex + '}}';
+                return '{{ROUND_QUOTE_' + pairIndex + '}}';
             });
         } else {
-            // 일반 따옴표 모드에서도 큰따옴표 안의 작은따옴표 처리
-            line = line.replace(/"([^"]*)"/g, function (match, content) {
-                // 큰따옴표 안의 작은따옴표를 먼저 처리하고 스타일 직접 적용
-                const innerProcessed = content.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, "$1<span style='" + q1Style + "'>'$2'</span>");
+            // 일반 따옴표 모드
+            line = line.replace(/"([^"]*)"/g, function (match, content, offset) {
+                if (offset > 0 && /\d/.test(line[offset - 1])) {
+                    return match;
+                }
+                
+                if (/^\d+['′]\s*\d*["″]?$/.test(content.trim())) {
+                    return match;
+                }
+                
+                // 작은따옴표 처리 - nested에는 padding 없는 스타일 사용
+                const innerProcessed = content.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function(m, c) {
+                    return '<span style="' + q1StyleNested + '">\'' + c + '\'</span>';
+                });
+                
                 return '<span style="' + q2Style + '">"' + innerProcessed + '"</span>';
             });
-            // 남은 단독 작은따옴표 처리
-            line = line.replace(/(^|[^\w])'(.+?)'(?=[^\w]|$)/g, "$1<span style='" + q1Style + "'>'$2'</span>");
+            line = line.replace(/(?<=[^\w\d]|^)'(.+?)'(?=[^\w\d]|$)/g, function(match, content, offset) {
+                if (offset > 0 && /\d/.test(line[offset - 1])) {
+                    return match;
+                }
+                return '<span style="' + q1Style + '">\'' + content + '\'</span>';
+            });
         }
 
         // 플레이스홀더를 역순으로 복원 (안쪽부터 바깥쪽으로)
@@ -2279,8 +2366,16 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             if (pair.type === 'double') {
                 line = line.replace('{{ROUND_QUOTE_' + idx + '}}', '<span style="' + q2Style + '">\u201c' + pair.content + '\u201d</span>');
             } else {
-                line = line.replace('{{ROUND_QUOTE_' + idx + '}}', '<span style="' + q1Style + '">\u2018' + pair.content + '\u2019</span>');
+                // nested이면 padding 없는 스타일 사용
+                const style = pair.nested ? q1StyleNested : q1Style;
+                line = line.replace('{{ROUND_QUOTE_' + idx + '}}', '<span style="' + style + '">\u2018' + pair.content + '\u2019</span>');
             }
+        }
+
+        // 단위 플레이스홀더 복원
+        for (let i = unitPlaceholders.length - 1; i >= 0; i--) {
+            line = line.replace('{{UNIT_FULL_' + i + '}}', unitPlaceholders[i]);
+            line = line.replace('{{UNIT_FEET_' + i + '}}', unitPlaceholders[i]);
         }
 
         line = line.replace(/\*([^*]+)\*/g, '<em><span style="' + emStyle + '">$1</span></em>');
