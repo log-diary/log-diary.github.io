@@ -30,10 +30,17 @@ function getFontFallback(font) {
 // 이미지 URL 정규화 (프로토콜 상대 URL을 https로 변환)
 function normalizeImageUrl(url) {
     if (!url) return '';
+    
     // //로 시작하는 URL을 https://로 변환
     if (url.startsWith('//')) {
-        return 'https:' + url;
+        url = 'https:' + url;
     }
+    
+    // 나무위키나 특정 사이트의 이미지인 경우 CORS 프록시 사용
+    if (url.includes('namu.la') || url.includes('arca.live')) {
+        return 'https://corsproxy.io/?' + encodeURIComponent(url);
+    }
+    
     return url;
 }
 
@@ -1988,9 +1995,18 @@ function escapeRegExp(string) {
 function normalizeImageUrl(url) {
     if (!url || !url.trim()) return '';
     const trimmed = url.trim();
+    
+    // // 로 시작하는 경우 https: 추가
     if (trimmed.startsWith('//')) {
         return 'https:' + trimmed;
     }
+    
+    // 나무위키나 특정 사이트의 이미지인 경우 CORS 프록시 사용
+    if (trimmed.includes('namu.la') || trimmed.includes('arca.live')) {
+        // CORS 프록시를 통해 이미지 로드
+        return 'https://corsproxy.io/?' + encodeURIComponent(trimmed);
+    }
+    
     return trimmed;
 }
 
