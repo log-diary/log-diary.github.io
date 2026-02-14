@@ -1672,6 +1672,12 @@ function setupEventListeners() {
             }
         });
     }
+
+    // 초기화 버튼
+    const resetDataBtn = document.getElementById('resetData');
+    if (resetDataBtn) {
+        resetDataBtn.addEventListener('click', resetCurrentData);
+    }
 }
 
 // 알림 타이머 전역 변수
@@ -1696,6 +1702,106 @@ function showNotification(message) {
         notification.classList.remove('show');
         notificationTimer = null;
     }, 2000);
+}
+
+// 현재 작업 내용 초기화 (프리셋·커스텀 테마는 유지)
+function resetCurrentData() {
+    if (!confirm('현재 작업 중인 모든 내용이 초기화됩니다.\n저장된 프리셋과 테마는 유지됩니다.\n\n계속하시겠습니까?')) return;
+
+    // ── 전역 변수 초기화 ──
+    pages = [];
+    tags = [];
+    replacements = [];
+    profiles = [];
+    currentEditingIndex = null;
+    tempPageTags = [];
+    globalTheme = 'basic';
+    hidePageNumbers = false;
+    enablePageFold = true;
+    fontFamily = 'Pretendard';
+    textSpacing = {
+        fontSize: 14.2,
+        lineHeight: 1.7,
+        letterSpacing: -0.5,
+        paragraphSpacing: 10,
+        textIndent: 0
+    };
+
+    // ── 체크박스 초기화 ──
+    const checkboxIds = [
+        'useRoundedQuotes', 'useTextIndent', 'enableTopSection',
+        'enableCover', 'coverAutoFit', 'enableProfiles',
+        'enableTags', 'enableComment', 'hidePageNumbers'
+    ];
+    checkboxIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = (id === 'coverAutoFit' || id === 'enableTags');
+    });
+
+    // enablePageFold는 기본값 true
+    const enablePageFoldEl = document.getElementById('enablePageFold');
+    if (enablePageFoldEl) enablePageFoldEl.checked = true;
+
+    // ── 텍스트 입력 초기화 ──
+    const textInputIds = [
+        'coverImage', 'coverTitle', 'coverSubtitle',
+        'introText', 'summaryText',
+        'soundtrackUrl', 'soundtrackTitle', 'soundtrackArtist',
+        'commentText', 'commentNickname'
+    ];
+    textInputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+
+    // coverArchiveNo 기본값 복원
+    const coverArchiveNoEl = document.getElementById('coverArchiveNo');
+    if (coverArchiveNoEl) coverArchiveNoEl.value = 'ARCHIVE NO.001';
+
+    // ── 폰트 초기화 ──
+    const fontFamilyEl = document.getElementById('fontFamily');
+    if (fontFamilyEl) fontFamilyEl.value = 'Pretendard';
+
+    // ── 텍스트 간격 슬라이더/입력 초기화 ──
+    const spacingDefaults = {
+        textSizeInput: 14.2,   textSizeSlider: 14.2,
+        lineHeightInput: 1.7,  lineHeightSlider: 1.7,
+        letterSpacingInput: -0.5, letterSpacingSlider: -0.5,
+        paragraphSpacingInput: 10, paragraphSpacingSlider: 10,
+        textIndentInput: 0,    textIndentSlider: 0
+    };
+    Object.entries(spacingDefaults).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    });
+
+    // ── 전역 테마 초기화 ──
+    const globalThemeEl = document.getElementById('globalTheme');
+    if (globalThemeEl) globalThemeEl.value = 'basic';
+
+    // ── UI 목록 갱신 ──
+    updatePagesList();
+    updateTagsList();
+    updateReplacementsList();
+    updateProfilesList();
+
+    // 인트로/커버 섹션 숨김
+    const topSectionContent = document.getElementById('topSectionContent');
+    if (topSectionContent) topSectionContent.style.display = 'none';
+    const coverContent = document.getElementById('coverContent');
+    if (coverContent) coverContent.style.display = 'none';
+    const profileInputs = document.getElementById('profileInputs');
+    if (profileInputs) profileInputs.style.display = 'none';
+    const commentContent = document.getElementById('commentContent');
+    if (commentContent) commentContent.style.display = 'none';
+
+    // ── localStorage에서 메인 데이터만 삭제 (프리셋·테마는 유지) ──
+    localStorage.removeItem(STORAGE_KEY);
+
+    // ── 미리보기 갱신 ──
+    updatePreview();
+
+    showNotification('초기화 완료! 프리셋과 테마는 유지됩니다.');
 }
 
 // 데이터를 JSON 파일로 내보내기

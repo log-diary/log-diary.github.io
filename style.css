@@ -402,6 +402,32 @@ button { font-family: var(--font-display); letter-spacing: 1px; cursor: pointer;
     transform: translateY(0);
 }
 
+.btn-reset {
+    background: rgba(231, 76, 60, 0.07);
+    border: 1px solid rgba(231, 76, 60, 0.35);
+    color: #c0392b;
+    padding: 14px;
+    font-size: 13px;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+    background: rgba(231, 76, 60, 0.15);
+    border-color: rgba(231, 76, 60, 0.7);
+    color: #e74c3c;
+    transform: translateY(-1px);
+}
+
+.btn-reset:active {
+    transform: translateY(0);
+}
+
 /* 리스트 아이템 (태그, 치환 등) */
 .styled-list { display: flex; flex-direction: column; gap: 12px; }
 
@@ -1163,6 +1189,19 @@ body.light-mode .btn-credit-toggle {
 /* 라이트 모드에서 .btn-ghost 배경 보정 */
 body.light-mode .btn-ghost {
     background: rgba(0, 0, 0, 0.02);
+}
+
+/* 라이트 모드에서 .btn-reset 보정 */
+body.light-mode .btn-reset {
+    background: rgba(180, 40, 30, 0.05);
+    border-color: rgba(180, 40, 30, 0.3);
+    color: #a02820;
+}
+
+body.light-mode .btn-reset:hover {
+    background: rgba(180, 40, 30, 0.12);
+    border-color: rgba(180, 40, 30, 0.6);
+    color: #c0392b;
 }
 
 /* 라이트 모드에서 체크박스 미체크 테두리 보정 */
