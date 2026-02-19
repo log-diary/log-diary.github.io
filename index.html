@@ -159,6 +159,97 @@
                     </div>
                 </div>
                 <div class="sub-section">
+                    <h3>FONT STYLE</h3>
+                    <div class="control-grid">
+                        <div class="input-group">
+                            <label>글자 크기 <span id="textSizeDisplay" style="color:var(--accent-blue);">14.2px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="textSizeSlider" class="spacing-slider" min="10" max="24" step="0.1" value="14.2" style="flex:1;">
+                                <input type="number" id="textSizeInput" value="14.2" min="10" max="24" step="0.1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>줄 간격 <span id="lineHeightDisplay" style="color:var(--accent-blue);">1.7</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="lineHeightSlider" class="spacing-slider" min="1.0" max="3.0" step="0.05" value="1.7" style="flex:1;">
+                                <input type="number" id="lineHeightInput" value="1.7" min="1.0" max="3.0" step="0.05" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>자간 <span id="letterSpacingDisplay" style="color:var(--accent-blue);">-0.5px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="letterSpacingSlider" class="spacing-slider" min="-2" max="5" step="0.1" value="-0.5" style="flex:1;">
+                                <input type="number" id="letterSpacingInput" value="-0.5" min="-2" max="5" step="0.1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>문단 간격 <span id="paragraphSpacingDisplay" style="color:var(--accent-blue);">10px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="paragraphSpacingSlider" class="spacing-slider" min="0" max="40" step="1" value="10" style="flex:1;">
+                                <input type="number" id="paragraphSpacingInput" value="10" min="0" max="40" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>들여쓰기 크기 <span id="textIndentDisplay" style="color:var(--accent-blue);">0px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="textIndentSlider" class="spacing-slider" min="0" max="60" step="1" value="0" style="flex:1;">
+                                <input type="number" id="textIndentInput" value="0" min="0" max="60" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                    </div>
+                    <button id="resetSpacing" class="btn-ghost full-width" style="margin-top:12px;">↺ 기본값으로 초기화</button>
+                </div>
+
+                <div class="sub-section">
+                    <h3>HEADING SIZES</h3>
+                    <div class="control-grid">
+                        <div class="input-group">
+                            <label>표지 제목 <span id="coverTitleSizeDisplay" style="color:var(--accent-blue);">42px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="coverTitleSizeSlider" class="spacing-slider" min="20" max="80" step="1" value="42" style="flex:1;">
+                                <input type="number" id="coverTitleSizeInput" value="42" min="20" max="80" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>표지 부제 <span id="coverSubtitleSizeDisplay" style="color:var(--accent-blue);">14px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="coverSubtitleSizeSlider" class="spacing-slider" min="8" max="30" step="0.5" value="14" style="flex:1;">
+                                <input type="number" id="coverSubtitleSizeInput" value="14" min="8" max="30" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>섹션 제목 <span id="sectionTitleSizeDisplay" style="color:var(--accent-blue);">20px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="sectionTitleSizeSlider" class="spacing-slider" min="12" max="48" step="0.5" value="20" style="flex:1;">
+                                <input type="number" id="sectionTitleSizeInput" value="20" min="12" max="48" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>섹션 부제 <span id="sectionSubtitleSizeDisplay" style="color:var(--accent-blue);">11px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="sectionSubtitleSizeSlider" class="spacing-slider" min="8" max="24" step="0.5" value="11" style="flex:1;">
+                                <input type="number" id="sectionSubtitleSizeInput" value="11" min="8" max="24" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>페이지 헤더 번호 <span id="pageHeaderNumSizeDisplay" style="color:var(--accent-blue);">40px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="pageHeaderNumSizeSlider" class="spacing-slider" min="20" max="72" step="1" value="40" style="flex:1;">
+                                <input type="number" id="pageHeaderNumSizeInput" value="40" min="20" max="72" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>페이지 헤더 제목/부제 <span id="pageHeaderTitleSizeDisplay" style="color:var(--accent-blue);">15px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="pageHeaderTitleSizeSlider" class="spacing-slider" min="8" max="28" step="0.5" value="15" style="flex:1;">
+                                <input type="number" id="pageHeaderTitleSizeInput" value="15" min="8" max="28" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                    </div>
+                    <button id="resetHeadingSizes" class="btn-ghost full-width" style="margin-top:12px;">↺ 기본값으로 초기화</button>
+                </div>
+
+                <div class="sub-section">
                     <h3>WORD REPLACEMENT</h3>
                     <div id="replacementsList" class="styled-list"></div>
                     <button id="addReplacement" class="btn-ghost full-width">+ 치환 규칙 추가</button>

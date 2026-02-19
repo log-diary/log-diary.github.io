@@ -19,6 +19,16 @@ let textSpacing = {
     textIndent: 0
 };
 
+// 제목/헤더 폰트 크기 설정
+let headingFontSizes = {
+    coverTitle: 42,       // 표지 메인 제목
+    coverSubtitle: 14,    // 표지 부제
+    sectionTitle: 20,     // 섹션 제목 (배경 없음)
+    sectionSubtitle: 11,  // 섹션 부제
+    pageHeaderNum: 40,    // 페이지 헤더 번호
+    pageHeaderTitle: 15,  // 페이지 헤더 제목/부제
+};
+
 // 폰트 설정
 let fontFamily = 'Pretendard';
 
@@ -717,6 +727,12 @@ function loadFromStorage() {
                 if (paragraphSpacingSlider) paragraphSpacingSlider.value = textSpacing.paragraphSpacing;
                 if (textIndentInput) textIndentInput.value = textSpacing.textIndent;
                 if (textIndentSlider) textIndentSlider.value = textSpacing.textIndent;
+                // display 업데이트
+                const _sd = document.getElementById('textSizeDisplay'); if (_sd) _sd.textContent = textSpacing.fontSize.toFixed(1) + 'px';
+                const _lhd = document.getElementById('lineHeightDisplay'); if (_lhd) _lhd.textContent = textSpacing.lineHeight.toFixed(2);
+                const _lsd = document.getElementById('letterSpacingDisplay'); if (_lsd) _lsd.textContent = textSpacing.letterSpacing.toFixed(1) + 'px';
+                const _psd = document.getElementById('paragraphSpacingDisplay'); if (_psd) _psd.textContent = textSpacing.paragraphSpacing + 'px';
+                const _tid = document.getElementById('textIndentDisplay'); if (_tid) _tid.textContent = textSpacing.textIndent + 'px';
             } else {
                 // 기본값 설정 (요소가 있을 때만)
                 const textSizeInput = document.getElementById('textSizeInput');
@@ -747,6 +763,29 @@ function loadFromStorage() {
                 fontFamily = data.fontFamily;
                 const fontFamilyEl = document.getElementById('fontFamily');
                 if (fontFamilyEl) fontFamilyEl.value = fontFamily;
+            }
+
+            // 제목 크기 설정 로드
+            if (data.headingFontSizes) {
+                headingFontSizes = { ...headingFontSizes, ...data.headingFontSizes };
+                // UI는 setupHeadingControl에서 초기화되므로 여기서는 값만 동기화
+                Object.keys(headingFontSizes).forEach(k => {
+                    const map = {
+                        coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
+                        coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+                        sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
+                        sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
+                        pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },
+                        pageHeaderTitle: { slider: 'pageHeaderTitleSizeSlider', input: 'pageHeaderTitleSizeInput', display: 'pageHeaderTitleSizeDisplay' },
+                    };
+                    if (!map[k]) return;
+                    const sl = document.getElementById(map[k].slider);
+                    const inp = document.getElementById(map[k].input);
+                    const dsp = document.getElementById(map[k].display);
+                    if (sl) sl.value = headingFontSizes[k];
+                    if (inp) inp.value = headingFontSizes[k];
+                    if (dsp) dsp.textContent = headingFontSizes[k] + 'px';
+                });
             }
 
             // 전역 테마 설정 로드
@@ -1088,6 +1127,7 @@ function saveToStorage() {
             fontFamily: fontFamily,
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
+            headingFontSizes: headingFontSizes,
             enablePageFold: enablePageFold
         };
 
@@ -1526,6 +1566,21 @@ function setupEventListeners() {
     // --- script.js의 setupEventListeners 함수 내부에 추가 ---
 
     // 텍스트 간격 조정 기능
+    const spacingDisplayMap = {
+        fontSize: { displayId: 'textSizeDisplay', unit: 'px', decimals: 1 },
+        lineHeight: { displayId: 'lineHeightDisplay', unit: '', decimals: 2 },
+        letterSpacing: { displayId: 'letterSpacingDisplay', unit: 'px', decimals: 1 },
+        paragraphSpacing: { displayId: 'paragraphSpacingDisplay', unit: 'px', decimals: 0 },
+        textIndent: { displayId: 'textIndentDisplay', unit: 'px', decimals: 0 }
+    };
+
+    function updateSpacingDisplay(property, value) {
+        const info = spacingDisplayMap[property];
+        if (!info) return;
+        const el = document.getElementById(info.displayId);
+        if (el) el.textContent = parseFloat(value).toFixed(info.decimals) + info.unit;
+    }
+
     function setupSpacingControls(inputId, sliderId, property) {
         const input = document.getElementById(inputId);
         const slider = document.getElementById(sliderId);
@@ -1536,6 +1591,7 @@ function setupEventListeners() {
                 const value = parseFloat(this.value);
                 slider.value = value;
                 textSpacing[property] = value;
+                updateSpacingDisplay(property, value);
                 updatePreview();
                 saveToStorage();
             });
@@ -1545,9 +1601,13 @@ function setupEventListeners() {
                 const value = parseFloat(this.value);
                 input.value = value;
                 textSpacing[property] = value;
+                updateSpacingDisplay(property, value);
                 updatePreview();
                 saveToStorage();
             });
+
+            // 초기 display 갱신
+            updateSpacingDisplay(property, textSpacing[property] !== undefined ? textSpacing[property] : parseFloat(slider.value));
         }
     }
 
@@ -1597,6 +1657,71 @@ function setupEventListeners() {
             showNotification('텍스트 간격이 기본값으로 초기화되었습니다.');
         });
     }
+
+    // ── HEADING SIZES 컨트롤 ──────────────────────────────────────────
+    const headingDefaults = {
+        coverTitle: 42,
+        coverSubtitle: 14,
+        sectionTitle: 20,
+        sectionSubtitle: 11,
+        pageHeaderNum: 40,
+        pageHeaderTitle: 15,
+    };
+    const headingDisplayMap = {
+        coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
+        coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+        sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
+        sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
+        pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },
+        pageHeaderTitle: { slider: 'pageHeaderTitleSizeSlider', input: 'pageHeaderTitleSizeInput', display: 'pageHeaderTitleSizeDisplay' },
+    };
+
+    function syncHeadingUI(key, value) {
+        const ids = headingDisplayMap[key];
+        const sl = document.getElementById(ids.slider);
+        const inp = document.getElementById(ids.input);
+        const dsp = document.getElementById(ids.display);
+        if (sl) sl.value = value;
+        if (inp) inp.value = value;
+        if (dsp) dsp.textContent = value + 'px';
+    }
+
+    function setupHeadingControl(key) {
+        const ids = headingDisplayMap[key];
+        const slider = document.getElementById(ids.slider);
+        const input  = document.getElementById(ids.input);
+        if (!slider || !input) return;
+        slider.addEventListener('input', function () {
+            const v = parseFloat(this.value);
+            headingFontSizes[key] = v;
+            syncHeadingUI(key, v);
+            updatePreview();
+            saveToStorage();
+        });
+        input.addEventListener('input', function () {
+            const v = parseFloat(this.value);
+            headingFontSizes[key] = v;
+            syncHeadingUI(key, v);
+            updatePreview();
+            saveToStorage();
+        });
+        // 초기값 동기화
+        syncHeadingUI(key, headingFontSizes[key]);
+    }
+
+    Object.keys(headingDefaults).forEach(setupHeadingControl);
+
+    const resetHeadingBtn = document.getElementById('resetHeadingSizes');
+    if (resetHeadingBtn) {
+        resetHeadingBtn.addEventListener('click', function () {
+            headingFontSizes = { ...headingDefaults };
+            Object.keys(headingDefaults).forEach(k => syncHeadingUI(k, headingDefaults[k]));
+            updatePreview();
+            saveToStorage();
+            showNotification('제목 크기가 기본값으로 초기화되었습니다.');
+        });
+    }
+    // ─────────────────────────────────────────────────────────────────
 
     // 폰트 선택 이벤트
     const fontFamilySelect = document.getElementById('fontFamily');
@@ -1857,6 +1982,7 @@ function exportDataToJSON() {
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
             enablePageFold: enablePageFold,
+            headingFontSizes: headingFontSizes,
             presets: presets, // 프리셋 데이터 포함
             exportDate: new Date().toISOString(),
             version: '1.0'
@@ -2023,6 +2149,28 @@ function importDataFromJSON(file) {
             if (data.fontFamily) {
                 fontFamily = data.fontFamily;
                 document.getElementById('fontFamily').value = fontFamily;
+            }
+
+            // 제목 크기 설정 복원
+            if (data.headingFontSizes) {
+                headingFontSizes = { ...headingFontSizes, ...data.headingFontSizes };
+                const _hmap = {
+                    coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
+                    coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+                    sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
+                    sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
+                    pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },
+                    pageHeaderTitle: { slider: 'pageHeaderTitleSizeSlider', input: 'pageHeaderTitleSizeInput', display: 'pageHeaderTitleSizeDisplay' },
+                };
+                Object.keys(headingFontSizes).forEach(k => {
+                    if (!_hmap[k]) return;
+                    const sl = document.getElementById(_hmap[k].slider);
+                    const inp = document.getElementById(_hmap[k].input);
+                    const dsp = document.getElementById(_hmap[k].display);
+                    if (sl) sl.value = headingFontSizes[k];
+                    if (inp) inp.value = headingFontSizes[k];
+                    if (dsp) dsp.textContent = headingFontSizes[k] + 'px';
+                });
             }
 
             // 전역 테마 복원
@@ -2594,14 +2742,14 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         // Layout with number
         headerHtml += '<div style="display: table; width: 100%; padding: clamp(15px, 3vw, 20px) 0; ">';
         headerHtml += '<div style="display: table-cell; width: clamp(70px, 15vw, 100px); vertical-align: center; padding-left: clamp(30px, 5vw, 50px);padding-right: clamp(20px, 3vw, 30px);">';
-        headerHtml += '<div style="font-size: clamp(32px, 7vw, 48px); font-weight: 700; color: ' + numberColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1;">' + pageNum.replace('#', '') + '</div>';
+        headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderNum + 'px; font-weight: 700; color: ' + numberColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1;">' + pageNum.replace('#', '') + '</div>';
         headerHtml += '</div>';
         headerHtml += '<div style="display: table-cell; vertical-align: middle; padding-top: 0;">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderTitle + 'px; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
-            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            headerHtml += '<div style="font-size: ' + Math.round(headingFontSizes.pageHeaderTitle * 0.8) + 'px; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
         headerHtml += '</div>';
@@ -2609,22 +2757,22 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         // 번호 숨김이지만 제목이나 부제목이 있는 경우 - 좌측 정렬
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderTitle + 'px; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
-            headerHtml += '<div style="font-size: clamp(11px, 2vw, 12px); color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            headerHtml += '<div style="font-size: ' + Math.round(headingFontSizes.pageHeaderTitle * 0.8) + 'px; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
     } else if (hidePageNumbers && pageNum) {
         // 번호 숨김이고 제목/부제목이 없는 경우 - "Page n" 표시 (좌측 정렬)
         const pageNumber = pageNum.replace('#', '');
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
-        headerHtml += '<div style="font-size: clamp(14px, 2.5vw, 16px); font-weight: 700; color: ' + titleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
+        headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderTitle + 'px; font-weight: 700; color: ' + titleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
         headerHtml += '</div>';
     } else {
         // Fallback to centered layout if no number
         const displayContent = text ? text.toUpperCase() : '';
-        const headerStyle = 'text-align: center; font-size: clamp(13px, 2.5vw, 16px); letter-spacing: clamp(2px, 0.5vw, 4px); font-weight: 600; color: ' + titleColor + '; margin-bottom: 0; padding: clamp(15px, 3vw, 20px) 0; line-height: 1; white-space: nowrap;';
+        const headerStyle = 'text-align: center; font-size: ' + headingFontSizes.pageHeaderTitle + 'px; letter-spacing: clamp(2px, 0.5vw, 4px); font-weight: 600; color: ' + titleColor + '; margin-bottom: 0; padding: clamp(15px, 3vw, 20px) 0; line-height: 1; white-space: nowrap;';
         const lineStyle = 'display: inline-block; width: clamp(25px, 5vw, 40px); height: 0px; border-top: 1px solid ' + titleColor + '; vertical-align: middle; font-size: 0px; line-height: 0px;';
         const textWrapperStyle = 'display: inline-block; margin: 0 clamp(10px, 2vw, 15px); vertical-align: middle;';
 
@@ -2838,7 +2986,7 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
 
         // 화살표 추가
         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: clamp(16px, 3vw, 20px); color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + headingFontSizes.sectionTitle + 'px; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
         const summaryContent = arrowWrapperStart + collapsedHeaderHtml + arrowWrapperMid;
 
         let detailsHtml = '<details style="' + containerStyle + '">';
@@ -2854,7 +3002,7 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
     if (headerHtml) {
         // 화살표로 감싼 header 생성
         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: clamp(16px, 3vw, 20px); color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + headingFontSizes.sectionTitle + 'px; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
 
         const headerWithArrow = arrowWrapperStart + headerHtml + arrowWrapperMid;
 
@@ -3765,11 +3913,11 @@ function generateHTML(isPreview) {
 
                     if (coverTitle) {
                         const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
-                        topContent += '<h1 style="font-size:clamp(32px, 6vw, 52px);color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + coverTitle + '</h1>';
+                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:clamp(12px, 2.2vw, 14.2px);letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + headingFontSizes.coverSubtitle + 'px;letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -3802,11 +3950,11 @@ function generateHTML(isPreview) {
 
                     if (coverTitle) {
                         const titleMargin = coverSubtitle ? '0 0 5px 0' : '0 0 15px 0';
-                        topContent += '<h1 style="font-size:clamp(32px, 6vw, 52px);color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;">' + coverTitle + '</h1>';
+                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:clamp(12px, 2.2vw, 14.2px);letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + headingFontSizes.coverSubtitle + 'px;letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4001,11 +4149,11 @@ function generateHTML(isPreview) {
                 sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);' + sectionBorderRadius + 'text-align:' + textAlign + ';">';
 
                 if (item.subtitle && item.subtitle.trim()) {
-                    sectionHtml += '<div style="font-size:clamp(10px, 1.8vw, 11px);line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + item.subtitle + '</div>';
+                    sectionHtml += '<div style="font-size:' + headingFontSizes.sectionSubtitle + 'px;line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + item.subtitle + '</div>';
                 }
 
                 if (item.title) {
-                    sectionHtml += '<h1 style="font-size:clamp(20px, 4vw, 28px);color:rgba(255, 255, 255, 1.0);margin:0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.2;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + item.title + '</h1>';
+                    sectionHtml += '<h1 style="font-size:' + headingFontSizes.sectionTitle + 'px;color:rgba(255, 255, 255, 1.0);margin:0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.2;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + item.title + '</h1>';
                 }
 
                 sectionHtml += '</div></div>';
@@ -4016,11 +4164,11 @@ function generateHTML(isPreview) {
                 sectionHtml += '<div style="width: 100%; padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px); text-align: ' + textAlign + ';">';
                 
                 if (item.subtitle && item.subtitle.trim()) {
-                    sectionHtml += '<div style="font-size: clamp(10px, 1.8vw, 11px); color: ' + currentSectionTheme.tagText + '; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + item.subtitle + '</div>';
+                    sectionHtml += '<div style="font-size: ' + headingFontSizes.sectionSubtitle + 'px; color: ' + currentSectionTheme.tagText + '; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + item.subtitle + '</div>';
                 }
                 
                 if (item.title) {
-                    sectionHtml += '<div style="font-size: clamp(16px, 3vw, 20px); font-weight: 700; color: ' + currentSectionTheme.header + '; letter-spacing: clamp(0.5px, 0.2vw, 1px);">' + item.title + '</div>';
+                    sectionHtml += '<div style="font-size: ' + headingFontSizes.sectionTitle + 'px; font-weight: 700; color: ' + currentSectionTheme.header + '; letter-spacing: clamp(0.5px, 0.2vw, 1px);">' + item.title + '</div>';
                 }
                 
                 sectionHtml += '</div>';
@@ -4163,7 +4311,7 @@ function generateHTML(isPreview) {
                         const collapsedHeaderHtml = header.replace('margin-bottom: 20px; padding-top: 20px;', 'margin: 0;').replace('vertical-align: center;', 'vertical-align: middle;');
                         // 테이블을 사용한 화살표 아이콘 (우측 정렬)
                         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-                        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: clamp(16px, 3vw, 20px); color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+                        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + headingFontSizes.sectionTitle + 'px; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
                         sectionContainerHtml += '<details style="margin: 0;">';
                         sectionContainerHtml += '<summary style="' + summaryStyle + '">' + arrowWrapperStart + collapsedHeaderHtml + arrowWrapperMid + '</summary>';
                         sectionContainerHtml += collapsedContent;
@@ -4490,6 +4638,7 @@ function saveNewPreset() {
             fontFamily: fontFamily,
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
+            headingFontSizes: headingFontSizes,
             enablePageFold: enablePageFold
         };
         
@@ -4729,6 +4878,28 @@ function loadPreset(slotIndex) {
             fontFamily = data.fontFamily;
             const fontFamilySelect = document.getElementById('fontFamily');
             if (fontFamilySelect) fontFamilySelect.value = fontFamily;
+        }
+
+        // 제목 크기 복원
+        if (data.headingFontSizes) {
+            headingFontSizes = { ...headingFontSizes, ...data.headingFontSizes };
+            const _hmap2 = {
+                coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
+                coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+                sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
+                sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
+                pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },
+                pageHeaderTitle: { slider: 'pageHeaderTitleSizeSlider', input: 'pageHeaderTitleSizeInput', display: 'pageHeaderTitleSizeDisplay' },
+            };
+            Object.keys(headingFontSizes).forEach(k => {
+                if (!_hmap2[k]) return;
+                const sl = document.getElementById(_hmap2[k].slider);
+                const inp = document.getElementById(_hmap2[k].input);
+                const dsp = document.getElementById(_hmap2[k].display);
+                if (sl) sl.value = headingFontSizes[k];
+                if (inp) inp.value = headingFontSizes[k];
+                if (dsp) dsp.textContent = headingFontSizes[k] + 'px';
+            });
         }
 
         // 전역 테마 복원
