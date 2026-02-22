@@ -10,6 +10,8 @@ let globalTheme = 'basic'; // 전역 테마 설정
 let hidePageNumbers = false; // 페이지 헤더 번호 숨김 여부
 let enablePageFold = true; // 페이지 접기 활성화 여부 (기본값: 켜짐)
 let showHeaderWhenFoldOff = false; // 접기 OFF일 때도 헤더 표시 여부
+let dividerStyle = 'line'; // 구분선 디자인
+let dividerCustomText = ''; // 직접 입력 구분선
 
 // 텍스트 간격 설정
 let textSpacing = {
@@ -816,6 +818,13 @@ function loadFromStorage() {
             const shEl = document.getElementById('showHeaderWhenFoldOff');
             if (shEl) shEl.checked = showHeaderWhenFoldOff;
 
+            dividerStyle = data.dividerStyle || 'line';
+            dividerCustomText = data.dividerCustomText || '';
+            const dsEl = document.getElementById('dividerStyle');
+            const dcEl = document.getElementById('dividerCustomText');
+            if (dsEl) { dsEl.value = dividerStyle; }
+            if (dcEl) { dcEl.value = dividerCustomText; dcEl.style.display = dividerStyle === 'custom' ? 'block' : 'none'; }
+
             if (data.profiles && data.profiles.length > 0) {
                 profiles = JSON.parse(JSON.stringify(data.profiles));
             } else {
@@ -1134,7 +1143,9 @@ function saveToStorage() {
             hidePageNumbers: hidePageNumbers,
             headingFontSizes: headingFontSizes,
             enablePageFold: enablePageFold,
-            showHeaderWhenFoldOff: showHeaderWhenFoldOff
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff,
+            dividerStyle: dividerStyle,
+            dividerCustomText: dividerCustomText
         };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -1275,6 +1286,25 @@ function setupEventListeners() {
         });
     }
 
+    // dividerStyle 드롭다운 이벤트
+    const dividerStyleEl = document.getElementById('dividerStyle');
+    const dividerCustomEl = document.getElementById('dividerCustomText');
+    if (dividerStyleEl) {
+        dividerStyleEl.addEventListener('change', function () {
+            dividerStyle = dividerStyleEl.value;
+            dividerCustomEl.style.display = dividerStyle === 'custom' ? 'block' : 'none';
+            updatePreview();
+            saveToStorage();
+        });
+    }
+    if (dividerCustomEl) {
+        dividerCustomEl.addEventListener('input', function () {
+            dividerCustomText = dividerCustomEl.value;
+            updatePreview();
+            saveToStorage();
+        });
+    }
+
     const checkboxIds = ['useRoundedQuotes', 'useTextIndent', 'enableTopSection', 'enableProfiles', 'enableTags', 'enableCover', 'enableComment'];
     checkboxIds.forEach(function (id) {
         const el = document.getElementById(id);
@@ -1353,14 +1383,6 @@ function setupEventListeners() {
             document.getElementById('pageTitle').value = '';
             document.getElementById('pageSubtitle').value = '';
             document.getElementById('pageContent').value = '';
-
-            // 이미지 크기 슬라이더 초기화
-            const pageImageWidth = document.getElementById('pageImageWidth');
-            const pageImageWidthValue = document.getElementById('pageImageWidthValue');
-            if (pageImageWidth && pageImageWidthValue) {
-                pageImageWidth.value = 100;
-                pageImageWidthValue.textContent = '100%';
-            }
 
             tempPageTags = [];
 
@@ -1471,13 +1493,13 @@ function setupEventListeners() {
         });
     }
 
-    // 페이지 이미지 크기 슬라이더 이벤트
-    const pageImageWidth = document.getElementById('pageImageWidth');
-    if (pageImageWidth) {
-        pageImageWidth.addEventListener('input', function () {
-            const pageImageWidthValue = document.getElementById('pageImageWidthValue');
-            if (pageImageWidthValue) {
-                pageImageWidthValue.textContent = this.value + '%';
+    // 전역 이미지 크기 슬라이더 이벤트
+    const defaultImageWidth = document.getElementById('defaultImageWidth');
+    if (defaultImageWidth) {
+        defaultImageWidth.addEventListener('input', function () {
+            const defaultImageWidthValue = document.getElementById('defaultImageWidthValue');
+            if (defaultImageWidthValue) {
+                defaultImageWidthValue.textContent = this.value + '%';
             }
         });
     }
@@ -1529,6 +1551,34 @@ function setupEventListeners() {
 
     const insertItalicBtn = document.getElementById('insertItalic');
     if (insertItalicBtn) insertItalicBtn.addEventListener('click', function() { toggleInlineWrap('*'); });
+
+    // ── 정렬 버튼 ──
+    function setLineAlign(prefix) {
+        const ta = document.getElementById('pageContent');
+        if (!ta) return;
+        const start = ta.selectionStart;
+        const text = ta.value;
+        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = text.indexOf('\n', start);
+        const lineEndActual = lineEnd === -1 ? text.length : lineEnd;
+        const lineText = text.slice(lineStart, lineEndActual);
+        // 기존 정렬 prefix 제거 후 새 prefix 추가 (토글: 같은 prefix면 제거)
+        const stripped = lineText.replace(/^\[<\]\s*|^\[\|\]\s*|^\[>\]\s*/, '');
+        const existingPrefix = lineText.match(/^(\[<\]|\[\|\]|\[>\])\s*/);
+        const isSame = existingPrefix && existingPrefix[1] === prefix;
+        const newLine = isSame ? stripped : prefix + ' ' + stripped;
+        ta.value = text.slice(0, lineStart) + newLine + text.slice(lineEndActual);
+        ta.setSelectionRange(lineStart + newLine.length, lineStart + newLine.length);
+        ta.focus();
+        updatePreview();
+    }
+
+    const insertAlignLeft = document.getElementById('insertAlignLeft');
+    if (insertAlignLeft) insertAlignLeft.addEventListener('click', function() { setLineAlign('[<]'); });
+    const insertAlignCenter = document.getElementById('insertAlignCenter');
+    if (insertAlignCenter) insertAlignCenter.addEventListener('click', function() { setLineAlign('[|]'); });
+    const insertAlignRight = document.getElementById('insertAlignRight');
+    if (insertAlignRight) insertAlignRight.addEventListener('click', function() { setLineAlign('[>]'); });
 
     // ── 마크다운 헤딩 삽입 버튼 ──
     function insertHeading(prefix) {
@@ -1926,6 +1976,8 @@ function resetCurrentData() {
     hidePageNumbers = false;
     enablePageFold = true;
     showHeaderWhenFoldOff = false;
+    dividerStyle = 'line';
+    dividerCustomText = '';
     fontFamily = 'Pretendard';
     textSpacing = {
         fontSize: 14.2,
@@ -1953,6 +2005,11 @@ function resetCurrentData() {
     // showHeaderWhenFoldOff 기본값 false
     const resetShEl = document.getElementById('showHeaderWhenFoldOff');
     if (resetShEl) resetShEl.checked = false;
+
+    const resetDsEl = document.getElementById('dividerStyle');
+    const resetDcEl = document.getElementById('dividerCustomText');
+    if (resetDsEl) resetDsEl.value = 'line';
+    if (resetDcEl) { resetDcEl.value = ''; resetDcEl.style.display = 'none'; }
 
     // ── 텍스트 입력 초기화 ──
     const textInputIds = [
@@ -2070,6 +2127,8 @@ function exportDataToJSON() {
             hidePageNumbers: hidePageNumbers,
             enablePageFold: enablePageFold,
             showHeaderWhenFoldOff: showHeaderWhenFoldOff,
+            dividerStyle: dividerStyle,
+            dividerCustomText: dividerCustomText,
             headingFontSizes: headingFontSizes,
             presets: presets, // 프리셋 데이터 포함
             exportDate: new Date().toISOString(),
@@ -2285,6 +2344,13 @@ function importDataFromJSON(file) {
             showHeaderWhenFoldOff = data.showHeaderWhenFoldOff || false;
             const importShEl = document.getElementById('showHeaderWhenFoldOff');
             if (importShEl) importShEl.checked = showHeaderWhenFoldOff;
+
+            dividerStyle = data.dividerStyle || 'line';
+            dividerCustomText = data.dividerCustomText || '';
+            const importDsEl = document.getElementById('dividerStyle');
+            const importDcEl = document.getElementById('dividerCustomText');
+            if (importDsEl) { importDsEl.value = dividerStyle; }
+            if (importDcEl) { importDcEl.value = dividerCustomText; importDcEl.style.display = dividerStyle === 'custom' ? 'block' : 'none'; }
 
             // 프리셋 데이터 복원
             if (data.presets && typeof data.presets === 'object') {
@@ -2651,7 +2717,20 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
 
         if (line.trim() === '[HR]') {
             const hrColor = themeStyle.divider || themeStyle.tagText || themeStyle.header;
-            html += '<div style="width: 30%; height: 1px; background-color: ' + hrColor + '; margin: 20px auto;"></div>';
+            const dividerContents = {
+                line:     '<div style="width:30%;height:1px;background-color:' + hrColor + ';margin:20px auto;"></div>',
+                fleuron:  '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">─── ❧ ───</div>',
+                dots:     '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">· · · · · · ·</div>',
+                stars:    '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">✦ ─── ✦ ─── ✦</div>',
+                diamond:  '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">◇ ─ ◇ ─ ◇</div>',
+                wave:     '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">〰〰〰〰〰</div>',
+                cross:    '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">† ─── † ─── †</div>',
+            };
+            if (dividerStyle === 'custom' && dividerCustomText) {
+                html += '<div style="text-align:center;margin:20px auto;color:' + hrColor + ';font-size:' + fontSize + ';">' + dividerCustomText + '</div>';
+            } else {
+                html += dividerContents[dividerStyle] || dividerContents.line;
+            }
             continue;
         }
 
@@ -2816,8 +2895,18 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             const marginTop = prevIsHeading ? '3px' : '20px';
             const marginBottom = nextIsHeading ? '1px' : '14px';
 
-            const hStyle = 'display:block; font-size:' + Math.round(sizes[idx]) + 'px; font-weight:' + weights[idx] + '; color:' + colors[idx] + '; font-family:\'' + ff + '\',' + ffFallback + '; line-height:1.35; margin:' + marginTop + ' 0 ' + marginBottom + '; letter-spacing:-0.2px;';
-            html += '<div style="' + hStyle + '">' + headingText + '</div>';
+            // 헤딩 텍스트 앞 정렬 prefix 감지 (예: [|] 제목)
+            const hAlignMatch = headingText.match(/^(\[<\]|\[\|\]|\[>\])\s*/);
+            let hAlign = '';
+            let hText = headingText;
+            if (hAlignMatch) {
+                const hAlignMap = { '[<]': 'left', '[|]': 'center', '[>]': 'right' };
+                hAlign = hAlignMap[hAlignMatch[1]];
+                hText = headingText.slice(hAlignMatch[0].length);
+            }
+            const hAlignStyle = hAlign ? ' text-align:' + hAlign + ';' : '';
+            const hStyle = 'display:block; font-size:' + Math.round(sizes[idx]) + 'px; font-weight:' + weights[idx] + '; color:' + colors[idx] + '; font-family:\'' + ff + '\',' + ffFallback + '; line-height:1.35; margin:' + marginTop + ' 0 ' + marginBottom + '; letter-spacing:-0.2px;' + hAlignStyle;
+            html += '<div style="' + hStyle + '">' + hText + '</div>';
             continue;
         }
 
@@ -2825,7 +2914,17 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             line = line.replace('{{FOOTNOTE_' + j + '}}', '<sup style="font-size: 0.7em;">' + '*'.repeat(j) + '</sup>');
         }
 
-        html += '<p style="' + pStyle + '">' + line + '</p>';
+        // ── 정렬 prefix 파싱 ([<] 좌측 / [|] 가운데 / [>] 우측) ──
+        let textAlign = '';
+        const alignMatch = line.match(/^\[(<|\||\>)\]\s*/);
+        if (alignMatch) {
+            const alignMap = { '<': 'left', '|': 'center', '>': 'right' };
+            textAlign = alignMap[alignMatch[1]];
+            line = line.slice(alignMatch[0].length);
+        }
+        const alignedPStyle = textAlign ? pStyle + ' text-align:' + textAlign + ';' : pStyle;
+
+        html += '<p style="' + alignedPStyle + '">' + line + '</p>';
 
         if (paragraphFootnotes.length > 0) {
             for (let k = 0; k < paragraphFootnotes.length; k++) {
@@ -3571,8 +3670,8 @@ function savePageData() {
     const pageTitle = document.getElementById('pageTitle').value.trim();
     const pageSubtitle = document.getElementById('pageSubtitle').value.trim();
     const content = document.getElementById('pageContent').value;
-    const pageImageWidthInput = document.getElementById('pageImageWidth');
-    const pageImageWidth = pageImageWidthInput ? parseInt(pageImageWidthInput.value) : 100;
+    const defaultImageWidthInput = document.getElementById('defaultImageWidth');
+    const pageImageWidth = defaultImageWidthInput ? parseInt(defaultImageWidthInput.value) : 100;
 
     if (!content.trim()) {
         alert('내용을 입력해주세요.');
@@ -3875,15 +3974,6 @@ function updatePagesList() {
                 document.getElementById('pageTitle').value = item.title || '';
                 document.getElementById('pageSubtitle').value = item.subtitle || '';
                 document.getElementById('pageContent').value = item.content;
-                
-                // 이미지 크기 슬라이더 값 설정
-                const pageImageWidth = document.getElementById('pageImageWidth');
-                const pageImageWidthValue = document.getElementById('pageImageWidthValue');
-                if (pageImageWidth && pageImageWidthValue) {
-                    const widthValue = item.imageWidth || 100;
-                    pageImageWidth.value = widthValue;
-                    pageImageWidthValue.textContent = widthValue + '%';
-                }
 
                 tempPageTags = [];
 
@@ -4041,9 +4131,8 @@ function generateHTML(isPreview) {
                     const coverWrapperMarginBottom = hasRealContent ? '30px' : '0';
                     const coverImgBorderRadius = hasRealContent ? '10px 10px 0 0' : '10px 10px 10px 10px';
 
-                    topContent += '<div style="width:100%;margin:0 0 ' + coverWrapperMarginBottom + ' 0;box-sizing:border-box;background:transparent;overflow:hidden;border-radius:' + coverImgBorderRadius + ';">';
-                    topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + backgroundSize + ';background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;">';
-                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);">';
+                    topContent += '<div style="width:100%;margin:0 0 ' + coverWrapperMarginBottom + ' 0;box-sizing:border-box;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + backgroundSize + ';background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:' + coverImgBorderRadius + ';display:table;">';
+                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;min-height:300px;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:' + coverImgBorderRadius + ';">';
 
                     if (coverArchiveNo) {
                         topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
@@ -4077,7 +4166,7 @@ function generateHTML(isPreview) {
                         }
                     }
 
-                    topContent += '</div></div></div>';
+                    topContent += '</div></div>';
                 } else {
                     // 이미지가 없지만 제목/부제목/번호가 있는 경우 - 텍스트만 표시 (테마 색상 사용)
                     topContent += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 40px) clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);">';
@@ -4781,7 +4870,9 @@ function saveNewPreset() {
             hidePageNumbers: hidePageNumbers,
             headingFontSizes: headingFontSizes,
             enablePageFold: enablePageFold,
-            showHeaderWhenFoldOff: showHeaderWhenFoldOff
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff,
+            dividerStyle: dividerStyle,
+            dividerCustomText: dividerCustomText
         };
         
         presets[newIndex] = {
@@ -4852,7 +4943,9 @@ function savePreset(slotIndex) {
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
             enablePageFold: enablePageFold,
-            showHeaderWhenFoldOff: showHeaderWhenFoldOff
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff,
+            dividerStyle: dividerStyle,
+            dividerCustomText: dividerCustomText
         };
         
         // 프리셋 저장
@@ -5071,6 +5164,13 @@ function loadPreset(slotIndex) {
         showHeaderWhenFoldOff = data.showHeaderWhenFoldOff || false;
         const presetShEl = document.getElementById('showHeaderWhenFoldOff');
         if (presetShEl) presetShEl.checked = showHeaderWhenFoldOff;
+
+        dividerStyle = data.dividerStyle || 'line';
+        dividerCustomText = data.dividerCustomText || '';
+        const presetDsEl = document.getElementById('dividerStyle');
+        const presetDcEl = document.getElementById('dividerCustomText');
+        if (presetDsEl) { presetDsEl.value = dividerStyle; }
+        if (presetDcEl) { presetDcEl.value = dividerCustomText; presetDcEl.style.display = dividerStyle === 'custom' ? 'block' : 'none'; }
 
         // 미리보기 업데이트 및 로컬 스토리지 저장
         updatePreview();

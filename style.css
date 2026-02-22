@@ -698,8 +698,8 @@ button { font-family: var(--font-display); letter-spacing: 1px; cursor: pointer;
 
 .modal-content {
     background: var(--modal-bg); 
-    width: 1100px; 
-    max-width: 92%;
+    width: 1000px; 
+    max-width: 90%;
     max-height: 90vh;
     border: 1px solid var(--modal-border); 
     display: flex; 

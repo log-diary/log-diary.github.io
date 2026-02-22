@@ -454,8 +454,6 @@
                         <input type="checkbox" id="enablePageFold" checked>
                         <label for="enablePageFold">페이지 접기</label>
                     </div>
-                </div>
-                <div class="control-grid" style="margin-bottom: 10px;">
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="showHeaderWhenFoldOff">
                         <label for="showHeaderWhenFoldOff">접기 OFF일 때 헤더 표시</label>
@@ -465,6 +463,39 @@
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="hidePageNumbers">
                         <label for="hidePageNumbers">페이지 헤더 번호 지우기</label>
+                    </div>
+                </div>
+                <!-- 페이지 내 이미지 크기 조절 -->
+                <div class="sub-section">
+                    <h3>IMAGE SIZE</h3>
+                    <div class="input-group">
+                        <label>이미지 기본 너비 (화면 대비) <span id="defaultImageWidthValue"
+                                style="color:var(--accent-blue);">100%</span></label>
+                        <input type="range" id="defaultImageWidth" class="spacing-slider" min="30" max="100" value="100"
+                            style="width: 100%;">
+                        <p style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            • 이 설정은 모든 이미지의 기본 크기입니다.<br>
+                            • 개별 이미지 크기 조정: [IMG:URL:크기] 형식으로 직접 편집 (예: [IMG:주소:70])
+                        </p>
+                    </div>
+                </div>
+
+                <div class="control-grid" style="margin-bottom: 15px;">
+                    <div class="input-group">
+                        <label>구분선 [HR] 디자인</label>
+                        <div class="select-wrapper">
+                            <select id="dividerStyle" style="width:100%;">
+                                <option value="line">────────────</option>
+                                <option value="fleuron">─── ❧ ───</option>
+                                <option value="dots">· · · · · · ·</option>
+                                <option value="stars">✦ ─── ✦ ─── ✦</option>
+                                <option value="diamond">◇ ─ ◇ ─ ◇</option>
+                                <option value="wave">〰〰〰〰〰</option>
+                                <option value="cross">† ─── † ─── †</option>
+                                <option value="custom">직접 입력...</option>
+                            </select>
+                        </div>
+                        <input type="text" id="dividerCustomText" placeholder="직접 입력 (예: ── ✿ ──)" style="display:none; margin-top:8px;">
                     </div>
                 </div>
                 <div class="control-grid" style="margin-bottom: 15px;">
@@ -711,31 +742,17 @@
                     <span class="toolbar-sep"></span>
                     <button id="insertBold" class="btn-tool" style="font-weight:700;">B</button>
                     <button id="insertItalic" class="btn-tool" style="font-style:italic;">I</button>
-                    <div class="toolbar-break"></div>
+                    <span class="toolbar-sep"></span>
                     <button id="insertDivider" class="btn-tool">구분선 (HR)</button>
                     <button id="insertFootnote" class="btn-tool">주석 (FN)</button>
                     <button id="insertImage" class="btn-tool">이미지 (IMG)</button>
                     <span class="image-url-tooltip" style="margin-left: 5px;">
                         <span class="tooltip-icon">?</span>
-                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 삽입된 이미지는 자동으로 아래 '페이지 내 이미지 크기 조절' 값을 따릅니다. 개별 이미지 크기를 조정하려면 [IMG:URL:크기] 형식으로 직접 편집하세요 (예: [IMG:주소:70] → 70% 크기).</span>
+                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 삽입된 이미지는 자동으로 Pages 탭의 '이미지 기본 너비' 값을 따릅니다. 개별 이미지 크기를 조정하려면 [IMG:URL:크기] 형식으로 직접 편집하세요 (예: [IMG:주소:70] → 70% 크기).</span>
                     </span>
                 </div>
 
                 <textarea id="pageContent" class="editor-textarea" placeholder="내용을 입력하세요..." rows="20"></textarea>
-
-                <div class="sub-section" style="margin-top: 20px;">
-                    <h3>페이지 내 이미지 크기 조절</h3>
-                    <div class="input-group">
-                        <label>이미지 기본 너비 (화면 대비) <span id="pageImageWidthValue"
-                                style="color:var(--accent-blue);">100%</span></label>
-                        <input type="range" id="pageImageWidth" class="spacing-slider" min="30" max="100" value="100"
-                            style="width: 100%;">
-                        <p style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
-                            • 이 설정은 모든 이미지의 기본 크기입니다.<br>
-                            • 개별 이미지 크기 조정: [IMG:URL:크기] 형식으로 직접 편집 (예: [IMG:주소:70])
-                        </p>
-                    </div>
-                </div>
 
                 <div id="pageStats">
                     <!-- 페이지 통계가 여기 표시됩니다 -->
