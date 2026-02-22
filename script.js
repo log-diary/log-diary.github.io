@@ -2470,9 +2470,9 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
     const paragraphMargin = '0 0 ' + paragraphSpacing + ' 0';
     const pStyle = 'margin: ' + paragraphMargin + '; color: ' + themeStyle.text + '; line-height: ' + lineHeight + '; letter-spacing: ' + letterSpacing + '; font-size: ' + fontSize + ';' + textIndentStyle;
     const emStyle = 'font-style: italic; color: ' + themeStyle.em + ';';
-    const q1Style = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0 4px; border-radius: 2px;';
-    const q1StyleNested = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; border-radius: 2px;'; // 큰따옴표 안의 작은따옴표용 (padding 없음)
-    const q2Style = 'background-color: ' + themeStyle.quote2Bg + '; color: ' + themeStyle.quote2Text + '; font-weight: 600; padding: 0 4px; border-radius: 2px;';
+    const q1Style = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0.05em 0.25em; border-radius: 2px;';
+    const q1StyleNested = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0.05em 0.1em; border-radius: 2px;'; // 큰따옴표 안의 작은따옴표용
+    const q2Style = 'background-color: ' + themeStyle.quote2Bg + '; color: ' + themeStyle.quote2Text + '; font-weight: 600; padding: 0.05em 0.25em; border-radius: 2px;';
     const footnoteStyle = 'font-size: 11px; color: ' + themeStyle.tagText + '; margin: -8px 0 10px 0; line-height: 1.4;';
 
     let detailsBlocks = [];
@@ -3025,7 +3025,7 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
 
 function createCreditFooter() {
     // 컨테이너 바깥에 독립적으로 표시되는 크레딧
-    return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: 0 auto;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
+    return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: clamp(5px, 1vw, 10px) auto 0;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
 }
 
 function createCommentSection(commentText, commentNickname, themeStyle) {
@@ -4572,10 +4572,6 @@ function generateHTML(isPreview) {
         html += '</div>';
     }
 
-
-    if (html) {
-        html += '<br>';
-    }
 
     // 코멘트 섹션 추가
     const enableComment = document.getElementById('enableComment').checked;
