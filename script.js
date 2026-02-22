@@ -4140,7 +4140,7 @@ function generateHTML(isPreview) {
 
                     if (coverTitle) {
                         const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
-                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + coverTitle + '</h1>';
+                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
@@ -4159,7 +4159,7 @@ function generateHTML(isPreview) {
                                 const tagContent = tag.link
                                     ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
                                     : tag.value;
-                                const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) 0 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+                                const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
                                 topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
                             });
                             topContent += '</div>';
@@ -4177,7 +4177,7 @@ function generateHTML(isPreview) {
 
                     if (coverTitle) {
                         const titleMargin = coverSubtitle ? '0 0 5px 0' : '0 0 15px 0';
-                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;">' + coverTitle + '</h1>';
+                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
