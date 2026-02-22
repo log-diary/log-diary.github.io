@@ -455,6 +455,12 @@
                         <label for="enablePageFold">페이지 접기</label>
                     </div>
                 </div>
+                <div class="control-grid" style="margin-bottom: 10px;">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="showHeaderWhenFoldOff">
+                        <label for="showHeaderWhenFoldOff">접기 OFF일 때 헤더 표시</label>
+                    </div>
+                </div>
                 <div class="control-grid" style="margin-bottom: 15px;">
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="hidePageNumbers">
@@ -698,9 +704,17 @@
                 </div>
 
                 <div class="toolbar">
-                    <button id="insertDivider" class="btn-tool">구분선 (HR)</button>
-                    <button id="insertFootnote" class="btn-tool">주석 (FN)</button>
-                    <button id="insertImage" class="btn-tool">이미지 (IMG)</button>
+                    <button id="insertH1" class="btn-tool">#</button>
+                    <button id="insertH2" class="btn-tool">##</button>
+                    <button id="insertH3" class="btn-tool">###</button>
+                    <button id="insertH4" class="btn-tool">####</button>
+                    <span class="toolbar-sep"></span>
+                    <button id="insertBold" class="btn-tool" style="font-weight:700;">B</button>
+                    <button id="insertItalic" class="btn-tool" style="font-style:italic;">I</button>
+                    <span class="toolbar-sep"></span>
+                    <button id="insertDivider" class="btn-tool">구분선</button>
+                    <button id="insertFootnote" class="btn-tool">주석</button>
+                    <button id="insertImage" class="btn-tool">이미지</button>
                     <span class="image-url-tooltip" style="margin-left: 5px;">
                         <span class="tooltip-icon">?</span>
                         <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 삽입된 이미지는 자동으로 아래 '페이지 내 이미지 크기 조절' 값을 따릅니다. 개별 이미지 크기를 조정하려면 [IMG:URL:크기] 형식으로 직접 편집하세요 (예: [IMG:주소:70] → 70% 크기).</span>

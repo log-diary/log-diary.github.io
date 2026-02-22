@@ -9,6 +9,7 @@ let tempPageTags = [];
 let globalTheme = 'basic'; // 전역 테마 설정
 let hidePageNumbers = false; // 페이지 헤더 번호 숨김 여부
 let enablePageFold = true; // 페이지 접기 활성화 여부 (기본값: 켜짐)
+let showHeaderWhenFoldOff = false; // 접기 OFF일 때도 헤더 표시 여부
 
 // 텍스트 간격 설정
 let textSpacing = {
@@ -811,6 +812,10 @@ function loadFromStorage() {
             const enablePageFoldEl = document.getElementById('enablePageFold');
             if (enablePageFoldEl) enablePageFoldEl.checked = enablePageFold;
 
+            showHeaderWhenFoldOff = data.showHeaderWhenFoldOff || false;
+            const shEl = document.getElementById('showHeaderWhenFoldOff');
+            if (shEl) shEl.checked = showHeaderWhenFoldOff;
+
             if (data.profiles && data.profiles.length > 0) {
                 profiles = JSON.parse(JSON.stringify(data.profiles));
             } else {
@@ -1128,7 +1133,8 @@ function saveToStorage() {
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
             headingFontSizes: headingFontSizes,
-            enablePageFold: enablePageFold
+            enablePageFold: enablePageFold,
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff
         };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -1254,6 +1260,16 @@ function setupEventListeners() {
     if (enablePageFoldEl) {
         enablePageFoldEl.addEventListener('change', function () {
             enablePageFold = enablePageFoldEl.checked;
+            updatePreview();
+            saveToStorage();
+        });
+    }
+
+    // showHeaderWhenFoldOff 체크박스 이벤트
+    const showHeaderWhenFoldOffEl = document.getElementById('showHeaderWhenFoldOff');
+    if (showHeaderWhenFoldOffEl) {
+        showHeaderWhenFoldOffEl.addEventListener('change', function () {
+            showHeaderWhenFoldOff = showHeaderWhenFoldOffEl.checked;
             updatePreview();
             saveToStorage();
         });
@@ -1482,6 +1498,72 @@ function setupEventListeners() {
             }
         });
     }
+
+    // ── Bold / Italic 토글 버튼 ──
+    function toggleInlineWrap(marker) {
+        const ta = document.getElementById('pageContent');
+        if (!ta) return;
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const text = ta.value;
+        const selected = text.slice(start, end);
+        const mLen = marker.length;
+
+        // 이미 감싸져 있으면 제거, 없으면 추가
+        const before = text.slice(start - mLen, start);
+        const after = text.slice(end, end + mLen);
+        if (before === marker && after === marker) {
+            ta.value = text.slice(0, start - mLen) + selected + text.slice(end + mLen);
+            ta.setSelectionRange(start - mLen, end - mLen);
+        } else {
+            const insert = marker + (selected || '텍스트') + marker;
+            ta.value = text.slice(0, start) + insert + text.slice(end);
+            ta.setSelectionRange(start + mLen, start + mLen + (selected || '텍스트').length);
+        }
+        ta.focus();
+        updatePreview();
+    }
+
+    const insertBoldBtn = document.getElementById('insertBold');
+    if (insertBoldBtn) insertBoldBtn.addEventListener('click', function() { toggleInlineWrap('**'); });
+
+    const insertItalicBtn = document.getElementById('insertItalic');
+    if (insertItalicBtn) insertItalicBtn.addEventListener('click', function() { toggleInlineWrap('*'); });
+
+    // ── 마크다운 헤딩 삽입 버튼 ──
+    function insertHeading(prefix) {
+        const ta = document.getElementById('pageContent');
+        if (!ta) return;
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const text = ta.value;
+        const selected = text.slice(start, end).trim();
+        // 커서가 있는 줄의 시작으로 이동
+        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = text.indexOf('\n', end);
+        const lineEndActual = lineEnd === -1 ? text.length : lineEnd;
+        const lineText = text.slice(lineStart, lineEndActual);
+        // 이미 헤딩 prefix가 있으면 교체, 없으면 추가
+        const stripped = lineText.replace(/^#{1,4}\s*/, '');
+        const newLine = prefix + ' ' + (stripped || '제목');
+        ta.value = text.slice(0, lineStart) + newLine + text.slice(lineEndActual);
+        // 텍스트 부분 선택
+        const selectStart = lineStart + prefix.length + 1;
+        const selectEnd = lineStart + newLine.length;
+        ta.setSelectionRange(selectStart, selectEnd);
+        ta.focus();
+        updatePreview();
+    }
+
+    ['insertH1', 'insertH2', 'insertH3', 'insertH4'].forEach(function(id) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            const level = parseInt(id.replace('insertH', ''));
+            btn.addEventListener('click', function() {
+                insertHeading('#'.repeat(level));
+            });
+        }
+    });
 
     const insertDivider = document.getElementById('insertDivider');
     if (insertDivider) {
@@ -1843,6 +1925,7 @@ function resetCurrentData() {
     globalTheme = 'basic';
     hidePageNumbers = false;
     enablePageFold = true;
+    showHeaderWhenFoldOff = false;
     fontFamily = 'Pretendard';
     textSpacing = {
         fontSize: 14.2,
@@ -1866,6 +1949,10 @@ function resetCurrentData() {
     // enablePageFold는 기본값 true
     const enablePageFoldEl = document.getElementById('enablePageFold');
     if (enablePageFoldEl) enablePageFoldEl.checked = true;
+
+    // showHeaderWhenFoldOff 기본값 false
+    const resetShEl = document.getElementById('showHeaderWhenFoldOff');
+    if (resetShEl) resetShEl.checked = false;
 
     // ── 텍스트 입력 초기화 ──
     const textInputIds = [
@@ -1982,6 +2069,7 @@ function exportDataToJSON() {
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
             enablePageFold: enablePageFold,
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff,
             headingFontSizes: headingFontSizes,
             presets: presets, // 프리셋 데이터 포함
             exportDate: new Date().toISOString(),
@@ -2193,6 +2281,10 @@ function importDataFromJSON(file) {
             }
             const importEnablePageFoldEl = document.getElementById('enablePageFold');
             if (importEnablePageFoldEl) importEnablePageFoldEl.checked = enablePageFold;
+
+            showHeaderWhenFoldOff = data.showHeaderWhenFoldOff || false;
+            const importShEl = document.getElementById('showHeaderWhenFoldOff');
+            if (importShEl) importShEl.checked = showHeaderWhenFoldOff;
 
             // 프리셋 데이터 복원
             if (data.presets && typeof data.presets === 'object') {
@@ -2689,7 +2781,45 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
             line = line.replace('{{UNIT_FEET_' + i + '}}', unitPlaceholders[i]);
         }
 
+        // 볼드(**) 먼저 처리 — 내부에 *이탤릭* 중첩 허용
+        line = line.replace(/\*\*([\s\S]+?)\*\*/g, function(match, inner) {
+            const innerParsed = inner.replace(/\*([^*]+)\*/g, '<em><span style="' + emStyle + '">$1</span></em>');
+            return '<strong style="font-weight:700; color:' + themeStyle.text + ';">' + innerParsed + '</strong>';
+        });
+        // 볼드 처리 후 남은 단독 이탤릭(*)
         line = line.replace(/\*([^*]+)\*/g, '<em><span style="' + emStyle + '">$1</span></em>');
+
+        // ── 마크다운 헤딩 파싱 (#, ##, ###, ####) ──
+        const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+        if (headingMatch) {
+            const level = headingMatch[1].length;
+            const headingText = headingMatch[2];
+            const ff = fontFamily || 'Pretendard';
+            const ffFallback = typeof getFontFallback === 'function' ? getFontFallback(ff) : 'sans-serif';
+            const baseSize = (headingFontSizes && headingFontSizes.pageHeaderTitle) ? headingFontSizes.pageHeaderTitle : 20;
+            const hColor = themeStyle.header || themeStyle.text;
+            const subColor = themeStyle.tagText || themeStyle.text;
+            // # → 가장 크고 굵게, #### → 본문보다 약간 크게
+            const sizes = [baseSize * 1.3, baseSize * 1.05, baseSize * 0.88, baseSize * 0.76];
+            const weights = ['800', '700', '600', '600'];
+            const colors = [hColor, hColor, subColor, subColor];
+            const idx = level - 1;
+
+            // 이전/다음 줄이 헤딩인지 확인해서 margin 동적 결정
+            const prevLine = i > 0 ? lines[i - 1] : '';
+            const nextLine = i < lines.length - 1 ? lines[i + 1] : '';
+            const prevIsHeading = /^#{1,4}\s+/.test(prevLine.trim());
+            const nextIsHeading = /^#{1,4}\s+/.test(nextLine.trim());
+
+            // 헤딩 그룹 첫 줄이면 위 여백 크게, 연속이면 위 여백 작게
+            // 다음이 본문이면 아래 여백 크게, 다음도 헤딩이면 작게
+            const marginTop = prevIsHeading ? '3px' : '20px';
+            const marginBottom = nextIsHeading ? '1px' : '14px';
+
+            const hStyle = 'display:block; font-size:' + Math.round(sizes[idx]) + 'px; font-weight:' + weights[idx] + '; color:' + colors[idx] + '; font-family:\'' + ff + '\',' + ffFallback + '; line-height:1.35; margin:' + marginTop + ' 0 ' + marginBottom + '; letter-spacing:-0.2px;';
+            html += '<div style="' + hStyle + '">' + headingText + '</div>';
+            continue;
+        }
 
         for (let j = 1; j <= footnoteCount; j++) {
             line = line.replace('{{FOOTNOTE_' + j + '}}', '<sup style="font-size: 0.7em;">' + '*'.repeat(j) + '</sup>');
@@ -2941,12 +3071,14 @@ function createSoundtrackSection(youtubeUrl, songTitle, artistName, themeStyle, 
 
 
 
-function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHtml, hasTopImage) {
+function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHtml, hasTopImage, noBottomPadding) {
     const theme = getTheme(globalTheme);
 
     // hasTopImage가 true면 상단 패딩 0, 아니면 하단과 동일하게
     const topPadding = hasTopImage ? '0' : 'clamp(20px, 4vw, 30px)';
-    let containerStyle = 'box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 1rem; background-color: ' + theme.bg + '; padding: ' + topPadding + ' 0 clamp(20px, 4vw, 30px) 0; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; font-size: clamp(13px, 2.3vw, 14.2px);';
+    const bottomPadding = noBottomPadding ? '0' : 'clamp(20px, 4vw, 30px)';
+    const overflowStyle = noBottomPadding ? 'overflow:hidden;' : '';
+    let containerStyle = 'box-shadow:0 4px 16px rgba(0,0,0,0.1);max-width: 900px; margin: 5px auto; border-radius: 1rem; background-color: ' + theme.bg + '; padding: ' + topPadding + ' 0 ' + bottomPadding + ' 0; ' + overflowStyle + 'font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; font-size: clamp(13px, 2.3vw, 14.2px);';
 
     if (bgImage) {
         const normalizedBgImage = normalizeImageUrl(bgImage);
@@ -3876,8 +4008,10 @@ function generateHTML(isPreview) {
         const coverTitle = document.getElementById('coverTitle').value;
         const coverSubtitle = document.getElementById('coverSubtitle').value;
 
-        // 표지 이미지를 제외한 실제 내용이 있는지 미리 확인
-        const hasRealContent = (enableProfiles && profiles.length > 0) || introText.trim() || summaryText.trim() || coverArchiveNo || coverTitle || coverSubtitle;
+        // 표지 하단에 올 실제 내용이 있는지 확인 (프로필, 인트로, 요약, 사운드트랙만 체크)
+        // coverArchiveNo/coverTitle/coverSubtitle은 표지 내부 요소이므로 포함하지 않음
+        const soundtrackUrlCheck = document.getElementById('soundtrackUrl').value;
+        const hasRealContent = (enableProfiles && profiles.length > 0) || introText.trim() || summaryText.trim() || (soundtrackUrlCheck && soundtrackUrlCheck.trim());
 
         // 인트로가 마지막 컨테이너인지 확인 (페이지도 없고 코멘트도 없으면)
         const enableComment = document.getElementById('enableComment').checked;
@@ -3903,9 +4037,13 @@ function generateHTML(isPreview) {
                     // 자동 크기 조절 여부에 따라 background-size 결정
                     const backgroundSize = coverAutoFit ? 'cover' : (coverZoom + '% auto');
                     
-                    topContent += '<div style="width:100%;margin:0 0 30px 0;box-sizing:border-box;background:transparent;">';
-                    topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + backgroundSize + ';background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:10px 10px 0 0;">';
-                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:10px 10px 0 0;">';
+                    // 내용 없을 때: margin/padding 없이 표지가 컨테이너를 꽉 채움
+                    const coverWrapperMarginBottom = hasRealContent ? '30px' : '0';
+                    const coverImgBorderRadius = hasRealContent ? '10px 10px 0 0' : '10px 10px 10px 10px';
+
+                    topContent += '<div style="width:100%;margin:0 0 ' + coverWrapperMarginBottom + ' 0;box-sizing:border-box;background:transparent;overflow:hidden;border-radius:' + coverImgBorderRadius + ';">';
+                    topContent += '<div style="width:100%;height:30vh;min-height:300px;display:table;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + backgroundSize + ';background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;">';
+                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);">';
 
                     if (coverArchiveNo) {
                         topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
@@ -3932,7 +4070,7 @@ function generateHTML(isPreview) {
                                 const tagContent = tag.link
                                     ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
                                     : tag.value;
-                                const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+                                const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) 0 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
                                 topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
                             });
                             topContent += '</div>';
@@ -4075,10 +4213,10 @@ function generateHTML(isPreview) {
             topContent += createSoundtrackSection(soundtrackUrl, soundtrackTitle, soundtrackArtist, theme, isPreview);
         }
 
-        // 표지만 있고 다른 내용이 없으면 표지만 출력, 그 외의 경우 컨테이너로 감싸기
+        // 표지만 있고 다른 내용이 없으면 컨테이너 없이 표지만 직접 출력
         if (enableCover && !hasRealContent) {
-            // 표지만 있는 경우도 컨테이너로 감싸서 크기 유지
-            html += createContainer(topContent, themeType, null, false, null, null, !!coverImage);
+            // 컨테이너(배경색/패딩/그림자) 없이 max-width만 맞춰서 직접 출력
+            html += '<div style="max-width:900px;margin:5px auto;">' + topContent + '</div>';
         } else if (hasRealContent || enableCover) {
             // 내용이 있거나 표지와 함께 내용이 있는 경우
             html += createContainer(topContent, themeType, null, false, null, null, !!coverImage);
@@ -4229,9 +4367,12 @@ function generateHTML(isPreview) {
 
             const isExpanded = currentPage.collapsed;
 
-            // ── 페이지 접기 OFF: 헤더 없이 본문만 펼쳐서 표시 ──
+            // ── 페이지 접기 OFF: 헤더 없이 본문만 펼쳐서 표시 (옵션에 따라 헤더 포함) ──
             if (!enablePageFold) {
                 const pageImageWidth = (currentPage.imageWidth !== undefined && currentPage.imageWidth !== null) ? currentPage.imageWidth : 100;
+                if (showHeaderWhenFoldOff) {
+                    pageContentHtml += header;
+                }
                 pageContentHtml += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 50px);">' + parseText(currentPage.content, theme, false, false, pageImageWidth) + '</div>';
 
                 if (currentPage.bgImage) {
@@ -4639,7 +4780,8 @@ function saveNewPreset() {
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
             headingFontSizes: headingFontSizes,
-            enablePageFold: enablePageFold
+            enablePageFold: enablePageFold,
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff
         };
         
         presets[newIndex] = {
@@ -4709,7 +4851,8 @@ function savePreset(slotIndex) {
             fontFamily: fontFamily,
             globalTheme: globalTheme,
             hidePageNumbers: hidePageNumbers,
-            enablePageFold: enablePageFold
+            enablePageFold: enablePageFold,
+            showHeaderWhenFoldOff: showHeaderWhenFoldOff
         };
         
         // 프리셋 저장
@@ -4924,6 +5067,10 @@ function loadPreset(slotIndex) {
         }
         const presetPageFoldEl = document.getElementById('enablePageFold');
         if (presetPageFoldEl) presetPageFoldEl.checked = enablePageFold;
+
+        showHeaderWhenFoldOff = data.showHeaderWhenFoldOff || false;
+        const presetShEl = document.getElementById('showHeaderWhenFoldOff');
+        if (presetShEl) presetShEl.checked = showHeaderWhenFoldOff;
 
         // 미리보기 업데이트 및 로컬 스토리지 저장
         updatePreview();
