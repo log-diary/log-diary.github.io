@@ -4132,7 +4132,7 @@ function generateHTML(isPreview) {
                     const coverImgBorderRadius = hasRealContent ? '10px 10px 0 0' : '10px 10px 10px 10px';
 
                     topContent += '<div style="width:100%;margin:0 0 ' + coverWrapperMarginBottom + ' 0;box-sizing:border-box;background-color:#1a1a1a;background-image:url(\'' + normalizedCoverImage + '\');background-size:' + backgroundSize + ';background-position:' + coverFocusX + '% ' + coverFocusY + '%;background-repeat:no-repeat;border-radius:' + coverImgBorderRadius + ';display:table;">';
-                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:30vh;min-height:300px;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:' + coverImgBorderRadius + ';">';
+                    topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:min(68.421vw, 615px);min-height:200px;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:' + coverImgBorderRadius + ';">';
 
                     if (coverArchiveNo) {
                         topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
