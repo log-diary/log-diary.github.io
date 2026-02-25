@@ -4157,12 +4157,12 @@ function generateHTML(isPreview) {
                     }
 
                     if (coverTitle) {
-                        const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
+                        const titleMargin = coverSubtitle ? '0 0 8px 0' : '0 0 10px 0';
                         topContent += '<h1 style="font-size:' + pxToClamp(headingFontSizes.coverTitle) + ';color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:0 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4194,12 +4194,12 @@ function generateHTML(isPreview) {
                     }
 
                     if (coverTitle) {
-                        const titleMargin = coverSubtitle ? '0 0 5px 0' : '0 0 15px 0';
+                        const titleMargin = coverSubtitle ? '0 0 8px 0' : '0 0 15px 0';
                         topContent += '<h1 style="font-size:' + pxToClamp(headingFontSizes.coverTitle) + ';color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:' + theme.text + ';margin:0 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4590,7 +4590,10 @@ function generateHTML(isPreview) {
         html += '</div>';
     }
 
-
+if (pages.length > 0) {
+        html += '<br>';
+    }
+    
     // 코멘트 섹션 추가
     const enableComment = document.getElementById('enableComment').checked;
     if (enableComment) {
