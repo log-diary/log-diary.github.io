@@ -24,8 +24,10 @@ let textSpacing = {
 
 // 제목/헤더 폰트 크기 설정
 let headingFontSizes = {
+    coverArchiveNo: 11,   // 표지 아카이브 번호
     coverTitle: 42,       // 표지 메인 제목
     coverSubtitle: 14,    // 표지 부제
+    coverTag: 11,         // 표지 태그
     sectionTitle: 20,     // 섹션 제목 (배경 없음)
     sectionSubtitle: 11,  // 섹션 부제
     pageHeaderNum: 40,    // 페이지 헤더 번호
@@ -34,6 +36,16 @@ let headingFontSizes = {
 
 // 폰트 설정
 let fontFamily = 'Pretendard';
+
+// 폰트 크기를 clamp() 단위로 변환 (모바일 대응)
+// maxPx: 사용자가 설정한 최대 크기(px), minRatio: min/max 비율(기본 0.6)
+// 컨테이너 기준 900px 기준으로 vw 계산
+function pxToClamp(maxPx, minRatio) {
+    minRatio = minRatio || 0.75;
+    const min = Math.round(maxPx * minRatio);
+    const vw = (maxPx / 900 * 100).toFixed(2);
+    return 'clamp(' + min + 'px, ' + vw + 'vw, ' + maxPx + 'px)';
+}
 
 // 폰트에 맞는 fallback 반환
 function getFontFallback(font) {
@@ -1792,16 +1804,20 @@ function setupEventListeners() {
 
     // ── HEADING SIZES 컨트롤 ──────────────────────────────────────────
     const headingDefaults = {
+        coverArchiveNo: 11,
         coverTitle: 42,
         coverSubtitle: 14,
+        coverTag: 11,
         sectionTitle: 20,
         sectionSubtitle: 11,
         pageHeaderNum: 40,
         pageHeaderTitle: 15,
     };
     const headingDisplayMap = {
+        coverArchiveNo:  { slider: 'coverArchiveNoSizeSlider',  input: 'coverArchiveNoSizeInput',  display: 'coverArchiveNoSizeDisplay' },
         coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
         coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+        coverTag:        { slider: 'coverTagSizeSlider',        input: 'coverTagSizeInput',        display: 'coverTagSizeDisplay' },
         sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
         sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
         pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },
@@ -2302,8 +2318,10 @@ function importDataFromJSON(file) {
             if (data.headingFontSizes) {
                 headingFontSizes = { ...headingFontSizes, ...data.headingFontSizes };
                 const _hmap = {
+                    coverArchiveNo:  { slider: 'coverArchiveNoSizeSlider',  input: 'coverArchiveNoSizeInput',  display: 'coverArchiveNoSizeDisplay' },
                     coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
                     coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+                    coverTag:        { slider: 'coverTagSizeSlider',        input: 'coverTagSizeInput',        display: 'coverTagSizeDisplay' },
                     sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
                     sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
                     pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },
@@ -2969,16 +2987,16 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
     // hidePageNumbers가 true면 번호를 표시하지 않음
     if (pageNum && !hidePageNumbers) {
         // Layout with number
-        headerHtml += '<div style="display: table; width: 100%; padding: clamp(15px, 3vw, 20px) 0; ">';
-        headerHtml += '<div style="display: table-cell; width: clamp(70px, 15vw, 100px); vertical-align: center; padding-left: clamp(30px, 5vw, 50px);padding-right: clamp(20px, 3vw, 30px);">';
-        headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderNum + 'px; font-weight: 700; color: ' + numberColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1;">' + pageNum.replace('#', '') + '</div>';
+        headerHtml += '<div style="display: flex; align-items: center; width: 100%; padding: clamp(15px, 3vw, 20px) 0;">';
+        headerHtml += '<div style="flex: 0 0 auto; padding-left: clamp(30px, 5vw, 50px); padding-right: clamp(20px, 3vw, 30px); white-space: nowrap;">';
+        headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderNum) + '; font-weight: 700; color: ' + numberColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1; white-space: nowrap;">' + pageNum.replace('#', '') + '</div>';
         headerHtml += '</div>';
-        headerHtml += '<div style="display: table-cell; vertical-align: middle; padding-top: 0;">';
+        headerHtml += '<div style="flex: 1 1 0; min-width: 0;">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderTitle + 'px; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
-            headerHtml += '<div style="font-size: ' + Math.round(headingFontSizes.pageHeaderTitle * 0.8) + 'px; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            headerHtml += '<div style="font-size: ' + pxToClamp(Math.round(headingFontSizes.pageHeaderTitle * 0.8)) + '; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
         headerHtml += '</div>';
@@ -2986,22 +3004,22 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         // 번호 숨김이지만 제목이나 부제목이 있는 경우 - 좌측 정렬
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderTitle + 'px; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
-            headerHtml += '<div style="font-size: ' + Math.round(headingFontSizes.pageHeaderTitle * 0.8) + 'px; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            headerHtml += '<div style="font-size: ' + pxToClamp(Math.round(headingFontSizes.pageHeaderTitle * 0.8)) + '; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
         }
         headerHtml += '</div>';
     } else if (hidePageNumbers && pageNum) {
         // 번호 숨김이고 제목/부제목이 없는 경우 - "Page n" 표시 (좌측 정렬)
         const pageNumber = pageNum.replace('#', '');
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
-        headerHtml += '<div style="font-size: ' + headingFontSizes.pageHeaderTitle + 'px; font-weight: 700; color: ' + titleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
+        headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">Page ' + pageNumber + '</div>';
         headerHtml += '</div>';
     } else {
         // Fallback to centered layout if no number
         const displayContent = text ? text.toUpperCase() : '';
-        const headerStyle = 'text-align: center; font-size: ' + headingFontSizes.pageHeaderTitle + 'px; letter-spacing: clamp(2px, 0.5vw, 4px); font-weight: 600; color: ' + titleColor + '; margin-bottom: 0; padding: clamp(15px, 3vw, 20px) 0; line-height: 1; white-space: nowrap;';
+        const headerStyle = 'text-align: center; font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; letter-spacing: clamp(2px, 0.5vw, 4px); font-weight: 600; color: ' + titleColor + '; margin-bottom: 0; padding: clamp(15px, 3vw, 20px) 0; line-height: 1; white-space: nowrap;';
         const lineStyle = 'display: inline-block; width: clamp(25px, 5vw, 40px); height: 0px; border-top: 1px solid ' + titleColor + '; vertical-align: middle; font-size: 0px; line-height: 0px;';
         const textWrapperStyle = 'display: inline-block; margin: 0 clamp(10px, 2vw, 15px); vertical-align: middle;';
 
@@ -3217,7 +3235,7 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
 
         // 화살표 추가
         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + headingFontSizes.sectionTitle + 'px; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + pxToClamp(headingFontSizes.sectionTitle) + '; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
         const summaryContent = arrowWrapperStart + collapsedHeaderHtml + arrowWrapperMid;
 
         let detailsHtml = '<details style="' + containerStyle + '">';
@@ -3233,7 +3251,7 @@ function createContainer(content, type, bgImage, isCollapsed, headerHtml, tagsHt
     if (headerHtml) {
         // 화살표로 감싼 header 생성
         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + headingFontSizes.sectionTitle + 'px; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + pxToClamp(headingFontSizes.sectionTitle) + '; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
 
         const headerWithArrow = arrowWrapperStart + headerHtml + arrowWrapperMid;
 
@@ -4135,16 +4153,16 @@ function generateHTML(isPreview) {
                     topContent += '<div style="display:table-cell;vertical-align:bottom;width:100%;height:min(68.421vw, 615px);min-height:200px;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, transparent 45%);border-radius:' + coverImgBorderRadius + ';">';
 
                     if (coverArchiveNo) {
-                        topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
+                        topContent += '<p style="font-size:' + pxToClamp(headingFontSizes.coverArchiveNo) + ';color:rgba(255, 255, 255, 0.8);letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 5px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-shadow:0 2px 4px rgba(0,0,0,0.5);">' + coverArchiveNo + '</p>';
                     }
 
                     if (coverTitle) {
                         const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
-                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);word-break:keep-all;">' + coverTitle + '</h1>';
+                        topContent += '<h1 style="font-size:' + pxToClamp(headingFontSizes.coverTitle) + ';color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:' + headingFontSizes.coverSubtitle + 'px;letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4159,7 +4177,7 @@ function generateHTML(isPreview) {
                                 const tagContent = tag.link
                                     ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
                                     : tag.value;
-                                const tagStyle = 'display:inline-block;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+                                const tagStyle = 'display:inline-block;vertical-align:top;background:rgba(255, 255, 255, 0.1);color:#ffffff;padding:' + pxToClamp(Math.round(headingFontSizes.coverTag * 0.45)) + ' ' + pxToClamp(Math.round(headingFontSizes.coverTag * 1.1)) + ';margin:0 ' + pxToClamp(Math.round(headingFontSizes.coverTag * 0.7)) + ' ' + pxToClamp(Math.round(headingFontSizes.coverTag * 0.7)) + ' 0;border:1px solid rgba(255, 255, 255, 0.3);font-size:' + pxToClamp(headingFontSizes.coverTag) + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
                                 topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
                             });
                             topContent += '</div>';
@@ -4172,16 +4190,16 @@ function generateHTML(isPreview) {
                     topContent += '<div style="padding: clamp(20px, 4vw, 30px) clamp(30px, 5vw, 40px) clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);">';
                     
                     if (coverArchiveNo) {
-                        topContent += '<p style="font-size:clamp(10px, 1.8vw, 11px);color:' + theme.tagText + ';letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 8px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">' + coverArchiveNo + '</p>';
+                        topContent += '<p style="font-size:' + pxToClamp(headingFontSizes.coverArchiveNo) + ';color:' + theme.tagText + ';letter-spacing:clamp(2px, 0.4vw, 3px);margin:0 0 8px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';">' + coverArchiveNo + '</p>';
                     }
 
                     if (coverTitle) {
                         const titleMargin = coverSubtitle ? '0 0 5px 0' : '0 0 15px 0';
-                        topContent += '<h1 style="font-size:' + headingFontSizes.coverTitle + 'px;color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;word-break:keep-all;">' + coverTitle + '</h1>';
+                        topContent += '<h1 style="font-size:' + pxToClamp(headingFontSizes.coverTitle) + ';color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:' + headingFontSizes.coverSubtitle + 'px;letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4196,7 +4214,7 @@ function generateHTML(isPreview) {
                                 const tagContent = tag.link
                                     ? '<a href="' + tag.link + '" style="text-decoration:none;color:inherit;">' + tag.value + '</a>'
                                     : tag.value;
-                                const tagStyle = 'display:inline-block;background:' + theme.quote1Bg + ';color:' + theme.text + ';padding:clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);margin:0 clamp(6px, 1.2vw, 8px) clamp(6px, 1.2vw, 8px) 0;border:1px solid ' + theme.divider + ';font-size:clamp(10px, 1.8vw, 11px);font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
+                                const tagStyle = 'display:inline-block;vertical-align:top;background:' + theme.quote1Bg + ';color:' + theme.text + ';padding:' + pxToClamp(Math.round(headingFontSizes.coverTag * 0.45)) + ' ' + pxToClamp(Math.round(headingFontSizes.coverTag * 1.1)) + ';margin:0 ' + pxToClamp(Math.round(headingFontSizes.coverTag * 0.7)) + ' ' + pxToClamp(Math.round(headingFontSizes.coverTag * 0.7)) + ' 0;border:1px solid ' + theme.divider + ';font-size:' + pxToClamp(headingFontSizes.coverTag) + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';';
                                 topContent += '<span style="' + tagStyle + '">' + tagContent + '</span> ';
                             });
                             topContent += '</div>';
@@ -4376,11 +4394,11 @@ function generateHTML(isPreview) {
                 sectionHtml += '<div style="display:table-cell;vertical-align:middle;width:100%;height:15vh;padding:clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px);box-sizing:border-box;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, transparent 60%);' + sectionBorderRadius + 'text-align:' + textAlign + ';">';
 
                 if (item.subtitle && item.subtitle.trim()) {
-                    sectionHtml += '<div style="font-size:' + headingFontSizes.sectionSubtitle + 'px;line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + item.subtitle + '</div>';
+                    sectionHtml += '<div style="font-size:' + pxToClamp(headingFontSizes.sectionSubtitle) + ';line-height:1.3;letter-spacing:clamp(1.5px, 0.3vw, 2px);color:rgba(255, 255, 255, 0.7);margin:0 0 clamp(6px, 1.2vw, 8px) 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + item.subtitle + '</div>';
                 }
 
                 if (item.title) {
-                    sectionHtml += '<h1 style="font-size:' + headingFontSizes.sectionTitle + 'px;color:rgba(255, 255, 255, 1.0);margin:0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.2;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + item.title + '</h1>';
+                    sectionHtml += '<h1 style="font-size:' + pxToClamp(headingFontSizes.sectionTitle) + ';color:rgba(255, 255, 255, 1.0);margin:0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.2;text-shadow:0 4px 15px rgba(0,0,0,0.6);">' + item.title + '</h1>';
                 }
 
                 sectionHtml += '</div></div>';
@@ -4391,11 +4409,11 @@ function generateHTML(isPreview) {
                 sectionHtml += '<div style="width: 100%; padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 40px); text-align: ' + textAlign + ';">';
                 
                 if (item.subtitle && item.subtitle.trim()) {
-                    sectionHtml += '<div style="font-size: ' + headingFontSizes.sectionSubtitle + 'px; color: ' + currentSectionTheme.tagText + '; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + item.subtitle + '</div>';
+                    sectionHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.sectionSubtitle) + '; color: ' + currentSectionTheme.tagText + '; letter-spacing: clamp(1.5px, 0.3vw, 2px); margin-bottom: clamp(8px, 1.5vw, 10px); text-transform: uppercase;">' + item.subtitle + '</div>';
                 }
                 
                 if (item.title) {
-                    sectionHtml += '<div style="font-size: ' + headingFontSizes.sectionTitle + 'px; font-weight: 700; color: ' + currentSectionTheme.header + '; letter-spacing: clamp(0.5px, 0.2vw, 1px);">' + item.title + '</div>';
+                    sectionHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.sectionTitle) + '; font-weight: 700; color: ' + currentSectionTheme.header + '; letter-spacing: clamp(0.5px, 0.2vw, 1px);">' + item.title + '</div>';
                 }
                 
                 sectionHtml += '</div>';
@@ -4541,7 +4559,7 @@ function generateHTML(isPreview) {
                         const collapsedHeaderHtml = header.replace('margin-bottom: 20px; padding-top: 20px;', 'margin: 0;').replace('vertical-align: center;', 'vertical-align: middle;');
                         // 테이블을 사용한 화살표 아이콘 (우측 정렬)
                         const arrowWrapperStart = '<div style="width: 100%; display: table;"><div style="display: table-row;"><div style="display: table-cell; vertical-align: middle;">';
-                        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + headingFontSizes.sectionTitle + 'px; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
+                        const arrowWrapperMid = '</div><div style="display: table-cell; vertical-align: middle; width: clamp(50px, 10vw, 70px); text-align: right; padding-right: clamp(30px, 5vw, 50px);"><span style="font-size: ' + pxToClamp(headingFontSizes.sectionTitle) + '; color: ' + theme.tagText + ';">⌵</span></div></div></div>';
                         sectionContainerHtml += '<details style="margin: 0;">';
                         sectionContainerHtml += '<summary style="' + summaryStyle + '">' + arrowWrapperStart + collapsedHeaderHtml + arrowWrapperMid + '</summary>';
                         sectionContainerHtml += collapsedContent;
@@ -5116,8 +5134,10 @@ function loadPreset(slotIndex) {
         if (data.headingFontSizes) {
             headingFontSizes = { ...headingFontSizes, ...data.headingFontSizes };
             const _hmap2 = {
+                coverArchiveNo:  { slider: 'coverArchiveNoSizeSlider',  input: 'coverArchiveNoSizeInput',  display: 'coverArchiveNoSizeDisplay' },
                 coverTitle:      { slider: 'coverTitleSizeSlider',      input: 'coverTitleSizeInput',      display: 'coverTitleSizeDisplay' },
                 coverSubtitle:   { slider: 'coverSubtitleSizeSlider',   input: 'coverSubtitleSizeInput',   display: 'coverSubtitleSizeDisplay' },
+                coverTag:        { slider: 'coverTagSizeSlider',        input: 'coverTagSizeInput',        display: 'coverTagSizeDisplay' },
                 sectionTitle:    { slider: 'sectionTitleSizeSlider',    input: 'sectionTitleSizeInput',    display: 'sectionTitleSizeDisplay' },
                 sectionSubtitle: { slider: 'sectionSubtitleSizeSlider', input: 'sectionSubtitleSizeInput', display: 'sectionSubtitleSizeDisplay' },
                 pageHeaderNum:   { slider: 'pageHeaderNumSizeSlider',   input: 'pageHeaderNumSizeInput',   display: 'pageHeaderNumSizeDisplay' },

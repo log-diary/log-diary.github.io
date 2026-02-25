@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Log Diary</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
 
 <body>
@@ -82,8 +82,8 @@
                 <div class="header-controls">
                     <button id="themeToggle" class="btn-theme-toggle" title="라이트/다크 모드 전환">
                         <!-- 다크 모드일 때 (밝은 아이콘 표시 → 라이트로 전환) -->
-                        <svg id="icon-theme-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                            style="display: none;">
+                        <svg id="icon-theme-light" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" style="display: none;">
                             <circle cx="12" cy="12" r="5" />
                             <line x1="12" y1="1" x2="12" y2="3" />
                             <line x1="12" y1="21" x2="12" y2="23" />
@@ -95,15 +95,15 @@
                             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                         </svg>
                         <!-- 라이트 모드일 때 (달 아이콘 표시 → 다크로 전환) -->
-                        <svg id="icon-theme-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                            style="display: block;">
+                        <svg id="icon-theme-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" style="display: block;">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                         </svg>
                     </button>
                     <button id="soundToggle" class="btn-sound-toggle" title="빗소리 켜기/끄기">
                         <!-- 기본값: 소리 꺼짐 아이콘 -->
-                        <svg id="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                            style="display: block;">
+                        <svg id="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" style="display: block;">
                             <path d="M11 5L6 9H2v6h4l5 4V5z" />
                             <line x1="23" y1="9" x2="17" y2="15" />
                             <line x1="17" y1="9" x2="23" y2="15" />
@@ -133,14 +133,17 @@
                     <h2>Text Formatting</h2>
                     <span class="deco-line"></span>
                 </div>
-                <div class="control-grid">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="useRoundedQuotes">
-                        <label for="useRoundedQuotes">둥근 따옴표 (" " → “ ”)</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="useTextIndent">
-                        <label for="useTextIndent">문단 첫 줄 들여쓰기</label>
+                <div class="sub-section">
+                    <h3>OPTIONS</h3>
+                    <div class="control-grid">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="useRoundedQuotes">
+                            <label for="useRoundedQuotes">둥근 따옴표 (" " → “ ”)</label>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="useTextIndent">
+                            <label for="useTextIndent">문단 첫 줄 들여쓰기</label>
+                        </div>
                     </div>
                 </div>
 
@@ -162,38 +165,53 @@
                     <h3>FONT STYLE</h3>
                     <div class="control-grid">
                         <div class="input-group">
-                            <label>글자 크기 <span id="textSizeDisplay" style="color:var(--accent-blue);">14.2px</span></label>
+                            <label>글자 크기 <span id="textSizeDisplay"
+                                    style="color:var(--accent-blue);">14.2px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="textSizeSlider" class="spacing-slider" min="10" max="24" step="0.1" value="14.2" style="flex:1;">
-                                <input type="number" id="textSizeInput" value="14.2" min="10" max="24" step="0.1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="textSizeSlider" class="spacing-slider" min="10" max="24"
+                                    step="0.1" value="14.2" style="flex:1;">
+                                <input type="number" id="textSizeInput" value="14.2" min="10" max="24" step="0.1"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>줄 간격 <span id="lineHeightDisplay" style="color:var(--accent-blue);">1.7</span></label>
+                            <label>줄 간격 <span id="lineHeightDisplay"
+                                    style="color:var(--accent-blue);">1.7</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="lineHeightSlider" class="spacing-slider" min="1.0" max="3.0" step="0.05" value="1.7" style="flex:1;">
-                                <input type="number" id="lineHeightInput" value="1.7" min="1.0" max="3.0" step="0.05" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="lineHeightSlider" class="spacing-slider" min="1.0" max="3.0"
+                                    step="0.05" value="1.7" style="flex:1;">
+                                <input type="number" id="lineHeightInput" value="1.7" min="1.0" max="3.0" step="0.05"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>자간 <span id="letterSpacingDisplay" style="color:var(--accent-blue);">-0.5px</span></label>
+                            <label>자간 <span id="letterSpacingDisplay"
+                                    style="color:var(--accent-blue);">-0.5px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="letterSpacingSlider" class="spacing-slider" min="-2" max="5" step="0.1" value="-0.5" style="flex:1;">
-                                <input type="number" id="letterSpacingInput" value="-0.5" min="-2" max="5" step="0.1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="letterSpacingSlider" class="spacing-slider" min="-2" max="5"
+                                    step="0.1" value="-0.5" style="flex:1;">
+                                <input type="number" id="letterSpacingInput" value="-0.5" min="-2" max="5" step="0.1"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>문단 간격 <span id="paragraphSpacingDisplay" style="color:var(--accent-blue);">10px</span></label>
+                            <label>문단 간격 <span id="paragraphSpacingDisplay"
+                                    style="color:var(--accent-blue);">10px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="paragraphSpacingSlider" class="spacing-slider" min="0" max="40" step="1" value="10" style="flex:1;">
-                                <input type="number" id="paragraphSpacingInput" value="10" min="0" max="40" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="paragraphSpacingSlider" class="spacing-slider" min="0" max="40"
+                                    step="1" value="10" style="flex:1;">
+                                <input type="number" id="paragraphSpacingInput" value="10" min="0" max="40" step="1"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>들여쓰기 크기 <span id="textIndentDisplay" style="color:var(--accent-blue);">0px</span></label>
+                            <label>들여쓰기 크기 <span id="textIndentDisplay"
+                                    style="color:var(--accent-blue);">0px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="textIndentSlider" class="spacing-slider" min="0" max="60" step="1" value="0" style="flex:1;">
-                                <input type="number" id="textIndentInput" value="0" min="0" max="60" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="textIndentSlider" class="spacing-slider" min="0" max="60"
+                                    step="1" value="0" style="flex:1;">
+                                <input type="number" id="textIndentInput" value="0" min="0" max="60" step="1"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                     </div>
@@ -204,49 +222,90 @@
                     <h3>HEADING SIZES</h3>
                     <div class="control-grid">
                         <div class="input-group">
-                            <label>표지 제목 <span id="coverTitleSizeDisplay" style="color:var(--accent-blue);">42px</span></label>
+                            <label>표지 아카이브 번호 <span id="coverArchiveNoSizeDisplay"
+                                    style="color:var(--accent-blue);">11px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="coverTitleSizeSlider" class="spacing-slider" min="20" max="80" step="1" value="42" style="flex:1;">
-                                <input type="number" id="coverTitleSizeInput" value="42" min="20" max="80" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="coverArchiveNoSizeSlider" class="spacing-slider" min="6"
+                                    max="24" step="0.5" value="11" style="flex:1;">
+                                <input type="number" id="coverArchiveNoSizeInput" value="11" min="6" max="24" step="0.5"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>표지 부제 <span id="coverSubtitleSizeDisplay" style="color:var(--accent-blue);">14px</span></label>
+                            <label>표지 제목 <span id="coverTitleSizeDisplay"
+                                    style="color:var(--accent-blue);">42px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="coverSubtitleSizeSlider" class="spacing-slider" min="8" max="30" step="0.5" value="14" style="flex:1;">
-                                <input type="number" id="coverSubtitleSizeInput" value="14" min="8" max="30" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="coverTitleSizeSlider" class="spacing-slider" min="20" max="80"
+                                    step="1" value="42" style="flex:1;">
+                                <input type="number" id="coverTitleSizeInput" value="42" min="20" max="80" step="1"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>섹션 제목 <span id="sectionTitleSizeDisplay" style="color:var(--accent-blue);">20px</span></label>
+                            <label>표지 부제 <span id="coverSubtitleSizeDisplay"
+                                    style="color:var(--accent-blue);">14px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="sectionTitleSizeSlider" class="spacing-slider" min="12" max="48" step="0.5" value="20" style="flex:1;">
-                                <input type="number" id="sectionTitleSizeInput" value="20" min="12" max="48" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="coverSubtitleSizeSlider" class="spacing-slider" min="8" max="30"
+                                    step="0.5" value="14" style="flex:1;">
+                                <input type="number" id="coverSubtitleSizeInput" value="14" min="8" max="30" step="0.5"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>섹션 부제 <span id="sectionSubtitleSizeDisplay" style="color:var(--accent-blue);">11px</span></label>
+                            <label>표지 태그 <span id="coverTagSizeDisplay"
+                                    style="color:var(--accent-blue);">11px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="sectionSubtitleSizeSlider" class="spacing-slider" min="8" max="24" step="0.5" value="11" style="flex:1;">
-                                <input type="number" id="sectionSubtitleSizeInput" value="11" min="8" max="24" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="coverTagSizeSlider" class="spacing-slider" min="6" max="24"
+                                    step="0.5" value="11" style="flex:1;">
+                                <input type="number" id="coverTagSizeInput" value="11" min="6" max="24" step="0.5"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>페이지 헤더 번호 <span id="pageHeaderNumSizeDisplay" style="color:var(--accent-blue);">40px</span></label>
+                            <label>섹션 제목 <span id="sectionTitleSizeDisplay"
+                                    style="color:var(--accent-blue);">20px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="pageHeaderNumSizeSlider" class="spacing-slider" min="20" max="72" step="1" value="40" style="flex:1;">
-                                <input type="number" id="pageHeaderNumSizeInput" value="40" min="20" max="72" step="1" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="sectionTitleSizeSlider" class="spacing-slider" min="12" max="48"
+                                    step="0.5" value="20" style="flex:1;">
+                                <input type="number" id="sectionTitleSizeInput" value="20" min="12" max="48" step="0.5"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>페이지 헤더 제목/부제 <span id="pageHeaderTitleSizeDisplay" style="color:var(--accent-blue);">15px</span></label>
+                            <label>섹션 부제 <span id="sectionSubtitleSizeDisplay"
+                                    style="color:var(--accent-blue);">11px</span></label>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <input type="range" id="pageHeaderTitleSizeSlider" class="spacing-slider" min="8" max="28" step="0.5" value="15" style="flex:1;">
-                                <input type="number" id="pageHeaderTitleSizeInput" value="15" min="8" max="28" step="0.5" style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                                <input type="range" id="sectionSubtitleSizeSlider" class="spacing-slider" min="8"
+                                    max="24" step="0.5" value="11" style="flex:1;">
+                                <input type="number" id="sectionSubtitleSizeInput" value="11" min="8" max="24"
+                                    step="0.5"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>페이지 헤더 번호 <span id="pageHeaderNumSizeDisplay"
+                                    style="color:var(--accent-blue);">40px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="pageHeaderNumSizeSlider" class="spacing-slider" min="20"
+                                    max="72" step="1" value="40" style="flex:1;">
+                                <input type="number" id="pageHeaderNumSizeInput" value="40" min="20" max="72" step="1"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>페이지 헤더 제목/부제 <span id="pageHeaderTitleSizeDisplay"
+                                    style="color:var(--accent-blue);">15px</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="range" id="pageHeaderTitleSizeSlider" class="spacing-slider" min="8"
+                                    max="28" step="0.5" value="15" style="flex:1;">
+                                <input type="number" id="pageHeaderTitleSizeInput" value="15" min="8" max="28"
+                                    step="0.5"
+                                    style="width:60px; text-align:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:var(--text-main); padding:4px 6px; font-size:13px;">
                             </div>
                         </div>
                     </div>
-                    <button id="resetHeadingSizes" class="btn-ghost full-width" style="margin-top:12px;">↺ 기본값으로 초기화</button>
+                    <button id="resetHeadingSizes" class="btn-ghost full-width" style="margin-top:12px;">↺ 기본값으로
+                        초기화</button>
                 </div>
 
                 <div class="sub-section">
@@ -260,7 +319,8 @@
                     <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">
                         빠른 설정 저장 및 불러오기 (최대 20개)
                     </p>
-                    <p style="color: var(--warning-color, #e8b339); font-size: 12px; margin-bottom: 15px; line-height: 1.5;">
+                    <p
+                        style="color: var(--warning-color, #e8b339); font-size: 12px; margin-bottom: 15px; line-height: 1.5;">
                         ⚠️ 프리셋은 브라우저 쿠키를 지울 경우 초기화되니 주의하세요!<br>백업을 위해 하단의 json 파일 내보내기를 권장합니다.
                     </p>
                     <div id="presetSlots" class="preset-slots">
@@ -270,7 +330,8 @@
 
                 <div class="sub-section">
                     <h3>DATA MANAGEMENT</h3>
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">현재 브라우저에 저장된 모든 데이터를 JSON 파일로 저장하거나 불러올 수 있습니다.</p>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">현재 브라우저에 저장된 모든 데이터를 JSON
+                        파일로 저장하거나 불러올 수 있습니다.</p>
                     <div class="control-grid" style="gap: 10px;">
                         <button id="exportData" class="btn-ghost full-width">
                             <span>📥 데이터 내보내기</span>
@@ -284,7 +345,8 @@
 
                 <div class="sub-section">
                     <h3>RESET</h3>
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">현재 작업 중인 내용을 모두 초기화합니다. 저장된 프리셋과 테마는 유지됩니다.</p>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">현재 작업 중인 내용을 모두 초기화합니다.
+                        저장된 프리셋과 테마는 유지됩니다.</p>
                     <button id="resetData" class="btn-reset full-width">
                         <span>🗑️ 현재 내용 초기화</span>
                     </button>
@@ -298,7 +360,8 @@
                     <h2>Introduction</h2>
                     <span class="deco-line"></span>
                 </div>
-                <div class="control-row">
+                <div class="sub-section">
+                    <h3>ACTIVATION</h3>
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="enableTopSection">
                         <label for="enableTopSection">인트로 활성화</label>
@@ -321,7 +384,8 @@
                                 <label>배경 이미지 URL
                                     <span class="image-url-tooltip">
                                         <span class="tooltip-icon">?</span>
-                                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
+                                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를
+                                            삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
                                     </span>
                                 </label>
                                 <input type="text" id="coverImage" placeholder=" ">
@@ -339,24 +403,24 @@
                                 <div class="input-group">
                                     <label>Zoom <span id="coverZoomValue"
                                             style="color:var(--accent-blue);">100%</span></label>
-                                    <input type="range" id="coverZoom" class="spacing-slider" min="100" max="300" value="100"
-                                        style="width: 100%;">
+                                    <input type="range" id="coverZoom" class="spacing-slider" min="100" max="300"
+                                        value="100" style="width: 100%;">
                                 </div>
                                 <div class="input-group">
                                     <label>Focus X (좌우) <span id="coverFocusXValue"
                                             style="color:var(--accent-blue);">50%</span></label>
-                                    <input type="range" id="coverFocusX" class="spacing-slider" min="0" max="100" value="50"
-                                        style="width: 100%;">
+                                    <input type="range" id="coverFocusX" class="spacing-slider" min="0" max="100"
+                                        value="50" style="width: 100%;">
                                 </div>
                                 <div class="input-group">
                                     <label>Focus Y (상하) <span id="coverFocusYValue"
                                             style="color:var(--accent-blue);">28%</span></label>
-                                    <input type="range" id="coverFocusY" class="spacing-slider" min="0" max="100" value="28"
-                                        style="width: 100%;">
+                                    <input type="range" id="coverFocusY" class="spacing-slider" min="0" max="100"
+                                        value="28" style="width: 100%;">
                                 </div>
                             </div>
 
-                            <div class="input-group">
+                            <div class="input-group" id="coverArchiveNoGroup" style="margin-top: 18px;">
                                 <label>아카이브 번호</label>
                                 <input type="text" id="coverArchiveNo" placeholder=" " value="ARCHIVE NO.001">
                                 <span class="focus-border"></span>
@@ -404,8 +468,8 @@
                     </div>
 
                     <div class="sub-section">
+                        <h3>ADDITIONAL DESCRIPTION</h3>
                         <div class="input-group area-group">
-                            <label>부가 소개글 (Additional Description)</label>
                             <textarea id="introText" rows="4" placeholder="소개 내용을 입력하세요..."></textarea>
                         </div>
                     </div>
@@ -423,7 +487,8 @@
                             <label>YouTube URL
                                 <span class="image-url-tooltip">
                                     <span class="tooltip-icon">?</span>
-                                    <span class="tooltip-text">유튜브 영상 URL을 입력하세요. 다양한 형식의 링크를 자동으로 변환합니다. (예: https://www.youtube.com/watch?v=... 또는 https://youtu.be/...)</span>
+                                    <span class="tooltip-text">유튜브 영상 URL을 입력하세요. 다양한 형식의 링크를 자동으로 변환합니다. (예:
+                                        https://www.youtube.com/watch?v=... 또는 https://youtu.be/...)</span>
                                 </span>
                             </label>
                             <input type="text" id="soundtrackUrl" placeholder="https://www.youtube.com/watch?v=...">
@@ -449,17 +514,18 @@
                     <h2>Dialogue Pages</h2>
                     <span class="deco-line"></span>
                 </div>
-                <div class="control-grid" style="margin-bottom: 10px;">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="enablePageFold" checked>
-                        <label for="enablePageFold">페이지 접기</label>
+                <div class="sub-section">
+                    <h3>PAGE OPTIONS</h3>
+                    <div class="control-grid">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="enablePageFold" checked>
+                            <label for="enablePageFold">페이지 접기</label>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="showHeaderWhenFoldOff">
+                            <label for="showHeaderWhenFoldOff">접기 OFF일 때 헤더 표시</label>
+                        </div>
                     </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="showHeaderWhenFoldOff">
-                        <label for="showHeaderWhenFoldOff">접기 OFF일 때 헤더 표시</label>
-                    </div>
-                </div>
-                <div class="control-grid" style="margin-bottom: 15px;">
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="hidePageNumbers">
                         <label for="hidePageNumbers">페이지 헤더 번호 지우기</label>
@@ -480,7 +546,8 @@
                     </div>
                 </div>
 
-                <div class="control-grid" style="margin-bottom: 15px;">
+                <div class="sub-section">
+                    <h3>DIVIDER STYLE</h3>
                     <div class="input-group">
                         <label>구분선 [HR] 디자인</label>
                         <div class="select-wrapper">
@@ -495,10 +562,11 @@
                                 <option value="custom">직접 입력...</option>
                             </select>
                         </div>
-                        <input type="text" id="dividerCustomText" placeholder="직접 입력 (예: ── ✿ ──)" style="display:none; margin-top:8px;">
+                        <input type="text" id="dividerCustomText" placeholder="직접 입력 (예: ── ✿ ──)"
+                            style="display:none; margin-top:8px;">
                     </div>
                 </div>
-                <div class="control-grid" style="margin-bottom: 15px;">
+                <div class="control-grid" style="margin-top: 16px; margin-bottom: 15px;">
                     <button id="addSection" class="btn-ghost">
                         <span>+ NEW SECTION</span>
                     </button>
@@ -507,7 +575,7 @@
                     </button>
                 </div>
                 <div id="pagesList" class="cards-list"></div>
-                
+
                 <div id="totalStats">
                     <!-- 전체 통계가 여기 표시됩니다 -->
                 </div>
@@ -519,24 +587,28 @@
                     <h2>Comment Section</h2>
                     <span class="deco-line"></span>
                 </div>
-                
-                <div class="control-row">
+
+                <div class="sub-section">
+                    <h3>ACTIVATION</h3>
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="enableComment">
                         <label for="enableComment">코멘트 섹션 활성화</label>
                     </div>
                 </div>
 
-                <div id="commentContent" style="display: none; margin-top: 20px;">
-                    <div class="input-group">
-                        <label>작성자 닉네임 (BY)</label>
-                        <input type="text" id="commentNickname" placeholder="닉네임을 입력하세요...">
-                        <span class="focus-border"></span>
-                    </div>
+                <div id="commentContent" style="display: none;">
+                    <div class="sub-section">
+                        <h3>COMMENT CONTENT</h3>
+                        <div class="input-group">
+                            <label>작성자 닉네임 (BY)</label>
+                            <input type="text" id="commentNickname" placeholder="닉네임을 입력하세요...">
+                            <span class="focus-border"></span>
+                        </div>
 
-                    <div class="input-group area-group">
-                        <label>코멘트 내용</label>
-                        <textarea id="commentText" rows="10" placeholder="코멘트를 입력하세요..."></textarea>
+                        <div class="input-group area-group">
+                            <label>코멘트 내용</label>
+                            <textarea id="commentText" rows="10" placeholder="코멘트를 입력하세요..."></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -550,7 +622,7 @@
 
                 <div class="sub-section">
                     <h3>GLOBAL THEME</h3>
-                    
+
                     <div class="input-group">
                         <label>전역 테마</label>
                         <div class="select-wrapper">
@@ -593,88 +665,87 @@
 
                 <div class="sub-section">
                     <h3>CUSTOM THEME EDITOR</h3>
-                    
-                </div>
 
-                <div id="customThemeInputs" class="theme-color-grid">
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">배경색</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customBg" value="#ececed">
-                            <input type="text" id="customBgText" class="theme-hex-input" value="#ececed"
-                                placeholder="#000000">
+                    <div id="customThemeInputs" class="theme-color-grid">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">배경색</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customBg" value="#ececed">
+                                <input type="text" id="customBgText" class="theme-hex-input" value="#ececed"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">기본 텍스트</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customText" value="#555555">
-                            <input type="text" id="customTextText" class="theme-hex-input" value="#555555"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">기본 텍스트</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customText" value="#555555">
+                                <input type="text" id="customTextText" class="theme-hex-input" value="#555555"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">이탤릭</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customEm" value="#666666">
-                            <input type="text" id="customEmText" class="theme-hex-input" value="#666666"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">이탤릭</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customEm" value="#666666">
+                                <input type="text" id="customEmText" class="theme-hex-input" value="#666666"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">헤더 (제목/라인)</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customHeader" value="#333333">
-                            <input type="text" id="customHeaderText" class="theme-hex-input" value="#333333"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">헤더 (제목/라인)</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customHeader" value="#333333">
+                                <input type="text" id="customHeaderText" class="theme-hex-input" value="#333333"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">생각 배경</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customQuote1Bg" value="#e0e0e0">
-                            <input type="text" id="customQuote1BgText" class="theme-hex-input" value="#e0e0e0"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">생각 배경</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customQuote1Bg" value="#e0e0e0">
+                                <input type="text" id="customQuote1BgText" class="theme-hex-input" value="#e0e0e0"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">생각 텍스트</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customQuote1Text" value="#444444">
-                            <input type="text" id="customQuote1TextText" class="theme-hex-input" value="#444444"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">생각 텍스트</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customQuote1Text" value="#444444">
+                                <input type="text" id="customQuote1TextText" class="theme-hex-input" value="#444444"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">대사 배경</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customQuote2Bg" value="#dcdcdc">
-                            <input type="text" id="customQuote2BgText" class="theme-hex-input" value="#dcdcdc"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">대사 배경</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customQuote2Bg" value="#dcdcdc">
+                                <input type="text" id="customQuote2BgText" class="theme-hex-input" value="#dcdcdc"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">대사 텍스트</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customQuote2Text" value="#222222">
-                            <input type="text" id="customQuote2TextText" class="theme-hex-input" value="#222222"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">대사 텍스트</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customQuote2Text" value="#222222">
+                                <input type="text" id="customQuote2TextText" class="theme-hex-input" value="#222222"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">부제목/인물 태그</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customTagText" value="#6c8da8">
-                            <input type="text" id="customTagTextText" class="theme-hex-input" value="#6c8da8"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">부제목/인물 태그</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customTagText" value="#6c8da8">
+                                <input type="text" id="customTagTextText" class="theme-hex-input" value="#6c8da8"
+                                    placeholder="#000000">
+                            </div>
                         </div>
-                    </div>
-                    <div class="theme-color-item">
-                        <label class="theme-color-label">구분선</label>
-                        <div class="theme-color-input-wrapper">
-                            <input type="color" id="customDivider" value="#c8d6e0">
-                            <input type="text" id="customDividerText" class="theme-hex-input" value="#c8d6e0"
-                                placeholder="#000000">
+                        <div class="theme-color-item">
+                            <label class="theme-color-label">구분선</label>
+                            <div class="theme-color-input-wrapper">
+                                <input type="color" id="customDivider" value="#c8d6e0">
+                                <input type="text" id="customDividerText" class="theme-hex-input" value="#c8d6e0"
+                                    placeholder="#000000">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -748,11 +819,15 @@
                     <button id="insertImage" class="btn-tool">이미지 (IMG)</button>
                     <span class="image-url-tooltip" style="margin-left: 5px;">
                         <span class="tooltip-icon">?</span>
-                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 삽입된 이미지는 자동으로 Pages 탭의 '이미지 기본 너비' 값을 따릅니다. 개별 이미지 크기를 조정하려면 [IMG:URL:크기] 형식으로 직접 편집하세요 (예: [IMG:주소:70] → 70% 크기).</span>
+                        <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 삽입된 이미지는 자동으로 Pages 탭의 '이미지 기본
+                            너비'
+                            값을 따릅니다. 개별 이미지 크기를 조정하려면 [IMG:URL:크기] 형식으로 직접 편집하세요 (예: [IMG:주소:70] → 70% 크기).</span>
                     </span>
                 </div>
 
-                <textarea id="pageContent" class="editor-textarea" placeholder="내용을 입력하세요...&#10;- &quot;텍스트&quot;: 대사 처리&#10;- '텍스트': 생각 처리&#10;- *텍스트*: 이탤릭체 (기울임)&#10;- **텍스트**: 볼드체 (굵게)&#10;- [FN:텍스트]각주 내용[/FN]: 주석&#10;- [IMG:URL] 또는 [IMG:URL:크기]: 이미지 삽입&#10;- #, ##, ###, ####: 마크다운 헤딩" rows="20"></textarea>
+                <textarea id="pageContent" class="editor-textarea"
+                    placeholder="내용을 입력하세요...&#10;- &quot;텍스트&quot;: 대사 처리&#10;- '텍스트': 생각 처리&#10;- *텍스트*: 이탤릭체 (기울임)&#10;- **텍스트**: 볼드체 (굵게)&#10;- [FN:텍스트]각주 내용[/FN]: 주석&#10;- [IMG:URL] 또는 [IMG:URL:크기]: 이미지 삽입&#10;- #, ##, ###, ####: 마크다운 헤딩"
+                    rows="20"></textarea>
 
                 <div id="pageStats">
                     <!-- 페이지 통계가 여기 표시됩니다 -->
@@ -800,15 +875,15 @@
                     <label>이미지 URL
                         <span class="image-url-tooltip">
                             <span class="tooltip-icon">?</span>
-                            <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후 '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
+                            <span class="tooltip-text">//ac.namu.la/~ 형식의 링크 사용을 권장합니다. 아카라이브 글쓰기에서 원하는 이미지를 삽입한 후
+                                '코드보기'에서 확인할 수 있는 부분을 붙여넣기 해주세요.</span>
                         </span>
                     </label>
                     <input type="text" id="sectionImage" placeholder=" ">
                 </div>
 
                 <div class="input-group">
-                    <label>Zoom <span id="sectionZoomValue"
-                            style="color:var(--accent-blue);">100%</span></label>
+                    <label>Zoom <span id="sectionZoomValue" style="color:var(--accent-blue);">100%</span></label>
                     <input type="range" id="sectionZoom" class="spacing-slider" min="100" max="300" value="100"
                         style="width: 100%;">
                 </div>
@@ -852,22 +927,27 @@
                             Generator Pro 1.1</a>
                         <a href="https://arca.live/b/characterai/157048976" target="_blank" class="credit-link">Log
                             Studio</a>
-                        <a href="https://arca.live/b/characterai/159949150" target="_blank" class="credit-link">Logs of Glenna</a>   
-                        <a href="https://arca.live/b/characterai/161701867" target="_blank" class="credit-link">소개글 좆간지나게 작성하는 법</a> 
+                        <a href="https://arca.live/b/characterai/159949150" target="_blank" class="credit-link">Logs
+                            of
+                            Glenna</a>
+                        <a href="https://arca.live/b/characterai/161701867" target="_blank" class="credit-link">소개글
+                            좆간지나게 작성하는 법</a>
                     </div>
 
                     <div class="credit-item">
                         <span class="credit-role">ASSETS</span>
-                        
+
                         <a href="https://pixabay.com/ko/sound-effects/%ec%9e%90%ec%97%b0-rain-sound-and-forest-and-nature-sounds-18259/"
                             target="_blank" class="credit-link">Pixabay: Rain Sound and Forest and Nature Sounds</a>
-                        <a href="https://arca.live/b/characterai/154605913" target="_blank" class="credit-link">4.5F) 얼헌 애니 스샷 그림체 공유</a>
-                        
+                        <a href="https://arca.live/b/characterai/154605913" target="_blank" class="credit-link">4.5F) 얼헌
+                            애니 스샷 그림체 공유</a>
+
                     </div>
 
                     <div class="credit-item">
                         <span class="credit-role">SPECIAL THANKS</span>
-                        <span class="credit-text"><a href="https://arca.live/b/characterai" target="_blank" class="credit-link">아카라이브 AI 채팅 채널</a></span>
+                        <span class="credit-text"><a href="https://arca.live/b/characterai" target="_blank"
+                                class="credit-link">아카라이브 AI 채팅 채널</a></span>
                     </div>
                 </div>
             </div>
@@ -875,7 +955,7 @@
     </div>
 
     <div id="notification" class="notification"></div>
-    
+
     <script>
         // 크레딧 모달 제어
         const creditModal = document.getElementById('creditModal');
