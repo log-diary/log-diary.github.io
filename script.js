@@ -3043,7 +3043,7 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
 
 function createCreditFooter() {
     // 컨테이너 바깥에 독립적으로 표시되는 크레딧
-    return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: clamp(5px, 1vw, 10px) auto 0;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
+    return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: clamp(10px, 2vw, 15px) auto 0;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
 }
 
 function createCommentSection(commentText, commentNickname, themeStyle) {
@@ -4590,11 +4590,7 @@ function generateHTML(isPreview) {
         html += '</div>';
     }
 
-if (pages.length > 0) {
-        html += '<br>';
-    }
-    
-    // 코멘트 섹션 추가
+// 코멘트 섹션 추가
     const enableComment = document.getElementById('enableComment').checked;
     if (enableComment) {
         const commentText = document.getElementById('commentText').value;
@@ -4602,6 +4598,9 @@ if (pages.length > 0) {
         const commentTheme = globalTheme;
 
         if (commentText && commentText.trim()) {
+            if (pages.length > 0) {
+                html += '<br>';
+            }
             const theme = getTheme(commentTheme);
             html += createCommentSection(commentText, commentNickname, theme);
         }
