@@ -622,6 +622,8 @@ function loadFromStorage() {
 
             if (useRoundedQuotes) useRoundedQuotes.checked = data.useRoundedQuotes || false;
             if (useTextIndent) useTextIndent.checked = data.useTextIndent || false;
+            const preserveLineBreaks = document.getElementById('preserveLineBreaks');
+            if (preserveLineBreaks) preserveLineBreaks.checked = data.preserveLineBreaks || false;
             if (enableTopSection) enableTopSection.checked = data.enableTopSection || false;
 
             // 표지 관련 설정 로드
@@ -904,6 +906,8 @@ function loadDefaultSettings() {
     const useTextIndent = document.getElementById('useTextIndent');
     if (useRoundedQuotes) useRoundedQuotes.checked = true;
     if (useTextIndent) useTextIndent.checked = false;
+    const preserveLineBreaks = document.getElementById('preserveLineBreaks');
+    if (preserveLineBreaks) preserveLineBreaks.checked = false;
 
     // 인트로 섹션 활성화
     const enableTopSection = document.getElementById('enableTopSection');
@@ -1112,6 +1116,7 @@ function saveToStorage() {
         const data = {
             useRoundedQuotes: getChecked('useRoundedQuotes'),
             useTextIndent: getChecked('useTextIndent'),
+            preserveLineBreaks: getChecked('preserveLineBreaks'),
             enableTopSection: getChecked('enableTopSection'),
             enableCover: getChecked('enableCover'),
             coverImage: getValue('coverImage'),
@@ -1317,7 +1322,7 @@ function setupEventListeners() {
         });
     }
 
-    const checkboxIds = ['useRoundedQuotes', 'useTextIndent', 'enableTopSection', 'enableProfiles', 'enableTags', 'enableCover', 'enableComment'];
+    const checkboxIds = ['useRoundedQuotes', 'useTextIndent', 'preserveLineBreaks', 'enableTopSection', 'enableProfiles', 'enableTags', 'enableCover', 'enableComment'];
     checkboxIds.forEach(function (id) {
         const el = document.getElementById(id);
         if (el) {
@@ -2010,7 +2015,7 @@ function resetCurrentData() {
 
     // ── 체크박스 초기화 ──
     const checkboxIds = [
-        'useRoundedQuotes', 'useTextIndent', 'enableTopSection',
+        'useRoundedQuotes', 'useTextIndent', 'preserveLineBreaks', 'enableTopSection',
         'enableCover', 'coverAutoFit', 'enableProfiles',
         'enableTags', 'enableComment', 'hidePageNumbers'
     ];
@@ -2105,6 +2110,7 @@ function exportDataToJSON() {
         const data = {
             useRoundedQuotes: document.getElementById('useRoundedQuotes').checked,
             useTextIndent: document.getElementById('useTextIndent').checked,
+            preserveLineBreaks: document.getElementById('preserveLineBreaks').checked,
             enableTopSection: document.getElementById('enableTopSection').checked,
             enableCover: document.getElementById('enableCover').checked,
             coverImage: document.getElementById('coverImage').value,
@@ -2211,6 +2217,7 @@ function importDataFromJSON(file) {
             // 데이터 복원
             if (data.useRoundedQuotes !== undefined) document.getElementById('useRoundedQuotes').checked = data.useRoundedQuotes;
             if (data.useTextIndent !== undefined) document.getElementById('useTextIndent').checked = data.useTextIndent;
+            if (data.preserveLineBreaks !== undefined) document.getElementById('preserveLineBreaks').checked = data.preserveLineBreaks;
             if (data.enableTopSection !== undefined) {
                 document.getElementById('enableTopSection').checked = data.enableTopSection;
                 document.getElementById('topSectionContent').style.display = data.enableTopSection ? 'block' : 'none';
@@ -2687,10 +2694,16 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
 
     const lines = processedText.split('\n');
     let html = '';
+    const preserveLineBreaks = document.getElementById('preserveLineBreaks') && document.getElementById('preserveLineBreaks').checked;
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
-        if (!line.trim()) continue;
+        if (!line.trim()) {
+            if (preserveLineBreaks) {
+                html += '<p style="margin: 0; line-height: ' + lineHeight + '; font-size: ' + fontSize + ';">&nbsp;</p>';
+            }
+            continue;
+        }
 
         if (line.includes('[IMG:')) {
             const imgMatch = line.match(/\[IMG:([^\]]+)\]/);
