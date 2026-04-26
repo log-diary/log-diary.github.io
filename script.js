@@ -4635,6 +4635,10 @@ function generateHTML(isPreview) {
 
         if (commentText && commentText.trim()) {
             const theme = getTheme(commentTheme);
+            // 앞에 페이지/섹션이 있을 때 코멘트 앞에 줄바꿈 추가
+            if (pages.length > 0) {
+                html += '<br>';
+            }
             html += createCommentSection(commentText, commentNickname, theme);
         }
     }
