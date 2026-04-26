@@ -1475,6 +1475,11 @@ function setupEventListeners() {
         deleteSection.addEventListener('click', deleteSectionData);
     }
 
+    const deleteAllPagesBtn = document.getElementById('deleteAllPages');
+    if (deleteAllPagesBtn) {
+        deleteAllPagesBtn.addEventListener('click', deleteAllPages);
+    }
+
     // 페이지 컨텐츠 입력 시 실시간 통계 업데이트
     const pageContent = document.getElementById('pageContent');
     if (pageContent) {
@@ -2488,9 +2493,9 @@ function parseText(text, themeStyle, skipIndent, reduceParagraphSpacing, imageWi
     const paragraphMargin = '0 0 ' + paragraphSpacing + ' 0';
     const pStyle = 'margin: ' + paragraphMargin + '; color: ' + themeStyle.text + '; line-height: ' + lineHeight + '; letter-spacing: ' + letterSpacing + '; font-size: ' + fontSize + ';' + textIndentStyle;
     const emStyle = 'font-style: italic; color: ' + themeStyle.em + ';';
-    const q1Style = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0.05em 0.25em; border-radius: 2px;';
-    const q1StyleNested = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0.05em 0.1em; border-radius: 2px;'; // 큰따옴표 안의 작은따옴표용
-    const q2Style = 'background-color: ' + themeStyle.quote2Bg + '; color: ' + themeStyle.quote2Text + '; font-weight: 600; padding: 0.05em 0.25em; border-radius: 2px;';
+    const q1Style = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0.05em 0.25em; border-radius: 2px; vertical-align: baseline; line-height: inherit;';
+    const q1StyleNested = 'background-color: ' + themeStyle.quote1Bg + '; color: ' + themeStyle.quote1Text + '; padding: 0.05em 0.1em; border-radius: 2px; vertical-align: baseline; line-height: inherit;'; // 큰따옴표 안의 작은따옴표용
+    const q2Style = 'background-color: ' + themeStyle.quote2Bg + '; color: ' + themeStyle.quote2Text + '; font-weight: 600; padding: 0.05em 0.25em; border-radius: 2px; vertical-align: baseline; line-height: inherit;';
     const footnoteStyle = 'font-size: 11px; color: ' + themeStyle.tagText + '; margin: -8px 0 10px 0; line-height: 1.4;';
 
     let detailsBlocks = [];
@@ -2993,7 +2998,8 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         headerHtml += '</div>';
         headerHtml += '<div style="flex: 1 1 0; min-width: 0;">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            const titleMargin = pageSubtitle ? ' margin-bottom: 4px;' : '';
+            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + ';' + titleMargin + ' font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
             headerHtml += '<div style="font-size: ' + pxToClamp(Math.round(headingFontSizes.pageHeaderTitle * 0.8)) + '; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
@@ -3004,7 +3010,8 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         // 번호 숨김이지만 제목이나 부제목이 있는 경우 - 좌측 정렬
         headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
         if (pageTitle) {
-            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            const titleMarginNoNum = pageSubtitle ? ' margin-bottom: 4px;' : '';
+            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + ';' + titleMarginNoNum + ' font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
         }
         if (pageSubtitle) {
             headerHtml += '<div style="font-size: ' + pxToClamp(Math.round(headingFontSizes.pageHeaderTitle * 0.8)) + '; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
@@ -3043,7 +3050,7 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
 
 function createCreditFooter() {
     // 컨테이너 바깥에 독립적으로 표시되는 크레딧
-    return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: clamp(10px, 2vw, 15px) auto 0;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
+    return '<div style="text-align: center; padding: clamp(15px, 3vw, 20px) 0; font-size: clamp(9px, 1.5vw, 10px); color: #999999; max-width: 900px; margin: clamp(5px, 1vw, 10px) auto 0;">Template by <a href="https://arca.live/b/characterai/161701867" style="color: #999999; text-decoration: none;">Log Diary</a></div>';
 }
 
 function createCommentSection(commentText, commentNickname, themeStyle) {
@@ -3790,6 +3797,21 @@ function deletePageData() {
     }
 }
 
+// 전체 페이지 삭제 함수 (섹션 포함)
+function deleteAllPages() {
+    if (pages.length === 0) {
+        showNotification('삭제할 페이지가 없습니다.');
+        return;
+    }
+    if (confirm('모든 섹션과 페이지를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+        pages = [];
+        updatePagesList();
+        updatePreview();
+        saveToStorage();
+        showNotification('모든 섹션과 페이지가 삭제되었습니다.');
+    }
+}
+
 function movePageUp(index) {
     if (index > 0) {
         const temp = pages[index];
@@ -4157,12 +4179,12 @@ function generateHTML(isPreview) {
                     }
 
                     if (coverTitle) {
-                        const titleMargin = coverSubtitle ? '0 0 8px 0' : '0 0 10px 0';
+                        const titleMargin = coverSubtitle ? '0 0 0px 0' : '0 0 10px 0';
                         topContent += '<h1 style="font-size:' + pxToClamp(headingFontSizes.coverTitle) + ';color:rgba(255, 255, 255, 1.0);margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.0;text-shadow:0 4px 15px rgba(0,0,0,0.6);word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:0 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:rgba(255, 255, 255, 0.9);margin:5px 0 10px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;text-shadow:0 1px 3px rgba(0,0,0,0.8);">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4194,12 +4216,12 @@ function generateHTML(isPreview) {
                     }
 
                     if (coverTitle) {
-                        const titleMargin = coverSubtitle ? '0 0 8px 0' : '0 0 15px 0';
+                        const titleMargin = coverSubtitle ? '0 0 5px 0' : '0 0 15px 0';
                         topContent += '<h1 style="font-size:' + pxToClamp(headingFontSizes.coverTitle) + ';color:' + theme.header + ';margin:' + titleMargin + ';font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';font-weight:700;line-height:1.1;word-break:keep-all;">' + coverTitle + '</h1>';
                     }
 
                     if (coverSubtitle) {
-                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:' + theme.text + ';margin:0 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
+                        topContent += '<div style="font-size:' + pxToClamp(headingFontSizes.coverSubtitle) + ';letter-spacing:-0.5px;color:' + theme.text + ';margin:5px 0 15px 0;font-family:\'' + fontFamily + '\', ' + getFontFallback(fontFamily) + ';max-width:90%;">' + coverSubtitle + '</div>';
                     }
 
                     // 태그를 표지에 표시
@@ -4590,7 +4612,8 @@ function generateHTML(isPreview) {
         html += '</div>';
     }
 
-// 코멘트 섹션 추가
+
+    // 코멘트 섹션 추가
     const enableComment = document.getElementById('enableComment').checked;
     if (enableComment) {
         const commentText = document.getElementById('commentText').value;
@@ -4598,9 +4621,6 @@ function generateHTML(isPreview) {
         const commentTheme = globalTheme;
 
         if (commentText && commentText.trim()) {
-            if (pages.length > 0) {
-                html += '<br>';
-            }
             const theme = getTheme(commentTheme);
             html += createCommentSection(commentText, commentNickname, theme);
         }
