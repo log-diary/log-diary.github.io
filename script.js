@@ -3004,12 +3004,12 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
 
     // hidePageNumbers가 true면 번호를 표시하지 않음
     if (pageNum && !hidePageNumbers) {
-        // Layout with number
-        headerHtml += '<div style="display: flex; align-items: center; width: 100%; padding: clamp(15px, 3vw, 20px) 0;">';
-        headerHtml += '<div style="flex: 0 0 auto; padding-left: clamp(30px, 5vw, 50px); padding-right: clamp(20px, 3vw, 30px); white-space: nowrap;">';
+        // Layout with number - display:table로 flex 대체 (아카라이브 등 환경 호환)
+        headerHtml += '<div style="display: table; width: 100%; padding: clamp(15px, 3vw, 20px) 0;">';
+        headerHtml += '<div style="display: table-cell; vertical-align: middle; width: 1%; white-space: nowrap; padding-left: clamp(30px, 5vw, 50px); padding-right: clamp(20px, 3vw, 30px);">';
         headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderNum) + '; font-weight: 700; color: ' + numberColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1; white-space: nowrap;">' + pageNum.replace('#', '') + '</div>';
         headerHtml += '</div>';
-        headerHtml += '<div style="flex: 1 1 0; min-width: 0;">';
+        headerHtml += '<div style="display: table-cell; vertical-align: middle;">';
         if (pageTitle) {
             const titleMargin = pageSubtitle ? ' margin-bottom: 4px;' : '';
             headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + ';' + titleMargin + ' font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
@@ -3020,16 +3020,26 @@ function createHeader(text, themeStyle, headerImage, headerFocusX, headerFocusY)
         headerHtml += '</div>';
         headerHtml += '</div>';
     } else if (hidePageNumbers && (pageTitle || pageSubtitle)) {
-        // 번호 숨김이지만 제목이나 부제목이 있는 경우 - 좌측 정렬
-        headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
-        if (pageTitle) {
-            const titleMarginNoNum = pageSubtitle ? ' margin-bottom: 4px;' : '';
-            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + ';' + titleMarginNoNum + ' font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+        // 번호 숨김이지만 제목이나 부제목이 있는 경우
+        if (pageTitle && !pageSubtitle) {
+            // 제목만 있고 부제목 없음 - display:table로 세로 중앙정렬
+            const headerHeight = 'clamp(60px, 10vw, 80px)';
+            headerHtml += '<div style="display: table; width: 100%; height: ' + headerHeight + ';">';
+            headerHtml += '<div style="display: table-cell; vertical-align: middle; padding-left: clamp(30px, 5vw, 50px); padding-right: clamp(30px, 5vw, 50px);">';
+            headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            headerHtml += '</div>';
+            headerHtml += '</div>';
+        } else {
+            // 제목 + 부제목 둘 다 있는 경우 - 기존 방식 유지
+            headerHtml += '<div style="padding: clamp(15px, 3vw, 20px) clamp(30px, 5vw, 50px);">';
+            if (pageTitle) {
+                headerHtml += '<div style="font-size: ' + pxToClamp(headingFontSizes.pageHeaderTitle) + '; font-weight: 700; color: ' + titleColor + '; margin-bottom: 4px; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.3;">' + pageTitle + '</div>';
+            }
+            if (pageSubtitle) {
+                headerHtml += '<div style="font-size: ' + pxToClamp(Math.round(headingFontSizes.pageHeaderTitle * 0.8)) + '; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
+            }
+            headerHtml += '</div>';
         }
-        if (pageSubtitle) {
-            headerHtml += '<div style="font-size: ' + pxToClamp(Math.round(headingFontSizes.pageHeaderTitle * 0.8)) + '; color: ' + subtitleColor + '; font-family: \'' + fontFamily + '\', ' + getFontFallback(fontFamily) + '; line-height: 1.4;">' + pageSubtitle + '</div>';
-        }
-        headerHtml += '</div>';
     } else if (hidePageNumbers && pageNum) {
         // 번호 숨김이고 제목/부제목이 없는 경우 - "Page n" 표시 (좌측 정렬)
         const pageNumber = pageNum.replace('#', '');
