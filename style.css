@@ -419,6 +419,11 @@ body {
     margin-bottom: 0;
 }
 
+/* sub-section 안 control-row는 다음 input-group과 간격 확보 */
+.sub-section .control-row {
+    margin-bottom: 12px;
+}
+
 /* 최상위 체크박스 영역 */
 .control-row {
     margin-bottom: 8px;
@@ -572,6 +577,14 @@ select {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+}
+
+/* 체크박스만 있는 control-grid는 세로 방향으로 먼저 채워서 균등 배치 */
+.control-grid:has(> .checkbox-wrapper) {
+    grid-auto-flow: column;
+    grid-template-rows: repeat(2, auto);
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
 }
 
 /* 버튼 스타일 */
@@ -2320,10 +2333,22 @@ body.light-mode .btn-save-new-preset {
         margin-bottom: 12px;
     }
 
+    /* sub-section 내부 첫 번째 h3는 상단 여백 없음 */
+    .sub-section > h3:first-child {
+        margin-top: 0;
+    }
+
     /* 그리드 레이아웃 - 모바일에서 1열로 */
     .control-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+
+    /* 모바일에서 체크박스 그리드도 1열로 리셋 */
+    .control-grid:has(> .checkbox-wrapper) {
+        grid-auto-flow: row;
+        grid-template-rows: unset;
+        grid-template-columns: 1fr;
     }
 
     .input-group {
